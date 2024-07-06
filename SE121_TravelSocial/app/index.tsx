@@ -1,63 +1,63 @@
-import {StyleSheet} from 'react-native'
-import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import HomeScreen from "@/screen/HomeScreen";
-import TicketScreen from "@/screen/TicketScreen";
-import CollectionScreen from "@/screen/CollectionScreen";
-import ProfileScreen from "@/screen/ProfileScreen";
-import { AntDesign } from "@expo/vector-icons";
+import {View, Text} from 'react-native'
+import { NavigationContainer } from '@react-navigation/native'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
-const Tab = createBottomTabNavigator()
+import WelcomeScreen1 from '@/screen/Welcome/WelcomeScreen1'
+import WelcomeScreen2 from '@/screen/Welcome/WelcomeScreen2'
+import WelcomeScreen3 from '@/screen/Welcome/WelcomeScreen3'
+import LoginScreen from '@/screen/Welcome/LoginScreen'
+import RegisterScreen from '@/screen/Welcome/RegisterScreen'
+import MainScreen from '@/screen/MainScreen'
+
+const Stack = createNativeStackNavigator()
 
 export default function App() {
   return (
     <NavigationContainer independent={true}>
-      <Tab.Navigator 
-      screenOptions={{
-        tabBarStyle: styles.container,
-        tabBarItemStyle: styles.itemStyle,
-      }}>
-        <Tab.Screen 
-        name="Home" 
-        component={HomeScreen}
-        options={{tabBarIcon: ({focused}) => <AntDesign name = "home" size={22}/>}}/>
+      <Stack.Navigator
+      initialRouteName='WelcomeScreen1'>
+        <Stack.Screen 
+        name = "welcome1" 
+        component={WelcomeScreen1}
+        options={{
+          headerShown: false
+        }}/>
 
-        <Tab.Screen 
-        name="Ticket" 
-        component={TicketScreen}
-        options={{tabBarIcon: ({focused}) => <AntDesign name = "home" size={22}/>}}/>
+        <Stack.Screen 
+        name = "welcome2" 
+        component={WelcomeScreen2}
+        options={{
+          headerShown: false
+        }}/>
 
-        <Tab.Screen 
-        name="Collection" 
-        component={CollectionScreen}
-        options={{tabBarIcon: ({focused}) => <AntDesign name = "home" size={22}/>}}/>
+        <Stack.Screen 
+        name = "welcome3" 
+        component={WelcomeScreen3}
+        options={{
+          headerShown: false
+        }}/>
 
-        <Tab.Screen 
-        name="Profile" 
-        component={ProfileScreen}
-        options={{tabBarIcon: ({focused}) => <AntDesign name = "profile" size={22}/>}}/>
-      </Tab.Navigator>
+        <Stack.Screen 
+        name = "login" 
+        component={LoginScreen}
+        options={{
+          headerShown: false
+        }}/>
+
+        <Stack.Screen 
+        name = "register" 
+        component={RegisterScreen}
+        options={{
+          headerShown: false
+        }}/>
+
+        <Stack.Screen 
+        name = "main-screen"
+        component={MainScreen}
+        options={{
+          headerShown: false
+        }}/>
+      </Stack.Navigator>
     </NavigationContainer>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    position: "absolute",
-    height: "10%",
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
-    shadowColor: "#000",
-  shadowOffset: {
-    width: 0,
-    height: 12,
-  },
-  shadowOpacity: 0.7,
-  shadowRadius: 16,
-  elevation: 24,
-  },
-
-  itemStyle: {
-    marginBottom: 5
-  }
-})
