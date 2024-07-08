@@ -13,7 +13,7 @@ export default function App() {
   return (
     <NavigationContainer independent={true}>
       <Stack.Navigator
-      initialRouteName='WelcomeScreen1'>
+      initialRouteName='register'>
         <Stack.Screen 
         name = "welcome1" 
         component={WelcomeScreen1}
