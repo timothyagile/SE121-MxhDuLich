@@ -1,95 +1,47 @@
-import {StyleSheet, Image} from 'react-native'
-import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import HomeScreen from "@/screen/HomeScreen";
-import TicketScreen from "@/screen/TicketScreen";
-import CollectionScreen from "@/screen/CollectionScreen";
-import ProfileScreen from "@/screen/ProfileScreen";
-import { AntDesign } from "@expo/vector-icons";
-import React from 'react';
+import {View, Text} from 'react-native'
+import { NavigationContainer } from '@react-navigation/native'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
-const Tab = createBottomTabNavigator()
+import WelcomeScreen1 from '@/screen/Welcome/WelcomeScreen1'
+import LoginScreen from '@/screen/Welcome/LoginScreen'
+import RegisterScreen from '@/screen/Welcome/RegisterScreen'
+import MainScreen from '@/screen/MainScreen'
+
+const Stack = createNativeStackNavigator()
 
 export default function App() {
   return (
     <NavigationContainer independent={true}>
-      <Tab.Navigator 
-      screenOptions={{
-        tabBarStyle: styles.container,
-        tabBarItemStyle: styles.itemStyle,
-      }}>
-        <Tab.Screen 
-        name="Home" 
-        component={HomeScreen}
-        options={{ 
-          tabBarIcon: ({ focused }) => (
-            <Image 
-              source={require('../assets/icons/iconoir_home-simple.png')} 
-              style={{ tintColor: focused ? "blue" : "gray", width: 22, height: 22 }} 
-            />
-          )
-        }}
-      />
+      <Stack.Navigator
+      initialRouteName='WelcomeScreen1'>
+        <Stack.Screen 
+        name = "welcome1" 
+        component={WelcomeScreen1}
+        options={{
+          headerShown: false
+        }}/>
 
-        <Tab.Screen 
-        name="Ticket" 
-        component={TicketScreen}
-        options={{ 
-          tabBarIcon: ({ focused }) => (
-            <Image 
-              source={require('../assets/icons/mingcute_ticket-line.png')} 
-              style={{ tintColor: focused ? "blue" : "gray", width: 22, height: 22 }} 
-            />
-          )
-        }}
-      />
-        <Tab.Screen 
-        name="Collection" 
-        component={CollectionScreen}
-        options={{ 
-          tabBarIcon: ({ focused }) => (
-            <Image 
-              source={require('../assets/icons/collection.png')} 
-              style={{ tintColor: focused ? "blue" : "gray", width: 22, height: 22 }} 
-            />
-          )
-        }}
-      />
+        <Stack.Screen 
+        name = "login" 
+        component={LoginScreen}
+        options={{
+          headerShown: false
+        }}/>
 
-        <Tab.Screen 
-        name="Profile" 
-        component={ProfileScreen}
-        options={{ 
-          tabBarIcon: ({ focused }) => (
-            <Image 
-              source={require('../assets/icons/Profile.png')} 
-              style={{ tintColor: focused ? "blue" : "gray", width: 22, height: 22 }} 
-            />
-          )
-        }}
-      />      
-      </Tab.Navigator>
+        <Stack.Screen 
+        name = "register" 
+        component={RegisterScreen}
+        options={{
+          headerShown: false
+        }}/>
+
+        <Stack.Screen 
+        name = "main-screen"
+        component={MainScreen}
+        options={{
+          headerShown: false
+        }}/>
+      </Stack.Navigator>
     </NavigationContainer>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    position: "absolute",
-    height: "10%",
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
-    shadowColor: "#000",
-  shadowOffset: {
-    width: 0,
-    height: 12,
-  },
-  shadowOpacity: 0.7,
-  shadowRadius: 16,
-  elevation: 24,
-  },
-
-  itemStyle: {
-    marginBottom: 5
-  }
-})
