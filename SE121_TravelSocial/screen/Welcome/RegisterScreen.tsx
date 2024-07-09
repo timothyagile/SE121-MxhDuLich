@@ -1,3 +1,4 @@
+import React from 'react';
 import {Button, Text, View,  StyleSheet, Image, TouchableOpacity} from 'react-native';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 
@@ -27,7 +28,7 @@ export default function RegisterScreen ({navigation}: {navigation: NativeStackNa
 
             <TouchableOpacity
                 style={styles.signupButton}
-                onPress={() => navigation.navigate('login')}
+                onPress={() => navigation.navigate('register2')}
             >
                 <Text style={styles.signupButtonText}>Sign up</Text>
             </TouchableOpacity>
