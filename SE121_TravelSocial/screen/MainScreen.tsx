@@ -51,7 +51,9 @@ export default function MainScreen() {
               source={require('../assets/icons/collection.png')} 
               style={{ tintColor: focused ? "blue" : "gray", width: 22, height: 22 }} 
             />
-          )
+          ),
+          //tabBarLabel: () => null,
+          headerShown: false,
         }}
       />
         <Tab.Screen 
