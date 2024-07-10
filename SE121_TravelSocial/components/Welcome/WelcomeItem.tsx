@@ -1,3 +1,4 @@
+import React from 'react'
 import {View, StyleSheet, Image, useWindowDimensions} from 'react-native'
 
 interface props {
