@@ -5,6 +5,7 @@ import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/n
 
 import WelcomeItem from '@/components/Welcome/WelcomeItem';
 import welcomeSlides from '@/constants/welcome-slides';
+import React from 'react';
 
 
 export default function WelcomeScreen1 ({navigation}: {navigation: NativeStackNavigatorProps}) {

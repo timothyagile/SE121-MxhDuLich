@@ -81,7 +81,7 @@ export default function LoginScreen ({navigation}: {navigation: NativeStackNavig
 
             <TouchableOpacity
                 style={styles.signupButton}
-                onPress={() => navigation.navigate('login')}
+                onPress={() => navigation.navigate('main-screen')}
             >
                 <Text style={styles.signupButtonText}>Login</Text>
             </TouchableOpacity>
