@@ -45,72 +45,93 @@ export default function WelcomeScreen1 ({navigation}: {navigation: NativeStackNa
             backgroundColor: 'black'
         }}>
             <StatusBar 
-            barStyle={'light-content'}
-            backgroundColor={'black'}/>
-              <FlatList
-              ref={ref}
-              onMomentumScrollEnd={updateCurrentSlideIndex}
-              style = {styles.container}
-              data = {welcomeSlides}
-              renderItem={({item}) => <WelcomeItem {...item}/>}
-              keyExtractor={item => item.id}
-              horizontal={true}
-              pagingEnabled={true}
-              showsHorizontalScrollIndicator={false}
-              bounces= {false}
-              // onScroll={Animated.event([{ nativeEvent: { contentOffset: {x: scrollX } } }], {
-              //     useNativeDriver: false,
-              // })}
-              >
-              </FlatList>
+            backgroundColor={'black'}
+            barStyle={'light-content'}/>
+            <FlatList
+            ref={ref}
+            onMomentumScrollEnd={updateCurrentSlideIndex}
+            style = {styles.container}
+            data = {welcomeSlides}
+            renderItem={({item}) => <WelcomeItem {...item}/>}
+            keyExtractor={item => item.id}
+            horizontal={true}
+            pagingEnabled={true}
+            showsHorizontalScrollIndicator={false}
+            bounces= {false}
+            >
+            </FlatList>
+
             <View
-            style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                marginTop: 20,
-            }}>
-                {/* Render indicator */}
-                {welcomeSlides.map((_, index) => (
-                    <View
-                    key={index}
-                    style={[
-                        styles.indicator,
-                        currentSlideIndex === index && {
-                        backgroundColor: "blue",
-                        width: 25,
-                        },
-                    ]}
-                    />
-                ))}
+              style={styles.threeDot}>
+                  {/* Render indicator */}
+                  {welcomeSlides.map((_, index) => (
+                      <View
+                      key={index}
+                      style={[
+                          styles.indicator,
+                          currentSlideIndex === index && {
+                          backgroundColor: "white",
+                          width: 25,
+                          },
+                      ]}
+                      />
+                  ))}
             </View>
 
-            <View style={{ marginBottom: 20 }}>
-          {currentSlideIndex === welcomeSlides.length - 1 ? (
-            <View style={{ height: 50, position: "absolute" }}>
-              <TouchableOpacity
-                style={styles.btn}
-                onPress={() => navigation.navigate('login')}
-              >
-                <Text style={{ fontWeight: 'bold', fontSize: 15}}>
-                  GET STARTED
+            <View style = {styles.containerRouter}>
+              <View>
+            {currentSlideIndex === welcomeSlides.length - 1 ? (
+              <View style={{ height: 50}}>
+                <TouchableOpacity
+                  style={styles.btn}
+                  onPress={() => navigation.navigate('login')}
+                >
+                  <Text style={{ fontWeight: 'bold', fontSize: 20, color: 'white'}}>
+                    Explore
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View style={{ flexDirection: 'row', justifyContent: 'space-around'}}>
+
+<TouchableOpacity
+                activeOpacity={0.8}
+                style={[
+                  styles.btn,
+                  {
+                    borderColor: 'white',
+                    borderWidth: 1,
+                    backgroundColor: 'transparent',
+                  },
+                ]}
+                onPress={skip}>
+                <Text
+                  style={{
+                    fontWeight: 'bold',
+                    fontSize: 20,
+                    color: 'white',
+                  }}>
+                  Skip
                 </Text>
               </TouchableOpacity>
+              <View style={{width: 15}} />
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={goToNextSlide}
+                style={styles.btn}>
+                <Text
+                  style={{
+                    fontWeight: 'bold',
+                    fontSize: 20,
+                    color: 'white'
+                  }}>
+                  Next
+                </Text>
+              </TouchableOpacity>
+              </View>
+            )}
+          </View>
             </View>
-          ) : (
-            <View style={{ flexDirection: 'row', position: "absolute" }}>
-
-              <TouchableOpacity 
-              style = {{backgroundColor: '#007AFF',
-              paddingHorizontal: 16,
-              paddingVertical: 8,
-              borderRadius: 4,}}
-              onPress={skip}></TouchableOpacity>
-              <Button 
-              title='Next'
-              onPress={goToNextSlide}></Button>
-            </View>
-          )}
-        </View>
 
             
             
@@ -124,21 +145,32 @@ const styles = StyleSheet.create({
     },
     threeDot:
     {
-        flexDirection: "row",
-        justifyContent: "space-between",
+      flexDirection: 'row',
+      position: 'absolute',
+      justifyContent: 'space-between',
+      bottom: 80,
+      right: 175,
+      left: 175,
     },
     indicator: {
-        width: 20,
-        height: 20,
-        backgroundColor: "red",
+        width: 10,
+        height: 10,
+        backgroundColor: "gray",
         borderRadius: 50
     },
     btn: {
-        flex: 1,
-        height: 50,
-        borderRadius: 5,
-        backgroundColor: '#fff',
-        justifyContent: 'center',
-        alignItems: 'center',
+      flex: 1,
+      height: 50,
+      borderRadius: 5,
+      backgroundColor: '#176FF2',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    containerRouter: 
+    {
+      position: 'absolute',
+      right: 5,
+      left: 5,
+      bottom: 20
     }
 })
