@@ -5,7 +5,7 @@ import Checkbox from 'expo-checkbox';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 
 
-export default function LoginScreen ({navigation}: {navigation: NativeStackNavigatorProps}) {
+export default function RegisterScreen2 ({navigation}: {navigation: NativeStackNavigatorProps}) {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -26,8 +26,8 @@ export default function LoginScreen ({navigation}: {navigation: NativeStackNavig
 
     return (
         <View style={styles.container}>
-            <Text style={styles.textsignup}>Login Now</Text>
-            <Text style={styles.text1}>Please login to continue using our app</Text>
+            <Text style={styles.textsignup}>Sign Up</Text>
+            <Text style={styles.text1}>Please registration with email and sign up to continue using our app</Text>
             <Text style={styles.text2}>Login with</Text>
 
             <View style={styles.buttonRow}>
@@ -74,24 +74,31 @@ export default function LoginScreen ({navigation}: {navigation: NativeStackNavig
             </View>
 
             <View style={styles.checkboxContainer}>
+                <Checkbox
+                    disabled={false}
+                    value={toggleCheckBox}
+                    onValueChange={handleCheckBox}
+                    style={styles.checkbox}
+                    color ={toggleCheckBox?'#196EEE' : undefined}
+                />
                 <TouchableOpacity onPress={handleCheckBox}>
-                    <Text style={styles.checkboxText}>forgot password?</Text>
+                    <Text style={styles.checkboxText}>I agree with policy</Text>
                 </TouchableOpacity>
             </View>
 
             <TouchableOpacity
                 style={styles.signupButton}
-                onPress={() => navigation.navigate('main-screen')}
+                onPress={() => navigation.navigate('login')}
             >
-                <Text style={styles.signupButtonText}>Login</Text>
+                <Text style={styles.signupButtonText}>Sign up</Text>
             </TouchableOpacity>
             <View style={styles.buttonRow}>
-            <Text style={styles.text3}>Don't have an account </Text>
+            <Text style={styles.text3}>You already have an account? </Text>
             <TouchableOpacity
                 style={styles.text4}
                 onPress={() => navigation.navigate('login')}
             >
-                <Text style = {{fontSize:18,fontWeight:'bold',color:'#196EEE'}}> Sign up</Text>
+                <Text style = {{fontSize:18,fontWeight:'bold',color:'#196EEE'}}> Login</Text>
             </TouchableOpacity>
             
             </View>
@@ -140,7 +147,7 @@ const styles = StyleSheet.create({
         fontSize:18,
         marginTop:20,
         textAlign:'left',
-        width: '50%', 
+        width: '65%', 
         left: 30,
     },
     text4: {
@@ -149,7 +156,7 @@ const styles = StyleSheet.create({
         color: '#196EEE',
         fontWeight:'bold',
         textAlign:'left',
-        width: '50%',
+        width: '35%',
     },
 
     image: {
@@ -243,11 +250,12 @@ const styles = StyleSheet.create({
     },
 
     checkboxContainer: {
-        justifyContent:'flex-end',
+        justifyContent:'flex-start',
         flexDirection: 'row',
         marginTop: 20,
+        textAlign:'left',
         width:'100%',
-        marginRight: 60,
+        left:40,
         
     },
     checkbox: {
@@ -257,7 +265,9 @@ const styles = StyleSheet.create({
     },
     checkboxText: {
         marginLeft: 10,
-        fontSize: 15,
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#196EEE',
     },
     
 });

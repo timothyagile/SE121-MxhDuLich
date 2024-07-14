@@ -6,6 +6,8 @@ import WelcomeScreen1 from '@/screen/Welcome/WelcomeScreen1'
 import LoginScreen from '@/screen/Welcome/LoginScreen'
 import RegisterScreen from '@/screen/Welcome/RegisterScreen'
 import MainScreen from '@/screen/MainScreen'
+import React from 'react'
+import RegisterScreen2 from '@/screen/Welcome/RegisterScreen2'
 
 const Stack = createNativeStackNavigator()
 
@@ -13,7 +15,7 @@ export default function App() {
   return (
     <NavigationContainer independent={true}>
       <Stack.Navigator
-      initialRouteName='WelcomeScreen1'>
+      initialRouteName='register'>
         <Stack.Screen 
         name = "welcome1" 
         component={WelcomeScreen1}
@@ -31,6 +33,13 @@ export default function App() {
         <Stack.Screen 
         name = "register" 
         component={RegisterScreen}
+        options={{
+          headerShown: false
+        }}/>
+
+        <Stack.Screen 
+        name = "register2" 
+        component={RegisterScreen2}
         options={{
           headerShown: false
         }}/>
