@@ -1,4 +1,4 @@
-import {View, StyleSheet, Image, useWindowDimensions} from 'react-native'
+import {View, StyleSheet, Image, useWindowDimensions, Text, ImageBackground} from 'react-native'
 
 interface props {
     id: string,
@@ -12,10 +12,15 @@ export default function WelcomeItem({id, title, description, image} : props) {
 
     return (
         <View style = {[styles.containter, {width}]}>
-            <Image 
+            <ImageBackground 
             source =  {image}
-            style = {[styles.image, {width}]}
-            />
+            style = {[{flex: 1}, {width}]}
+            >
+                <View>
+                <Text style = {styles.text}>{title} </Text>
+                </View>
+            </ImageBackground>
+                
         </View>
     )
 }
@@ -25,8 +30,15 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
+        backgroundColor: "black"
     },
     image: {
-        resizeMode: "cover"
+        
+    },
+    text: {
+        color: 'white',
+        fontSize: 20,
+        fontWeight: "bold",
+        textAlign: "center"
     }
 })

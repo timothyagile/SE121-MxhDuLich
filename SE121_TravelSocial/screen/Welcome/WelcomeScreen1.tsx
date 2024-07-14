@@ -1,4 +1,4 @@
-import {Animated, Button, FlatList, StatusBar, StyleSheet, View, useWindowDimensions, TouchableOpacity, Text} from 'react-native';
+import {SafeAreaView, Button, FlatList, StatusBar, StyleSheet, View, useWindowDimensions, TouchableOpacity, Text} from 'react-native';
 import { useState, useRef } from 'react';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 
@@ -9,6 +9,7 @@ import welcomeSlides from '@/constants/welcome-slides';
 
 
 export default function WelcomeScreen1 ({navigation}: {navigation: NativeStackNavigatorProps}) {
+    
     const window = useWindowDimensions();
     const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
     const ref = useRef<FlatList>(null);
@@ -37,32 +38,31 @@ export default function WelcomeScreen1 ({navigation}: {navigation: NativeStackNa
 
 
     return (
-        <View style = {{
+        <SafeAreaView style = {{
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: "black"
+            backgroundColor: 'black'
         }}>
             <StatusBar 
-            backgroundColor={"black"}
-            barStyle={"light-content"}/>
-
-            <FlatList
-            ref={ref}
-            onMomentumScrollEnd={updateCurrentSlideIndex}
-            style = {styles.container}
-            data = {welcomeSlides}
-            renderItem={({item}) => <WelcomeItem {...item}/>}
-            keyExtractor={item => item.id}
-            horizontal={true}
-            pagingEnabled={true}
-            showsHorizontalScrollIndicator={false}
-            bounces= {false}
-            // onScroll={Animated.event([{ nativeEvent: { contentOffset: {x: scrollX } } }], {
-            //     useNativeDriver: false,
-            // })}
-            />
-            
+            barStyle={'light-content'}
+            backgroundColor={'black'}/>
+              <FlatList
+              ref={ref}
+              onMomentumScrollEnd={updateCurrentSlideIndex}
+              style = {styles.container}
+              data = {welcomeSlides}
+              renderItem={({item}) => <WelcomeItem {...item}/>}
+              keyExtractor={item => item.id}
+              horizontal={true}
+              pagingEnabled={true}
+              showsHorizontalScrollIndicator={false}
+              bounces= {false}
+              // onScroll={Animated.event([{ nativeEvent: { contentOffset: {x: scrollX } } }], {
+              //     useNativeDriver: false,
+              // })}
+              >
+              </FlatList>
             <View
             style={{
                 flexDirection: 'row',
@@ -86,7 +86,7 @@ export default function WelcomeScreen1 ({navigation}: {navigation: NativeStackNa
 
             <View style={{ marginBottom: 20 }}>
           {currentSlideIndex === welcomeSlides.length - 1 ? (
-            <View style={{ height: 50 }}>
+            <View style={{ height: 50, position: "absolute" }}>
               <TouchableOpacity
                 style={styles.btn}
                 onPress={() => navigation.navigate('login')}
@@ -97,54 +97,30 @@ export default function WelcomeScreen1 ({navigation}: {navigation: NativeStackNa
               </TouchableOpacity>
             </View>
           ) : (
-            <View style={{ flexDirection: 'row' }}>
-              {/* <TouchableOpacity
-                activeOpacity={0.8}
-                style={[
-                  styles.btn,
-                  {
-                    borderColor: "white",
-                    borderWidth: 1,
-                    backgroundColor: 'white',
-                  },
-                ]}
-                onPress={skip}
-              >
-                
-              </TouchableOpacity>
-              <View style={{ width: 15 }} />
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={goToNextSlide}
-                style={styles.btn}
-              >
-                <Text
-                  style={{
-                    fontWeight: 'bold',
-                    fontSize: 15,
-                  }}
-                >
-                  NEXT
-                </Text>
-              </TouchableOpacity> */}
+            <View style={{ flexDirection: 'row', position: "absolute" }}>
 
-              <Button 
-              title='Skip'
-              onPress={skip}></Button>
+              <TouchableOpacity 
+              style = {{backgroundColor: '#007AFF',
+              paddingHorizontal: 16,
+              paddingVertical: 8,
+              borderRadius: 4,}}
+              onPress={skip}></TouchableOpacity>
               <Button 
               title='Next'
               onPress={goToNextSlide}></Button>
             </View>
           )}
         </View>
+
             
-        </View>
+            
+        </SafeAreaView>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+        
     },
     threeDot:
     {
