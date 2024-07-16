@@ -5,7 +5,6 @@ import HomeScreen from "@/screen/HomeScreen";
 import TicketScreen from "@/screen/TicketScreen";
 import CollectionScreen from "@/screen/CollectionScreen";
 import ProfileScreen from "@/screen/ProfileScreen";
-import { AntDesign } from "@expo/vector-icons";
 import React from 'react';
 
 const Tab = createBottomTabNavigator()
@@ -17,6 +16,7 @@ export default function MainScreen() {
       screenOptions={{
         tabBarStyle: styles.container,
         tabBarItemStyle: styles.itemStyle,
+        headerShown: false
       }}>
         <Tab.Screen 
         name="Home" 
