@@ -1,6 +1,7 @@
 import {View, StyleSheet, Image, useWindowDimensions, Text, ImageBackground} from 'react-native'
 import * as Font from 'expo-font'
 import {useState, useEffect} from 'react'
+import React from 'react'
 
 interface props {
     id: string,

@@ -1,6 +1,9 @@
 import {useState} from 'react';
 import React from 'react';
-import {View, Text, StyleSheet, useWindowDimensions, TextInput, TextInputComponent} from 'react-native'
+import {View, Text, StyleSheet, useWindowDimensions, TextInput, TextInputComponent, FlatList} from 'react-native'
+
+import CategoryItem from "@/components/HomeScreen/CategoryItem"
+import categoryData from '@/constants/category';
 
 export default function HomeScreen ()
 {
@@ -30,6 +33,17 @@ export default function HomeScreen ()
                     onChangeText={setFindContent}
                     style = {styles.textInput}/>
                 </View>
+
+                <View style  = {styles.categoryContainer}>
+                    <FlatList
+                    data= {categoryData}
+                    renderItem={({item}) => <CategoryItem {...item}/>}
+                    horizontal
+                    showsHorizontalScrollIndicator = {false}
+                    style = {styles.flatList}>
+                    </FlatList>
+                </View>
+
             </View>
         </View>
     )
@@ -42,7 +56,7 @@ const styles = StyleSheet.create({
     },
     header: {
         borderWidth: 1,
-        height: 200
+        height: 250
     },
     text_container: {
         flexDirection: 'row',
@@ -73,11 +87,17 @@ const styles = StyleSheet.create({
         backgroundColor: '#A8CCF0',
         opacity: 0.2,
         height: '25%', 
-        padding: 15
+        padding: 20
     },
     textInput: {
         fontSize: 14,
         
+    },
+    categoryContainer: {
+        borderWidth: 1
+    },
+    flatList: {
+        marginTop: 10
     }
     
 })
