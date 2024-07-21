@@ -15,4 +15,8 @@ export default [
         id: "4",
         name: "Guest home"
     },
+    {
+        id: "5",
+        name: "Restaurant"
+    }
 ]

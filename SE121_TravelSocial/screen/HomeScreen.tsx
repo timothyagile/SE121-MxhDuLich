@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import React from 'react';
-import {View, Text, StyleSheet, TextInput, FlatList} from 'react-native'
+import {View, Text, StyleSheet, TextInput, FlatList, ScrollView} from 'react-native'
 
 import CategoryItem from "@/components/HomeScreen/CategoryItem"
 import categoryData from '@/constants/category';
@@ -9,7 +9,7 @@ export default function HomeScreen ()
 {
     //const {window} = useWindowDimensions()
     const [findContent, setFindContent] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [selectedCategory, setSelectedCategory] = useState(categoryData.at(0));
 
     return (
         <View style = {styles.container}>
@@ -50,6 +50,14 @@ export default function HomeScreen ()
                 </View>
 
             </View>
+
+            <View style = {styles.body}>
+                <ScrollView>
+                <Text style = {styles.titleText}>Popular</Text>
+                <Text style = {styles.titleText}>Recommended</Text>
+                <Text style = {styles.titleText}>Daily suggested</Text>
+                </ScrollView>
+            </View>
         </View>
     )
 }
@@ -60,7 +68,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff'
     },
     header: {
-        //borderWidth: 1,
+        borderWidth: 1,
         height: 250
     },
     text_container: {
@@ -103,6 +111,14 @@ const styles = StyleSheet.create({
     },
     flatList: {
         marginTop: 10
+    },
+    body: {
+        flex: 1,
+        borderWidth: 1
+    },
+    titleText: {
+        fontSize: 20,
+        fontWeight: 'bold'
     }
     
 })
