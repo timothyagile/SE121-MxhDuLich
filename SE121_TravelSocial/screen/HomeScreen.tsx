@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import React from 'react';
-import {View, Text, StyleSheet, useWindowDimensions, TextInput, TextInputComponent, FlatList} from 'react-native'
+import {View, Text, StyleSheet, TextInput, FlatList} from 'react-native'
 
 import CategoryItem from "@/components/HomeScreen/CategoryItem"
 import categoryData from '@/constants/category';
@@ -9,17 +9,18 @@ export default function HomeScreen ()
 {
     //const {window} = useWindowDimensions()
     const [findContent, setFindContent] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState(null);
 
     return (
         <View style = {styles.container}>
             <View style = {styles.header}>
                 {/*Text header */}
                 <View style = {styles.text_container}>
-                    <View style = {{borderWidth: 1}}>
+                    <View>
                         <Text style = {styles.text1}>Explore</Text>
                         <Text style = {styles.text2}>Aspen</Text>
                     </View>
-                    <View style = {{borderWidth: 1, }}>
+                    <View>
                         <Text style = {styles.text3}>HCM, VN</Text>
                     </View>
                 </View>
@@ -37,7 +38,11 @@ export default function HomeScreen ()
                 <View style  = {styles.categoryContainer}>
                     <FlatList
                     data= {categoryData}
-                    renderItem={({item}) => <CategoryItem {...item}/>}
+                    renderItem={({item}) => <CategoryItem 
+                        item = {item}
+                        selectedCategory = {selectedCategory}
+                        setSelectedCategory = {setSelectedCategory}/>}
+
                     horizontal
                     showsHorizontalScrollIndicator = {false}
                     style = {styles.flatList}>
@@ -55,13 +60,13 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff'
     },
     header: {
-        borderWidth: 1,
+        //borderWidth: 1,
         height: 250
     },
     text_container: {
         flexDirection: 'row',
-        borderWidth: 1,
-        justifyContent: 'space-between'
+        //borderWidth: 1,
+        justifyContent: 'space-between',
     },
     text1: {
         fontSize: 18,
@@ -94,7 +99,7 @@ const styles = StyleSheet.create({
         
     },
     categoryContainer: {
-        borderWidth: 1
+        //borderWidth: 1
     },
     flatList: {
         marginTop: 10
