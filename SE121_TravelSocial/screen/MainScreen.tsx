@@ -12,7 +12,7 @@ const Tab = createBottomTabNavigator()
 
 export default function MainScreen() {
   return (
-    <NavigationContainer independent={true}>
+    
       <Tab.Navigator 
       screenOptions={{
         tabBarStyle: styles.container,
@@ -51,7 +51,9 @@ export default function MainScreen() {
               source={require('../assets/icons/collection.png')} 
               style={{ tintColor: focused ? "blue" : "gray", width: 22, height: 22 }} 
             />
-          )
+          ),
+          //tabBarLabel: () => null,
+          headerShown: false,
         }}
       />
         <Tab.Screen 
@@ -63,11 +65,13 @@ export default function MainScreen() {
               source={require('../assets/icons/Profile.png')} 
               style={{ tintColor: focused ? "blue" : "gray", width: 22, height: 22 }} 
             />
-          )
+          ),
+          headerShown:false,
+
         }}
       />      
       </Tab.Navigator>
-    </NavigationContainer>
+    
   )
 }
 
