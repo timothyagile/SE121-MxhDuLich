@@ -1,15 +1,25 @@
 import { CommonActions, DrawerActions, useNavigation } from '@react-navigation/native';
 import React,{ useState, useEffect } from 'react'
 import {Button, Text, View,  StyleSheet, Image, TouchableOpacity, TextInput,Modal, Dimensions} from 'react-native';
-import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
+import { NativeStackNavigationProp, NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 
 
 const { height } = Dimensions.get('window');
 
-export default function CollectionScreen ({navigation}: {navigation: NativeStackNavigatorProps})
+type RootStackParamList = {
+  'add-new-collection-screen': undefined;
+  register: undefined;
+};
 
+type CollectionScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'add-new-collection-screen'
+>;
+
+export default function CollectionScreen ()
 {
   
+    const navigation = useNavigation<CollectionScreenNavigationProp>();
     const [modalVisible, setModalVisible] = useState(true);
     useEffect(() => {
         setModalVisible(true);
