@@ -1,4 +1,4 @@
-import { useNavigation } from '@react-navigation/native';
+import { CommonActions, DrawerActions, useNavigation } from '@react-navigation/native';
 import React,{ useState, useEffect } from 'react'
 import {Button, Text, View,  StyleSheet, Image, TouchableOpacity, TextInput,Modal, Dimensions} from 'react-native';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
@@ -9,6 +9,7 @@ const { height } = Dimensions.get('window');
 export default function CollectionScreen ({navigation}: {navigation: NativeStackNavigatorProps})
 
 {
+  
     const [modalVisible, setModalVisible] = useState(true);
     useEffect(() => {
         setModalVisible(true);
@@ -32,14 +33,19 @@ export default function CollectionScreen ({navigation}: {navigation: NativeStack
             <Text style={styles.collections }>Collections</Text>
             <View style={styles.list}>
                 <View style ={{width:'50%', alignItems:'center', flexDirection:'column'}}>
-                    <TouchableOpacity style={styles.square} onPress={() => navigation.navigate('add-collection-screen')}>
+                    <TouchableOpacity 
+                        style={styles.square} 
+                        onPress={() => navigation.navigate('add-new-collection-screen')}>
+                        
                         <Image source={require('../assets/icons/plus.png')} style={styles.iconplus} />
                     </TouchableOpacity>
                     <Text style={{marginTop:10, fontSize: 20,}}>Add new</Text>
                 </View>
                 
                 <View style ={{width:'50%',alignItems:'center'}}>
-                    <TouchableOpacity style={styles.square} onPress={() => navigation.navigate('add-collection-screen')}>
+                    <TouchableOpacity 
+                    style={styles.square} 
+                    onPress={() => navigation.navigate('register')}>
                         <Image source={require('../assets/icons/plus.png')} style={styles.iconplus} />
                     </TouchableOpacity>
                     <Text style={{marginTop:10, fontSize: 20,}}>Add new</Text>
