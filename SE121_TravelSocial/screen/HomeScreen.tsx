@@ -3,7 +3,9 @@ import React from 'react';
 import {View, Text, StyleSheet, TextInput, FlatList, ScrollView} from 'react-native'
 
 import CategoryItem from "@/components/HomeScreen/CategoryItem"
+import PortraitProductCard from '@/components/HomeScreen/PortraitProductCard';
 import categoryData from '@/constants/category';
+import locationData from '@/constants/location';
 
 export default function HomeScreen ()
 {
@@ -53,9 +55,20 @@ export default function HomeScreen ()
 
             <View style = {styles.body}>
                 <ScrollView>
-                <Text style = {styles.titleText}>Popular</Text>
+                    <View>
+                        <Text style = {styles.titleText}>Popular</Text>
+                        <FlatList
+                        data={locationData}
+                        renderItem={() => <PortraitProductCard />}
+                        horizontal>
+                
+                        </FlatList>
+                    </View>  
+
+
                 <Text style = {styles.titleText}>Recommended</Text>
                 <Text style = {styles.titleText}>Daily suggested</Text>
+
                 </ScrollView>
             </View>
         </View>
