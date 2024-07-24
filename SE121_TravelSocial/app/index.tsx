@@ -10,6 +10,7 @@ import React from 'react'
 import RegisterScreen2 from '@/screen/Welcome/RegisterScreen2'
 import AddNewCollectionScreen from '@/screen/AddNewCollectionScreen'
 import CollectionScreen from '@/screen/CollectionScreen'
+import PersonalInformationScreen from '@/screen/PersonalInformationScreen'
 
 const Stack = createNativeStackNavigator()
 
@@ -57,6 +58,13 @@ export default function App() {
         <Stack.Screen 
         name = "add-new-collection-screen"
         component={AddNewCollectionScreen}
+        options={{
+          headerShown: false
+        }}/>
+
+        <Stack.Screen 
+        name = "personal-information-screen"
+        component={PersonalInformationScreen}
         options={{
           headerShown: false
         }}/>
