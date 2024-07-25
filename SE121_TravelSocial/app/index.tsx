@@ -11,6 +11,9 @@ import RegisterScreen2 from '@/screen/Welcome/RegisterScreen2'
 import AddNewCollectionScreen from '@/screen/AddNewCollectionScreen'
 import CollectionScreen from '@/screen/CollectionScreen'
 import PersonalInformationScreen from '@/screen/PersonalInformationScreen'
+import NotificationsScreen from '@/screen/NotificationsScreen'
+import ChatBoardScreen from '@/screen/ChatBoardScreen'
+import ChatScreen from '@/screen/ChatScreen'
 
 const Stack = createNativeStackNavigator()
 
@@ -18,7 +21,7 @@ export default function App() {
   return (
     <NavigationContainer independent={true}>
       <Stack.Navigator
-      initialRouteName='main-screen'>
+      initialRouteName='chat-screen'>
         <Stack.Screen 
         name = "welcome1" 
         component={WelcomeScreen1}
@@ -65,6 +68,27 @@ export default function App() {
         <Stack.Screen 
         name = "personal-information-screen"
         component={PersonalInformationScreen}
+        options={{
+          headerShown: false
+        }}/>
+
+        <Stack.Screen 
+        name = "notifications-screen"
+        component={NotificationsScreen}
+        options={{
+          headerShown: false
+        }}/>
+
+        <Stack.Screen 
+        name = "chat-board-screen"
+        component={ChatBoardScreen}
+        options={{
+          headerShown: false
+        }}/>
+
+        <Stack.Screen 
+        name = "chat-screen"
+        component={ChatScreen}
         options={{
           headerShown: false
         }}/>

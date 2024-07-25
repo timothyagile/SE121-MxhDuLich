@@ -49,7 +49,7 @@ export default function ProfileScreen({ navigation }: { navigation: NativeStackN
                         <Text style={styles.personalInfoText}>Personal Information</Text>
                         <Image source={require('../assets/icons/arrowright.png')} style={styles.arrowIcon} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.personalInfoContainer}>
+                    <TouchableOpacity style={styles.personalInfoContainer} onPress={()=>navigation.navigate('notifications-screen')}>
                         <Text style={styles.personalInfoText}>Notifications</Text>
                         <Image source={require('../assets/icons/arrowright.png')} style={styles.arrowIcon} />
                     </TouchableOpacity>
