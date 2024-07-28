@@ -14,6 +14,8 @@ import PersonalInformationScreen from '@/screen/PersonalInformationScreen'
 import NotificationsScreen from '@/screen/NotificationsScreen'
 import ChatBoardScreen from '@/screen/ChatBoardScreen'
 import ChatScreen from '@/screen/ChatScreen'
+import PaymentMethodScreen from '@/screen/PaymentMethodScreen'
+import AddNewPaymentMethodScreen from '@/screen/AddNewPaymentMethodScreen'
 
 const Stack = createNativeStackNavigator()
 
@@ -21,7 +23,7 @@ export default function App() {
   return (
     <NavigationContainer independent={true}>
       <Stack.Navigator
-      initialRouteName='chat-screen'>
+      initialRouteName='payment-method-screen'>
         <Stack.Screen 
         name = "welcome1" 
         component={WelcomeScreen1}
@@ -96,6 +98,20 @@ export default function App() {
         <Stack.Screen 
         name = "main-screen"
         component={MainScreen}
+        options={{
+          headerShown: false
+        }}/>
+
+        <Stack.Screen 
+        name = "payment-method-screen"
+        component={PaymentMethodScreen}
+        options={{
+          headerShown: false
+        }}/>
+
+        <Stack.Screen 
+        name = "add-new-payment-method-screen"
+        component={AddNewPaymentMethodScreen}
         options={{
           headerShown: false
         }}/>
