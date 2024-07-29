@@ -30,7 +30,7 @@ export default function AddNewPaymentMethodScreen({ navigation }: {navigation: N
     };
 
     const fetchBanks = async () => {
-        setLoading(true);
+        
         try {
             const response = await fetch('https://api.vietqr.io/v2/android-app-deeplinks');
             const data = await response.json();
@@ -41,9 +41,7 @@ export default function AddNewPaymentMethodScreen({ navigation }: {navigation: N
             }
         } catch (error) {
             Alert.alert('Lỗi', 'Không thể tải danh sách ngân hàng.');
-        } finally {
-            setLoading(false);
-        }
+        } 
     };
     
     
@@ -57,7 +55,7 @@ export default function AddNewPaymentMethodScreen({ navigation }: {navigation: N
             })
             .catch(error => {
                 Alert.alert('Error', 'Không thể tải danh sách ngân hàng.');
-                setLoading(false);
+                //setLoading(false);
             });
     }, []);
 
