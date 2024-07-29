@@ -17,6 +17,7 @@ import ChatScreen from '@/screen/ChatScreen'
 import PaymentMethodScreen from '@/screen/PaymentMethodScreen'
 import AddNewPaymentMethodScreen from '@/screen/AddNewPaymentMethodScreen'
 import ReservationRequiredScreen from '@/screen/ReservationRequiredScreen'
+import AvailableRoomScreen from '@/screen/AvailableRoomScreen'
 
 const Stack = createNativeStackNavigator()
 
@@ -24,7 +25,7 @@ export default function App() {
   return (
     <NavigationContainer independent={true}>
       <Stack.Navigator
-      initialRouteName='reservation-required-screen'>
+      initialRouteName='available-room-screen'>
         <Stack.Screen 
         name = "welcome1" 
         component={WelcomeScreen1}
@@ -120,6 +121,13 @@ export default function App() {
         <Stack.Screen 
         name = "reservation-required-screen"
         component={ReservationRequiredScreen}
+        options={{
+          headerShown: false
+        }}/>
+
+        <Stack.Screen 
+        name = "available-room-screen"
+        component={AvailableRoomScreen}
         options={{
           headerShown: false
         }}/>
