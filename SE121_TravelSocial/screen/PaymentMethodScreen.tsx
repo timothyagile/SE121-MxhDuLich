@@ -71,7 +71,7 @@ export default function PaymentMethodScreen({ navigation }: {navigation: NativeS
                 <TouchableOpacity style={styles.arrowleftbutton} onPress={() => navigation.goBack()}>
                 <Image source={require('../assets/icons/arrowleft.png')} style={styles.arrowlefticon} />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Method Method</Text>
+                <Text style={styles.headerTitle}>Payment Method</Text>
             </View>
 
             <View style={{flexDirection:'row'}}>
