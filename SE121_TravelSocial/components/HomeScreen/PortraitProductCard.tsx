@@ -1,26 +1,35 @@
-import {Text, View, StyleSheet, ImageBackground} from 'react-native'
+import {Text, View, StyleSheet, Image, TouchableWithoutFeedback, useWindowDimensions, Dimensions, Touchable} from 'react-native'
 import * as React from 'react'
 
-export default function PortraitProductCard() {
+interface props {
+    id: string,
+    imgSource: string
+}
+export default function PortraitProductCard({id, imgSource} : props, index: any) {
+    
     return (
-        <View style = {styles.container}>
-            <ImageBackground 
-            source={require('@/assets/images/bai-truoc-20.jpg')}
-            style = {styles.img}
-            >
-            </ImageBackground>
-        </View>
+        <TouchableWithoutFeedback style = {{marginLeft: 24,
+            marginRight:  id === 5 - 1 ? 24 : 0}}>
+            <View style = {styles.container}>
+                <Image 
+                source={require('@/assets/images/bai-truoc-20.jpg')}
+                style = {styles.img}
+                >
+                </Image>
+            </View>
+        </TouchableWithoutFeedback>
     )
 }
 
 const styles = StyleSheet.create({
+    Touchable: {
+        
+    },
     container: {
-        width: 188,
-        height: 240
+        height: 240,
+        width: 188
     },
     img: {
-        width: null,
-        height: '100%',
-        aspectRatio: 1350/899
+        resizeMode: 'contain'
     }
 })

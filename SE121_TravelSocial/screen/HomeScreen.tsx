@@ -3,15 +3,16 @@ import React from 'react';
 import {View, Text, StyleSheet, TextInput, FlatList, ScrollView} from 'react-native'
 
 import CategoryItem from "@/components/HomeScreen/CategoryItem"
-import PortraitProductCard from '@/components/HomeScreen/PortraitProductCard';
 import categoryData from '@/constants/category';
-import locationData from '@/constants/location';
+
+import PopularSection from '@/components/HomeScreen/PopularSection';
 
 export default function HomeScreen ()
 {
-    //const {window} = useWindowDimensions()
+    
     const [findContent, setFindContent] = useState("");
     const [selectedCategory, setSelectedCategory] = useState(categoryData.at(0));
+    
 
     return (
         <View style = {styles.container}>
@@ -55,19 +56,10 @@ export default function HomeScreen ()
 
             <View style = {styles.body}>
                 <ScrollView>
-                    <View>
-                        <Text style = {styles.titleText}>Popular</Text>
-                        <FlatList
-                        data={locationData}
-                        renderItem={() => <PortraitProductCard />}
-                        horizontal>
-                
-                        </FlatList>
-                    </View>  
+                    <PopularSection/>
 
 
-                <Text style = {styles.titleText}>Recommended</Text>
-                <Text style = {styles.titleText}>Daily suggested</Text>
+            
 
                 </ScrollView>
             </View>
@@ -129,9 +121,10 @@ const styles = StyleSheet.create({
         flex: 1,
         borderWidth: 1
     },
-    titleText: {
-        fontSize: 20,
-        fontWeight: 'bold'
+    
+    popularList: {
+
+        
     }
     
 })
