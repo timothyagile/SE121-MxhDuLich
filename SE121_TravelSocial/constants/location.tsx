@@ -1,22 +1,36 @@
 export default [
     {
         id: "1",
-        imgSource: "@/assets/images/bai-truoc-20.jpg"
+        imgSource: require('@/assets/images/bai-truoc-20.jpg'),
+        name: "Vung Tau",
+        rating: "4.1",
+        long: "2N/1D"
     },
     {
         id: "2",
-        imgSource: "@/assets/images/bai-truoc-20.jpg"
+        imgSource: require('@/assets/images/bai-truoc-20.jpg'),
+        name: "Vung Tau",
+        rating: "4.1"
     },
     {
         id: "3",
-        imgSource: "@/assets/images/bai-truoc-20.jpg"
+        imgSource: require('@/assets/images/bai-truoc-20.jpg'),
+        name: "Vung Tau",
+        rating: "4.1",
+        long: "2N/1D"
     },
     {
         id: "4",
-        imgSource: "@/assets/images/bai-truoc-20.jpg"
+        imgSource: require('@/assets/images/bai-truoc-20.jpg'),
+        name: "Vung Tau",
+        rating: "4.1",
+        long: "2N/1D"
     },
     {
         id: "5",
-        imgSource: "@/assets/images/bai-truoc-20.jpg"
+        imgSource: require('@/assets/images/bai-truoc-20.jpg'),
+        name: "Vung Tau",
+        rating: "4.1",
+        long: "2N/1D"
     },
 ]

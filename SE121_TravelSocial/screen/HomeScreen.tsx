@@ -6,6 +6,8 @@ import CategoryItem from "@/components/HomeScreen/CategoryItem"
 import categoryData from '@/constants/category';
 
 import PopularSection from '@/components/HomeScreen/PopularSection';
+import RecommendedSection from '@/components/HomeScreen/RecommendedSection';
+import DailySection from '@/components/HomeScreen/DailySection';
 
 export default function HomeScreen ()
 {
@@ -54,15 +56,16 @@ export default function HomeScreen ()
 
             </View>
 
-            <View style = {styles.body}>
-                <ScrollView>
+            <ScrollView style = {{borderWidth: 1, borderColor: 'red'}}>
                     <PopularSection/>
-
-
+                    <RecommendedSection/>
+                    <DailySection/>
             
 
-                </ScrollView>
-            </View>
+            </ScrollView>
+            {/* <View style = {styles.body}>
+                
+            </View> */}
         </View>
     )
 }
@@ -70,7 +73,7 @@ export default function HomeScreen ()
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff'
+        backgroundColor: '#fff',
     },
     header: {
         borderWidth: 1,
@@ -119,7 +122,8 @@ const styles = StyleSheet.create({
     },
     body: {
         flex: 1,
-        borderWidth: 1
+        borderWidth: 1,
+        marginBottom: "0%"
     },
     
     popularList: {

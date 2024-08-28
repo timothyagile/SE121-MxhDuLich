@@ -73,7 +73,7 @@ export default function MainScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    position: "absolute",
+    //position: 'absolute',
     height: "10%",
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
@@ -85,6 +85,7 @@ const styles = StyleSheet.create({
   shadowOpacity: 0.7,
   shadowRadius: 16,
   elevation: 24,
+  //marginBottom: 100
   },
 
   itemStyle: {

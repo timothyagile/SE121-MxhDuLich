@@ -29,6 +29,16 @@ export default function PopularSection() {
                                 <Image source={require('@/assets/images/bai-truoc-20.jpg')}
                                 style = {styles.image}/>
                             </View>
+                            <View style = {styles.titleBox}>
+                                <View style = {styles.textBox}>
+                                    <Text style = {[styles.textStyle, {fontSize: 20}]}>{item.name}</Text>
+                                </View>
+                                <View style = {[styles.textBox, {top: 10, width: 70}]}>
+                                    <Image source={require('@/assets/icons/star.png')}
+                                    style = {styles.star}></Image>
+                                    <Text style = {[styles.textStyle, {fontSize: 15}]}>{item.rating}</Text>
+                                </View>
+                            </View>
                         </View>
 
                 </TouchableOpacity>                            )
@@ -42,8 +52,9 @@ export default function PopularSection() {
 
 const styles = StyleSheet.create({
     titleText: {
-        fontSize: 20,
-        fontWeight: 'bold'
+        fontSize: 24,
+        fontWeight: 'bold',
+        left: 20
     },
     card: {
         width: CARD_WIDTH,
@@ -61,5 +72,28 @@ const styles = StyleSheet.create({
         height: CARD_HEIGHT,
         resizeMode: 'cover',
 
+    },
+    titleBox: {
+        position: 'absolute',
+        top: CARD_HEIGHT - 90,
+        left: 16
+    },
+    textBox: {
+        flexDirection: 'row',
+        backgroundColor: '#4D5652',
+        borderRadius: 24,
+        alignItems: 'center',
+        justifyContent: 'space-evenly'
+    },
+    star: {
+        width: 24,
+        height: 24,
+        left: 10
+    },
+    textStyle: {
+        fontWeight: 'medium',
+        color: 'white',
+        marginHorizontal: 20,
+        marginVertical: 5
     }
 })
