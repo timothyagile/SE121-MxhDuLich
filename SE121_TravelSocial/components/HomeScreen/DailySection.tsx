@@ -17,7 +17,7 @@ export default function DailySection() {
                     <TouchableOpacity style = {{
                         marginLeft: 24,
                         marginRight:  index === locationData.length - 1 ? 24 : 0}}>
-                        <View style={[styles.card]} >
+                        <View style={[styles.card]} key = {item.key}>
                             <View style={styles.imageBox}>
                                 <Image style={styles.image} source={item.imgSource} />
                             </View>

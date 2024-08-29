@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import React from 'react';
-import {View, Text, StyleSheet, TextInput, FlatList, ScrollView} from 'react-native'
+import {View, Text, StyleSheet, TextInput, FlatList, ScrollView, TouchableOpacity} from 'react-native'
 
 import CategoryItem from "@/components/HomeScreen/CategoryItem"
 import categoryData from '@/constants/category';
@@ -8,8 +8,9 @@ import categoryData from '@/constants/category';
 import PopularSection from '@/components/HomeScreen/PopularSection';
 import RecommendedSection from '@/components/HomeScreen/RecommendedSection';
 import DailySection from '@/components/HomeScreen/DailySection';
+import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 
-export default function HomeScreen ()
+export default function HomeScreen ({navigation} : {navigation : NativeStackNavigatorProps})
 {
     
     const [findContent, setFindContent] = useState("");
@@ -57,15 +58,12 @@ export default function HomeScreen ()
             </View>
 
             <ScrollView style = {{borderWidth: 1, borderColor: 'red'}}>
-                    <PopularSection/>
+                    <PopularSection navigation = {navigation}/>
                     <RecommendedSection/>
                     <DailySection/>
             
 
             </ScrollView>
-            {/* <View style = {styles.body}>
-                
-            </View> */}
         </View>
     )
 }
