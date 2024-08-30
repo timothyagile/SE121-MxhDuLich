@@ -8,7 +8,7 @@ const CARD_WIDTH = 240;
 const CARD_HEIGHT = height - 600;
 const CARD_WIDTH_SPACING = CARD_WIDTH + 24;
 
-export default function PopularSection({navigation} : NativeStackNavigatorProps) {
+export default function PopularSection({navigation} : any) {
     return (
 
         <View>
