@@ -1,13 +1,14 @@
 import {Text, View, FlatList, Dimensions, TouchableOpacity, StyleSheet, Image} from 'react-native'
 import locationData from '@/constants/location';
 import React from 'react';
+import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 
 const {width, height} = Dimensions.get('window')
 const CARD_WIDTH = 240;
 const CARD_HEIGHT = height - 600;
 const CARD_WIDTH_SPACING = CARD_WIDTH + 24;
 
-export default function PopularSection() {
+export default function PopularSection({navigation} : any) {
     return (
 
         <View>
@@ -21,9 +22,11 @@ export default function PopularSection() {
         keyExtractor={item => item.id}
         renderItem={({item, index}) => {
             return (
-                <TouchableOpacity style = {{
+                <TouchableOpacity 
+                style = {{
                     marginLeft: 24,
-                    marginRight:  index === locationData.length - 1 ? 24 : 0}}>
+                    marginRight:  index === locationData.length - 1 ? 24 : 0}}
+                onPress={() => navigation.navigate('detail-screen')}>
                         <View style = {styles.card}>
                             <View style = {styles.imageBox}>
                                 <Image source={require('@/assets/images/bai-truoc-20.jpg')}
