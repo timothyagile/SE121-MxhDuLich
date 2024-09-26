@@ -4,11 +4,12 @@ import '../src/styles/index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import LoginScreen from './pages/LoginScreen';
+import DashBoardScreen from './pages/DashBoardScreen';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <LoginScreen />
+    <DashBoardScreen/>
   </React.StrictMode>
 );
 
