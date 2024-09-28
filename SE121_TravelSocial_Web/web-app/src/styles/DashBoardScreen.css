@@ -1,0 +1,356 @@
+@import url(../assets/styles/gradient-color.css);
+
+.dashboardheader {
+  display: flex;
+  height: calc(640px - 564.5px);
+  justify-content: end;
+}
+
+.notification-icon {
+  font-size: 24px;
+  color: #333;
+  cursor: pointer;
+  align-items: center;
+  display: flex;
+  margin-right: 20px;
+}
+
+.admin-info {
+  display: flex;
+  align-items: center;
+}
+
+.admin-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+
+.admin-name {
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 1px;
+}
+
+.admin-role {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  font-size: 14px;
+  color: #666;
+}
+
+.dashboardbody {
+  display: flex;
+}
+
+.leftframe {
+
+  margin-left: 10px;
+  width: 660px;
+  height: 562.5px;
+  display: block;
+}
+
+.chart {
+  width: 100%;
+  height: 45%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 cột */
+  gap: 15px; /* khoảng cách giữa các thẻ */
+  margin: 0px;
+   
+}
+
+
+.business-card {
+    width: 312.5px;
+    height: 100px;
+    border-radius: 10px;
+    background-color: var(--blue-opacity04-color);
+    border-radius: 6px;
+    padding: 5px;
+    position: relative;
+  } 
+
+  
+  .business-card .circle {
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    background-color: white !important;
+    border: 6px solid var(--blue-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+  }
+  
+  .business-card .card-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+    margin-left: 120px;
+  }
+
+
+ 
+  .business-card .card-body .number{
+    width:fit-content;
+    text-align: end;
+    margin-left: 100px;
+    padding:3px;
+    padding-left: 4px;
+    padding-right: 4px;
+    top: 15px;
+    right: 15px;
+    z-index: 2;
+  }
+
+  .business-card .card-body p{
+    position: relative;
+    height: 10px;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 2px solid #2196f3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    color: var(--blue-color);
+    font-size: 20px;
+  }
+
+
+  .business-card .card-body {
+    width: 100%;
+  }
+  
+  .business-card .card-header p {
+    font-size: 15px;
+    font-weight: 600;
+    color: black;
+    margin-top: 5px;
+    margin-left: 90px;
+    margin-bottom: 0px;
+
+  }
+
+  .business-card .card-header .frame  {
+    margin-left: 10px;
+    justify-content: end;
+    align-items: end;
+    text-align: end;
+  }
+  
+  .business-card .card-footer {
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    text-align: end;
+  }
+
+  .business-card .card-footer p {
+    margin-top: 0px;
+    margin-bottom:0px;
+    font-size: 12px;
+    font-style: italic;
+    opacity: 0.4;
+    margin-top: 5px;
+  }
+
+
+  .business-card .separator {
+    margin-top: 15px;
+    width: 310px;
+    height: 1.5px;
+    background-color: #000000;
+    opacity: 0.6;
+    margin-right: 0px;
+    margin-left: -5px;
+    z-index: 1;
+  }
+
+
+  .new-booking {
+    width: calc(100% - 2.5px);
+    height: calc(55% - 10px);
+    margin-top: 10px;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+  }
+
+  .new-booking-text {
+
+    color:var(--blue-color);
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-weight: 700;
+    font-size: 18px;
+    margin-left: 10px;
+  }
+
+  .custom-table {
+    margin-left: 10px;
+    width: 98%;
+    border-collapse: collapse;
+  }
+  
+  .custom-table th,
+  .custom-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    font-size: 11px;
+  }
+  
+  .custom-table th {
+    background-color: #ffffff;
+    font-weight: bold;
+  }
+  
+  .custom-table .location-icon {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .custom-table .location-icon img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+  
+  .custom-table .status-label {
+    background-color: #ffd6d6;
+    color: #ff4d4f;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+
+  .rightframe {
+    margin-left: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    
+    width: 300px;
+    height: 562.5px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+  }
+
+  .staticbydate {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  .new-business {
+    font-size: 16px;
+    font-weight: 600;
+
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    width: 90%;
+    height: 30px;
+    max-width: 500px;
+    background-image: var(--gradient-blue-customer);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+    margin-bottom:15px;
+    
+  }
+  
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 16px;
+  }
+  
+  .user-details {
+    flex-grow: 1;
+  }
+           
+  .user-name {
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 0px;
+  }
+  
+  .user-time {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom:0px ;
+  }
+  
+  .arrow-icon {
+    margin-left: 10px;
+    display: flex;
+    align-self: center;
+    justify-self: center;
+    font-size: 30px;
+    background-color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    color: #000000;
+  }
+
+
+  .custom-calendar { 
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 0px;
+    height: 240px;
+  }
+  
+  .custom-calendar .react-calendar__navigation {
+    margin-bottom: 20px;
+    justify-content: center;
+    display: flex;
+    
+  }
+  
+  .custom-calendar .react-calendar__navigation button {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--blue-color);
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .custom-calendar .react-calendar__tile {
+    padding: 0px;
+    font-size: 14px;
+    color: #333;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background-color: #f5f5f5;
+  }
+  
+  .custom-calendar .react-calendar__tile--active {
+    background-color: #2196f3;
+    color: #fff;
+    border-radius: 50%;
+  }
+  
+  .custom-calendar .react-calendar__tile--weekend {
+    color: #e53935;
+  }
