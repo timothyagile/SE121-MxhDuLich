@@ -54,7 +54,7 @@ body {
     color: #333;
   }
   
-  p {
+  .container .image-section p {
     margin: 0 0 20px 0;
     color: #777;
   }
@@ -145,3 +145,4 @@ body {
   .login-button:hover {
     background-color: var(--button-color-hover);  
   }
+
