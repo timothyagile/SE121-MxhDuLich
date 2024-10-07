@@ -5,12 +5,31 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import LoginScreen from './pages/LoginScreen';
 import DashBoardScreen from './pages/DashBoardScreen';
+import SideBar from './components/SideBar';
+import Layout from './pages/Layout';
+import ListBusinessScreen from './pages/ListBusinessScreen';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <DashBoardScreen/>
-    {/* <LoginScreen/> */}
+    
+
+    {/* <DashBoardScreen/>
+    <SideBar/> */}
+    <Router>
+      <Routes>
+        <Route path="/" element={<LoginScreen />} />
+        <Route element={<Layout />}>
+
+          <Route path="/dashboard" element={<DashBoardScreen />} />
+          <Route path="/listbusiness" element={<ListBusinessScreen />} />
+          {/* <Route path="/listlocation" element={<ListLocation />} />
+          <Route path="/chat" element={<Chat />} /> */}
+        </Route>
+      </Routes>
+    </Router>
+    
   </React.StrictMode>
 );
 

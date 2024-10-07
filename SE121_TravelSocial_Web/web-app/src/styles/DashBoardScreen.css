@@ -2,8 +2,56 @@
 
 .dashboardheader {
   display: flex;
-  height: calc(640px - 564.5px);
+  height: 10%;
   justify-content: end;
+}
+
+@media (min-width:1400px)  {
+  .leftframe {
+    width: 60%;
+  }
+
+}
+
+
+@media (min-width:1200px)  {
+  .leftframe {
+    width: 60%;
+  }
+
+}
+
+@media (min-width: 978px) and (max-width: 1199px) {
+  .leftframe {
+    width: 60%;
+  }
+}
+
+@media (min-width: 768px) and (max-width:979px) {
+  .leftframe {
+    width: 530px;
+  }
+  .rightframe {
+    width: 33%;
+  }
+  
+}
+
+@media (min-width: 481px) and (max-width:767px) {
+  
+  .rightframe {
+    display: none;
+  }
+  .leftframe {
+    width: 500px;
+  }
+  :root {
+    height: 560px;
+  }
+}
+
+@media (max-width: 480px) {
+  
 }
 
 .notification-icon {
@@ -18,17 +66,18 @@
 .admin-info {
   display: flex;
   align-items: center;
+  justify-content: space-evenly;
 }
 
 .admin-avatar {
-  width: 30px;
-  height: 30px;
+  width: 25%;
+  height: 100%;
   border-radius: 50%;
-  margin-right: 12px;
+  margin-right: 0px;
 }
 
 .admin-name {
-  font-size: 13px;
+  font-size: 0.8rem;
   font-weight: bold;
   margin-bottom: 1px;
 }
@@ -36,20 +85,24 @@
 .admin-role {
   margin-top: 0px;
   margin-bottom: 0px;
-  font-size: 14px;
+  font-size: 0.75rem;
   color: #666;
 }
 
 .dashboardbody {
+  width: 100%;
   display: flex;
+  height: 90%;
 }
 
 .leftframe {
 
   margin-left: 10px;
-  width: 660px;
-  height: 562.5px;
+  /* width: 60%; */
+  min-width: 60%;
+  
   display: block;
+  
 }
 
 .chart {
@@ -57,15 +110,15 @@
   height: 45%;
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* 2 cột */
-  gap: 15px; /* khoảng cách giữa các thẻ */
+  gap: 0.9rem; /* khoảng cách giữa các thẻ */
   margin: 0px;
-   
+  
 }
 
 
 .business-card {
-    width: 312.5px;
-    height: 100px;
+    width: 97%;
+    height: 90%;
     border-radius: 10px;
     background-color: var(--blue-opacity04-color);
     border-radius: 6px;
@@ -76,8 +129,8 @@
   
   .business-card .circle {
     border-radius: 50%;
-    width: 80px;
-    height: 80px;
+    width: 3.8rem;
+    height: 3.8rem;
     background-color: white !important;
     border: 6px solid var(--blue-color);
     display: flex;
@@ -105,7 +158,7 @@
   .business-card .card-body .number{
     width:fit-content;
     text-align: end;
-    margin-left: 100px;
+    margin-left: 40%;
     padding:3px;
     padding-left: 4px;
     padding-right: 4px;
@@ -116,7 +169,7 @@
 
   .business-card .card-body p{
     position: relative;
-    height: 10px;
+    height: 5%;
     border-radius: 10px;
     background-color: rgba(255, 255, 255, 0.5);
     border: 2px solid #2196f3;
@@ -126,7 +179,7 @@
     margin-bottom: 0px;
     margin-top: 0px;
     color: var(--blue-color);
-    font-size: 20px;
+    font-size: 1rem;
   }
 
 
@@ -135,7 +188,7 @@
   }
   
   .business-card .card-header p {
-    font-size: 15px;
+    font-size: 0.8rem;
     font-weight: 600;
     color: black;
     margin-top: 5px;
@@ -152,7 +205,7 @@
   }
   
   .business-card .card-footer {
-    bottom: 10px;
+    bottom: 0px;
     left: 0;
     right: 0;
     text-align: end;
@@ -170,7 +223,7 @@
 
   .business-card .separator {
     margin-top: 15px;
-    width: 310px;
+    width: 100%;
     height: 1.5px;
     background-color: #000000;
     opacity: 0.6;
@@ -181,8 +234,8 @@
 
 
   .new-booking {
-    width: calc(100% - 2.5px);
-    height: calc(55% - 10px);
+    width: 100%;
+    height: 53%;
     margin-top: 10px;
     border-radius: 5px;
     border: 1px solid var(--border-color);
@@ -242,8 +295,8 @@
     padding-left: 10px;
     padding-right: 10px;
     
-    width: 300px;
-    height: 562.5px;
+    /* width: 40%; */
+    height: 100%;
     border: 1px solid var(--border-color);
     border-radius: 10px;
   }

@@ -1,148 +1,225 @@
-/* LoginScreen.css */
 @import url(../assets/styles/font.css);
 @import url(../assets/styles/button-color.css);
 @import url(../assets/styles/blue.css);
 
-
 body {
-    width: 100%;
-    justify-content: center;
-    align-items: center;
-    margin: 0;
-    font-family: 'UTMTimesBold', sans-serif;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  font-family: 'UTMTimesBold', sans-serif;
+}
+
+.container {
+  align-items: center;
+  justify-content: center;
+  /* width: 100%; */
+  /* max-width: 1200px; */
+  display: flex;
+  /* padding: 20px; */
+  /* height: 100vh; */
+}
+
+@media (min-width:1400px)  {
+  :root {
+    font-size: 18px;
   }
-  
   .container {
-    align-items: center;
-    justify-content: center;
-    width: 1100px;
-    display: flex;
-    height: 100vh;
+    width: 1190px;
+    font-size: 1rem;
   }
-  
-  .image-section {
-    flex: 3;
-    background: #ffffff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  .sidebar {
+    width: 130px;
   }
-  
-  .background-image {
-    max-width: 100%;
-    border-radius: 20px;
+
+}
+
+
+@media (min-width:1200px)  {
+  :root {
+    font-size: 18px;
   }
-  
-  .login-section {
-    flex: 2;
-    padding: 40px;
-    background: white;
-    display: flex;
+  .container {
+    width: 1190px;
+    font-size: 1rem;
+  }
+  .sidebar {
+    width: 130px;
+  }
+
+}
+
+@media (min-width: 978px) and (max-width: 1199px) {
+  :root {
+    font-size: 16px;
+  }
+  .container {
+    width: 950px;
+  }
+
+  .sidebar {
+    width: 127px;
+  }
+}
+
+@media (min-width: 768px) and (max-width:979px) {
+  :root {
+    font-size: 14px;
+  }
+  .container {
     flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
+    width: 734px;
   }
   
-  .logo {
-    width: 150px;
-    margin-bottom: 20px;
+}
+
+@media (min-width: 481px) and (max-width:767px) {
+  :root {
+    font-size: 12px;
+  }
+  .container {
+    flex-direction: column;
+    width: 476px;
+    
+  }
+  .containerformobile {
+    height: 560px;
   }
   
-  h2 {
-    margin: 0;
-    font-size: 24px;
-    color: #333;
+}
+
+@media (max-width: 480px) {
+  :root {
+    font-size: 12px;
   }
-  
-  .container .image-section p {
-    margin: 0 0 20px 0;
-    color: #777;
-  }
-  
-  .input-group {
-    margin-bottom: 15px;
-    width: 320px;
-  }
-  
-  label {
-    display: block;
-    margin-bottom: 5px;
-    color: #555;
-  }
-  
-  input[type="email"],
-  input[type="password"] {
+  .container {
     width: 100%;
     padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
   }
+}
 
-  input[type="email"]:focus,
-  input[type="password"]:focus {
-    width: 100%;
-    padding: 10px;
-    border: 2px solid var(--blue-color);
-    border-radius: 5px;
-    outline: none;
-  }
+.image-section {
+  flex: 3;
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
 
-  input[type="checkbox"] {
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    background-color: #f0f0f0;
-    border: 2px solid #ccc;
-    border-radius: 4px;
-    cursor: pointer;
-    position: relative;
-  }
-  
-  input[type="checkbox"]:checked {
-    background-color: var(--button-color);
-    border-color: var(--button-color);
-  }
-  
-  input[type="checkbox"]:checked::after {
-    content: '';
-    position: absolute;
-    top: -1px;
-    left: 4px;
-    width: 6px;
-    height: 12px;
-    border: solid white;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-  }
-  
-  .checkbox-group {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 340px;
-    margin-bottom: 20px;
-  }
+.background-image {
+  max-width: 80%;
+  border-radius: 20px;
+}
 
-  .remember-group {
-    display: flex;
-  }
-  
-  .forgot-password {
-    color: var(--blue-color);
-    text-decoration: none;
-  }
-  
-  .login-button {
-    width: 100%;
-    padding: 10px;
-    background-color: var(--button-color);
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .login-button:hover {
-    background-color: var(--button-color-hover);  
-  }
+.login-section {
+  flex: 2;
+  padding: 20px;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  max-width: 400px;
+  width: 100%;
+}
 
+.logo {
+  width: 120px;
+  margin-bottom: 20px;
+}
+
+h2 {
+  margin: 0;
+  font-size: 22px;
+  color: #333;
+}
+
+.container .image-section p {
+  margin: 0 0 20px 0;
+  color: #777;
+}
+
+.input-group {
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: #555;
+}
+
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus {
+  border: 2px solid var(--blue-color);
+  outline: none;
+}
+
+input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background-color: #f0f0f0;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+}
+
+input[type="checkbox"]:checked {
+  background-color: var(--button-color);
+  border-color: var(--button-color);
+}
+
+input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 4px;
+  width: 6px;
+  height: 12px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.remember-group {
+  display: flex;
+}
+
+.forgot-password {
+  color: var(--blue-color);
+  text-decoration: none;
+}
+
+.login-button {
+  width: 100%;
+  padding: 10px;
+  background-color: var(--button-color);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.login-button:hover {
+  background-color: var(--button-color-hover);  
+}
