@@ -15,9 +15,8 @@ const DashBoardScreen = () => {
 
 
   return (
-    <div class = "container">
-      <SideBar />
-      <div>
+    <div class="container">
+      <div class="containerformobile" >
         <div class="dashboardheader">
           <div className="notification-icon">
             <FaBell></FaBell>

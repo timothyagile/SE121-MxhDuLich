@@ -1,40 +1,23 @@
 import { useState } from 'react';
 import React from 'react';
 import '../styles/SideBar.css';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaHome, FaMapMarkerAlt, FaBookOpen, FaServicestack, FaChartBar } from 'react-icons/fa';
 
 const SideBar = () => {
-  // const iconSources = [
-  //   {
-  //     inactive: require("../assets/icons/home.png"),
-  //     active: require("../assets/icons/active-home.png"),
-  //   },
-  //   {
-  //     inactive: require("../assets/icons/location.png"),
-  //     active: require("../assets/icons/active-location.png"),
-  //   },
-  //   {
-  //     inactive: require("../assets/icons/booking.png"),
-  //     active: require("../assets/icons/active-booking.png"),
-  //   },
-  //   {
-  //     inactive: require("../assets/icons/service.png"),
-  //     active: require("../assets/icons/active-service.png"),
-  //   },
-  //   {
-  //     inactive: require("../assets/icons/histogram.png"),
-  //     active: require("../assets/icons/active-histogram.png"),
-  //   },
-  // ];
+
+  const navigate = useNavigate(); 
 
   const iconSources = [
     {
       inactive: <FaHome />,
       active: <FaHome className="text-white" />,
+      link: "/dashboard",
     },
     {
       inactive: <FaMapMarkerAlt />,
       active: <FaMapMarkerAlt className="text-white" />,
+      link: "/listbusiness",
     },
     {
       inactive: <FaBookOpen />,
@@ -64,6 +47,7 @@ const SideBar = () => {
     const newActiveItems = activeItems.map((_, i) => i === index);
     setActiveItems(newActiveItems);
     setActiveIndex(index);
+    navigate(iconSources[index].link);
   };
 
   return (

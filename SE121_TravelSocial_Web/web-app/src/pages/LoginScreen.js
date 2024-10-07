@@ -1,8 +1,12 @@
 // LoginScreen.js
 import React from 'react';
 import '../styles/LoginScreen.css';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 function LoginScreen() {
+  const navigate = useNavigate(); 
+
   return (
     <div className="container">
       <div className="image-section">
@@ -29,7 +33,7 @@ function LoginScreen() {
             
             <a href="#" className="forgot-password">Quên mật khẩu?</a>
           </div>
-          <button type="submit" className="login-button">Đăng nhập</button>
+          <button type="submit" className="login-button" onClick={() => navigate("/dashboard")} >Đăng nhập</button>
         </form>
       </div>
     </div>
