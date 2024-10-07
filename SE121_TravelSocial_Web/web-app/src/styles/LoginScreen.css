@@ -3,19 +3,28 @@
 @import url(../assets/styles/blue.css);
 
 body {
+  box-sizing: unset;
   width: 100%;
+  height: 100%;
   justify-content: center;
   align-items: center;
   margin: 0;
   font-family: 'UTMTimesBold', sans-serif;
 }
 
+*, ::after, ::before {
+  box-sizing: content-box; /* Hoặc sử dụng giá trị khác mà bạn mong muốn */
+}
+
+
+
 .container {
-  align-items: center;
+  align-items: self-start;
   justify-content: center;
   /* width: 100%; */
   /* max-width: 1200px; */
   display: flex;
+  min-height: 760px;
   /* padding: 20px; */
   /* height: 100vh; */
 }
