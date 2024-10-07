@@ -3,12 +3,19 @@
 @import url(../assets/styles/blue.css);
 
 body {
+  box-sizing: unset;
   width: 100%;
   justify-content: center;
   align-items: center;
   margin: 0;
   font-family: 'UTMTimesBold', sans-serif;
 }
+
+*, ::after, ::before {
+  box-sizing: content-box; /* Hoặc sử dụng giá trị khác mà bạn mong muốn */
+}
+
+
 
 .container {
   align-items: center;
