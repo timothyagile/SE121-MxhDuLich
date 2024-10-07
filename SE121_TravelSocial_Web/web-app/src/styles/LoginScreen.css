@@ -5,6 +5,7 @@
 body {
   box-sizing: unset;
   width: 100%;
+  height: 100%;
   justify-content: center;
   align-items: center;
   margin: 0;
@@ -18,11 +19,12 @@ body {
 
 
 .container {
-  align-items: center;
+  align-items: self-start;
   justify-content: center;
   /* width: 100%; */
   /* max-width: 1200px; */
   display: flex;
+  min-height: 760px;
   /* padding: 20px; */
   /* height: 100vh; */
 }

@@ -4,7 +4,7 @@
 .sidebar {
   border-radius: 10px;
   /* width: 70%; */
-  height: 90%;
+  height: 110%;
   background-image: var(--gradient-blue-sidebar);
   padding: 20px;
   display: flex;

@@ -1,5 +1,6 @@
 @import url(../assets/styles/gradient-color.css);
 
+
 .dashboardheader {
   display: flex;
   height: 10%;
@@ -87,6 +88,10 @@
   margin-bottom: 0px;
   font-size: 0.75rem;
   color: #666;
+}
+
+.containerformobile {
+  height: 100%;
 }
 
 .dashboardbody {
