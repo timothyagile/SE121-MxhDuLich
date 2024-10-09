@@ -32,6 +32,7 @@ const SideBar = () => {
     {
       inactive: <FaChartBar />,
       active: <FaChartBar className="text-white" />,
+      link:"/statistic"
     },
   ];
 

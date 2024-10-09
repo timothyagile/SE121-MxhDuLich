@@ -6,7 +6,7 @@ import { FaAngleRight,FaBell, FaEye } from 'react-icons/fa';
 const ListBusinessScreen = () => {
   return (
     <div class="container">
-      <div class = "containerformobile">
+      <div class="containerformobile">
         <div class="dashboardheader">
             <div className="notification-icon">
               <FaBell></FaBell>

@@ -1,0 +1,16 @@
+.chartcontainer {
+    display: flex;
+}
+
+.staticchart {
+    display: table-column;
+    align-items: center;
+    justify-content: center;
+}
+
+.piechart{
+    display: flex;
+    width: 580px;
+    justify-content: center;
+    align-items: center;
+}
