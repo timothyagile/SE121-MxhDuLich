@@ -1,9 +1,9 @@
 import React from 'react';
-import '../styles/ListBuninessScreen.css'
+import '../styles/ListBookingScreen.css'
 import { FaAngleRight,FaBell, FaEye } from 'react-icons/fa';
 
 
-const ListBusinessScreen = () => {
+const ListBookingScreen = () => {
   return (
     <div class="container">
       <div class = "containerformobile">
@@ -26,37 +26,17 @@ const ListBusinessScreen = () => {
                 <thead>
                     <tr>
                         <th>STT</th>
-                        <th>Tên nhà kinh doanh</th>
-                        <th>Mã số</th>
-                        <th>CMND/CCCD</th>
-                        <th>Số điện thoại</th>
-                        <th>Loại</th>
+                        <th>Tên khách hàng</th>
+                        <th>Mã phiếu</th>
+                        <th>Ngày đặt</th>
+                        <th>Trạng thái</th>
+                        <th>Tổng tiền</th>
                         <th></th>
                     </tr> 
                 </thead>
               
                 <tbody class="row-container">
-                  
-                  <tr >
-                        <td>1</td>
-                        <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                        
-                          
-                          </td>
-                        <td>KH3453212</td>
-                        <td>079303041265</td>
-                        <td>0987654321</td>
-                        <td>Camping</td>
-                        <td>
-                          <div class="icon-container">
-                              <FaEye />
-                          </div>
-                        </td>
-                  </tr>
+
 
                   <tr >
                         <td>1</td>
@@ -65,13 +45,14 @@ const ListBusinessScreen = () => {
                             <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
                             <p>Du lịch hồ cốc - vùng tàu</p>
                           </div>
-                        
-                          
                           </td>
-                        <td>KH3453212</td>
-                        <td>079303041265</td>
-                        <td>0987654321</td>
-                        <td>Camping</td>
+                        
+                        <td>P3453212</td>
+                        <td>19/05/2024</td>
+                        
+
+                        <td>đang chờ</td>
+                        <td>50,000,000đ</td>
                         <td>
                           <div class="icon-container">
                               <FaEye />
@@ -86,118 +67,14 @@ const ListBusinessScreen = () => {
                             <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
                             <p>Du lịch hồ cốc - vùng tàu</p>
                           </div>
-                        
-                          
                           </td>
-                        <td>KH3453212</td>
-                        <td>079303041265</td>
-                        <td>0987654321</td>
-                        <td>Camping</td>
-                        <td>
-                          <div class="icon-container">
-                              <FaEye />
-                          </div>
-                        </td>
-                  </tr>
+                        
+                        <td>P3453212</td>
+                        <td>19/05/2024</td>
+                        
 
-                  <tr >
-                        <td>1</td>
-                        <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                        
-                          
-                          </td>
-                        <td>KH3453212</td>
-                        <td>079303041265</td>
-                        <td>0987654321</td>
-                        <td>Camping</td>
-                        <td>
-                          <div class="icon-container">
-                              <FaEye />
-                          </div>
-                        </td>
-                  </tr>
-
-                  <tr >
-                        <td>1</td>
-                        <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                        
-                          
-                          </td>
-                        <td>KH3453212</td>
-                        <td>079303041265</td>
-                        <td>0987654321</td>
-                        <td>Camping</td>
-                        <td>
-                          <div class="icon-container">
-                              <FaEye />
-                          </div>
-                        </td>
-                  </tr>
-
-                  <tr >
-                        <td>1</td>
-                        <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                        
-                          
-                          </td>
-                        <td>KH3453212</td>
-                        <td>079303041265</td>
-                        <td>0987654321</td>
-                        <td>Camping</td>
-                        <td>
-                          <div class="icon-container">
-                              <FaEye />
-                          </div>
-                        </td>
-                  </tr>
-
-                  <tr >
-                        <td>1</td>
-                        <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                        
-                          
-                          </td>
-                        <td>KH3453212</td>
-                        <td>079303041265</td>
-                        <td>0987654321</td>
-                        <td>Camping</td>
-                        <td>
-                          <div class="icon-container">
-                              <FaEye />
-                          </div>
-                        </td>
-                  </tr>
-
-                  <tr >
-                        <td>1</td>
-                        <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                        
-                          
-                          </td>
-                        <td>KH3453212</td>
-                        <td>079303041265</td>
-                        <td>0987654321</td>
-                        <td>Camping</td>
+                        <td>đang chờ</td>
+                        <td>50,000,000đ</td>
                         <td>
                           <div class="icon-container">
                               <FaEye />
@@ -205,7 +82,142 @@ const ListBusinessScreen = () => {
                         </td>
                   </tr>
                   
-                    
+
+                  <tr >
+                        <td>1</td>
+                        <td>
+                          <div class="namefield">
+                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
+                            <p>Du lịch hồ cốc - vùng tàu</p>
+                          </div>
+                          </td>
+                        
+                        <td>P3453212</td>
+                        <td>19/05/2024</td>
+                        
+
+                        <td>đang chờ</td>
+                        <td>50,000,000đ</td>
+                        <td>
+                          <div class="icon-container">
+                              <FaEye />
+                          </div>
+                        </td>
+                  </tr>
+                  
+
+                  <tr >
+                        <td>1</td>
+                        <td>
+                          <div class="namefield">
+                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
+                            <p>Du lịch hồ cốc - vùng tàu</p>
+                          </div>
+                          </td>
+                        
+                        <td>P3453212</td>
+                        <td>19/05/2024</td>
+                        
+
+                        <td>đang chờ</td>
+                        <td>50,000,000đ</td>
+                        <td>
+                          <div class="icon-container">
+                              <FaEye />
+                          </div>
+                        </td>
+                  </tr>
+                  
+
+                  <tr >
+                        <td>1</td>
+                        <td>
+                          <div class="namefield">
+                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
+                            <p>Du lịch hồ cốc - vùng tàu</p>
+                          </div>
+                          </td>
+                        
+                        <td>P3453212</td>
+                        <td>19/05/2024</td>
+                        
+
+                        <td>đang chờ</td>
+                        <td>50,000,000đ</td>
+                        <td>
+                          <div class="icon-container">
+                              <FaEye />
+                          </div>
+                        </td>
+                  </tr>
+                  
+                  <tr >
+                        <td>1</td>
+                        <td>
+                          <div class="namefield">
+                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
+                            <p>Du lịch hồ cốc - vùng tàu</p>
+                          </div>
+                          </td>
+                        
+                        <td>P3453212</td>
+                        <td>19/05/2024</td>
+                        
+
+                        <td>đang chờ</td>
+                        <td>50,000,000đ</td>
+                        <td>
+                          <div class="icon-container">
+                              <FaEye />
+                          </div>
+                        </td>
+                  </tr>
+                  
+
+                  <tr >
+                        <td>1</td>
+                        <td>
+                          <div class="namefield">
+                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
+                            <p>Du lịch hồ cốc - vùng tàu</p>
+                          </div>
+                          </td>
+                        
+                        <td>P3453212</td>
+                        <td>19/05/2024</td>
+                        
+
+                        <td>đang chờ</td>
+                        <td>50,000,000đ</td>
+                        <td>
+                          <div class="icon-container">
+                              <FaEye />
+                          </div>
+                        </td>
+                  </tr>
+                  
+                  <tr >
+                        <td>1</td>
+                        <td>
+                          <div class="namefield">
+                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
+                            <p>Du lịch hồ cốc - vùng tàu</p>
+                          </div>
+                          </td>
+                        
+                        <td>P3453212</td>
+                        <td>19/05/2024</td>
+                        
+
+                        <td>đang chờ</td>
+                        <td>50,000,000đ</td>
+                        <td>
+                          <div class="icon-container">
+                              <FaEye />
+                          </div>
+                        </td>
+                  </tr>
+                  
                 </tbody>
                 
             </table>
@@ -224,4 +236,4 @@ const ListBusinessScreen = () => {
   );
 };
 
-export default ListBusinessScreen;
+export default ListBookingScreen;

@@ -22,10 +22,12 @@ const SideBar = () => {
     {
       inactive: <FaBookOpen />,
       active: <FaBookOpen className="text-white" />,
+      link:"/listlocation",
     },
     {
       inactive: <FaServicestack />,
       active: <FaServicestack className="text-white" />,
+      link:"/listbooking",
     },
     {
       inactive: <FaChartBar />,
