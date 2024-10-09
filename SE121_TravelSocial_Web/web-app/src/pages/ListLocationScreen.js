@@ -1,9 +1,9 @@
 import React from 'react';
-import '../styles/ListBuninessScreen.css'
+import '../styles/ListLocationScreen.css'
 import { FaAngleRight,FaBell, FaEye } from 'react-icons/fa';
 
 
-const ListBusinessScreen = () => {
+const ListLocationScreen = () => {
   return (
     <div class="container">
       <div class = "containerformobile">
@@ -27,10 +27,8 @@ const ListBusinessScreen = () => {
                     <tr>
                         <th>STT</th>
                         <th>Tên nhà kinh doanh</th>
-                        <th>Mã số</th>
-                        <th>CMND/CCCD</th>
-                        <th>Số điện thoại</th>
                         <th>Loại</th>
+                        <th>Số điện thoại</th>
                         <th></th>
                     </tr> 
                 </thead>
@@ -47,10 +45,9 @@ const ListBusinessScreen = () => {
                         
                           
                           </td>
-                        <td>KH3453212</td>
-                        <td>079303041265</td>
-                        <td>0987654321</td>
+                        
                         <td>Camping</td>
+                        <td>FFXQ+X94, Bưng Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam</td>
                         <td>
                           <div class="icon-container">
                               <FaEye />
@@ -68,10 +65,9 @@ const ListBusinessScreen = () => {
                         
                           
                           </td>
-                        <td>KH3453212</td>
-                        <td>079303041265</td>
-                        <td>0987654321</td>
+                        
                         <td>Camping</td>
+                        <td>FFXQ+X94, Bưng Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam</td>
                         <td>
                           <div class="icon-container">
                               <FaEye />
@@ -89,10 +85,9 @@ const ListBusinessScreen = () => {
                         
                           
                           </td>
-                        <td>KH3453212</td>
-                        <td>079303041265</td>
-                        <td>0987654321</td>
+                        
                         <td>Camping</td>
+                        <td>FFXQ+X94, Bưng Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam</td>
                         <td>
                           <div class="icon-container">
                               <FaEye />
@@ -110,10 +105,9 @@ const ListBusinessScreen = () => {
                         
                           
                           </td>
-                        <td>KH3453212</td>
-                        <td>079303041265</td>
-                        <td>0987654321</td>
+                        
                         <td>Camping</td>
+                        <td>FFXQ+X94, Bưng Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam</td>
                         <td>
                           <div class="icon-container">
                               <FaEye />
@@ -131,10 +125,9 @@ const ListBusinessScreen = () => {
                         
                           
                           </td>
-                        <td>KH3453212</td>
-                        <td>079303041265</td>
-                        <td>0987654321</td>
+                        
                         <td>Camping</td>
+                        <td>FFXQ+X94, Bưng Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam</td>
                         <td>
                           <div class="icon-container">
                               <FaEye />
@@ -152,10 +145,9 @@ const ListBusinessScreen = () => {
                         
                           
                           </td>
-                        <td>KH3453212</td>
-                        <td>079303041265</td>
-                        <td>0987654321</td>
+                        
                         <td>Camping</td>
+                        <td>FFXQ+X94, Bưng Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam</td>
                         <td>
                           <div class="icon-container">
                               <FaEye />
@@ -173,10 +165,9 @@ const ListBusinessScreen = () => {
                         
                           
                           </td>
-                        <td>KH3453212</td>
-                        <td>079303041265</td>
-                        <td>0987654321</td>
+                        
                         <td>Camping</td>
+                        <td>FFXQ+X94, Bưng Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam</td>
                         <td>
                           <div class="icon-container">
                               <FaEye />
@@ -194,10 +185,9 @@ const ListBusinessScreen = () => {
                         
                           
                           </td>
-                        <td>KH3453212</td>
-                        <td>079303041265</td>
-                        <td>0987654321</td>
+                        
                         <td>Camping</td>
+                        <td>FFXQ+X94, Bưng Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam</td>
                         <td>
                           <div class="icon-container">
                               <FaEye />
@@ -224,4 +214,4 @@ const ListBusinessScreen = () => {
   );
 };
 
-export default ListBusinessScreen;
+export default ListLocationScreen;
