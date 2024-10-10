@@ -1,9 +1,12 @@
 import React from 'react';
 import '../styles/ListLocationScreen.css'
 import { FaAngleRight,FaBell, FaEye } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 
 const ListLocationScreen = () => {
+  const navigate = useNavigate();
+
   return (
     <div class="container">
       <div class="containerformobile">
@@ -49,9 +52,9 @@ const ListLocationScreen = () => {
                         <td>Camping</td>
                         <td>FFXQ+X94, Bưng Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam</td>
                         <td>
-                          <div class="icon-container">
-                              <FaEye />
-                          </div>
+                          <button type="submit" class="icon-container iconview" onClick={() => navigate("/detaillocation")}>
+                            <FaEye />
+                          </button>
                         </td>
                   </tr>
 
