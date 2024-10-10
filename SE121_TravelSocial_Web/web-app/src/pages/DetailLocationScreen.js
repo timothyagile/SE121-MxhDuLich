@@ -1,0 +1,253 @@
+import React from "react";
+import { useState } from "react";
+import { FaAngleRight,FaBell, FaEye,FaSearchLocation, FaEdit, FaStar, FaStarHalfAlt} from 'react-icons/fa';
+import { FaRankingStar, FaX, FaPlus } from "react-icons/fa6";
+import { MdEventNote } from "react-icons/md";
+import '../styles/DetailLocationScreen.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPhoneAlt, faEnvelope, faUser, faMapMarkerAlt, faMemo } from '@fortawesome/free-solid-svg-icons';
+
+const DetailLocationScreen =() => {
+
+    const [currentTab, setCurrentTab] = useState('baseinfo'); 
+
+    const handleBaseInfoClick = () => {
+        setCurrentTab('baseinfo'); 
+    };
+
+    const handleSpecificInfoClick = () => {
+        setCurrentTab('specificinfo'); 
+    };
+
+    const handleRatingServiceClick =() => {
+        setCurrentTab('ratingservice');
+    }
+
+
+    return (
+        <div class="container">
+           <div class="containerformobile">
+                <div class="dashboardheader">
+                    <div className="notification-icon">
+                    <FaBell></FaBell>
+                    </div>
+                    <div className="admin-info">
+                    <img src="avatar.png" alt="Admin Avatar" className="admin-avatar" />
+                    <div className="admin-details">
+                        <h2 className="admin-name">Tô Hoàng Huy</h2>
+                        <p className="admin-role">Quản trị viên</p>
+                    </div>
+                    </div>
+                </div>
+
+                <div class="containerlistbusiness widthlistbusiness">
+                    <div class="max-w-4xl mx-auto mt-10 bg-white rounded-lg shadow-md p-6">
+                        <div class="flex items-center">
+                            <img alt="Profile picture of a person" class="w-20 h-20 rounded-full mr-4" height="80" src="https://storage.googleapis.com/a1aa/image/0FPVWfLJ1m0nJS9YfULFrbvezZsDHus5bXhqxVDA6tO9UMKnA.jpg" width="80"/>
+                            <div>
+                                <h1 class="text-xl font-bold">
+                                    Du lịch Hồ Cốc - Vũng Tàu
+                                </h1>
+                                <div class="flex items-center text-gray-600 mt-2">
+                                    <FontAwesomeIcon icon={faPhoneAlt} className="mr-2" />
+                                    <span>
+                                        0987654321
+                                    </span>
+                                </div>
+                                <div class="flex items-center text-gray-600 mt-1">
+                                    <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
+                                    <span>
+                                        hc.vt@example.com
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <div class="flex">
+                                <button onClick={handleBaseInfoClick} className={`flex items-center px-4 py-2 ${currentTab === 'baseinfo' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'} rounded-t-lg`}>
+                                    {/* <FontAwesomeIcon icon={faUser} className="mr-2" /> */}
+                                    <FaSearchLocation className="mr-2 text-2xl" />
+                                    <span>
+                                        Thông tin tổng quan
+                                    </span>
+                                </button>
+                                <button  onClick={handleSpecificInfoClick} class={`flex items-center px-4 py-2 ${currentTab === 'specificinfo' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'} rounded-t-lg ml-2`}>
+                                    {/* <FontAwesomeIcon icon={faUser} className="mr-2" /> */}
+                                    <MdEventNote className="mr-2 text-2xl" />
+                                    <span>
+                                        Thông tin địa điểm
+                                    </span>
+                                </button>
+                                <button  onClick={handleRatingServiceClick} class={`flex items-center px-4 py-2 ${currentTab === 'ratingservice' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'} rounded-t-lg ml-2`}>
+                                    <FaRankingStar className="mr-2 text-2xl"/>
+                                    <span>
+                                        Dịch vụ và đánh giá
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                        {currentTab === 'baseinfo' && (
+                            <div class="border border-gray-200 rounded-b-lg p-4">
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <p class="text-gray-600">Mã địa điểm</p>
+                                        <p class="font-semibold">124335111</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-gray-600">Tên địa điểm</p>
+                                        <p class="font-semibold">Du lịch Hồ Cốc - Vũng Tàu</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-gray-600">Tên nhà kinh doanh</p>
+                                        <p class="font-semibold">Du lịch Hồ Cốc - Vũng Tàu</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-gray-600">Địa chỉ</p>
+                                        <p class="font-semibold">FFXQ+X94, Bung Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-gray-600">Loại</p>
+                                        <p class="font-semibold">camping</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-gray-600">Ngày đăng ký kinh doanh</p>
+                                        <p class="font-semibold"> 12/10/2023 </p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <img alt="Satellite view of Du lịch Hồ Cốc - Vũng Tàu" class="w-full max-w-xs mx-auto h-of-map" src="https://storage.googleapis.com/a1aa/image/oPZffFlAjIu7skZYoX8hS47d3ioVwXoWu6YnGKv7e0Wl2jKnA.jpg"/>
+                                </div>
+                            </div>  
+                        )}
+
+                        {currentTab === 'specificinfo' && (
+                            <div class="border border-gray-200 rounded-b-lg p-4">
+                               
+                                <div class="flex space-x-4 overflow-x-auto pb-4">
+                                        <div class="relative">
+                                            <img alt="Image of a castle" class="w-24 h-24 object-cover rounded-lg" height="100" src="https://storage.googleapis.com/a1aa/image/ouHZc2gP3LKELBzF9b9WhRW9eF7SEgifV3ddt1F1gtse8nKnA.jpg" width="100"/>
+                                            <button class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
+                                                <FaX className="text-xs"/>
+                                            </button>
+                                        </div>
+                                        <div class="relative">
+                                            <img alt="Image of a ferris wheel" class="w-24 h-24 object-cover rounded-lg" height="100" src="https://storage.googleapis.com/a1aa/image/sCsVlOJSeD3UTaLoIIrOT6PxhfRdIWZr15lz5azFe8KJ9nKnA.jpg" width="100"/>
+                                            <button class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
+                                                <FaX className="text-xs"/>
+                                            </button>
+                                        </div>
+                                        <div class="relative">
+                                            <img alt="Image of a ticket" class="w-24 h-24 object-cover rounded-lg" height="100" src="https://storage.googleapis.com/a1aa/image/2DNYdCQdMDJbBZyhIyouoG7XtT5NuAbJKXjf12XkQuoPfTlTA.jpg" width="100"/>
+                                            <button class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
+                                                <FaX className="text-xs"/>
+                                            </button>
+                                        </div>
+                                        <div class="relative">
+                                            <img alt="Image of a castle with flowers" class="w-24 h-24 object-cover rounded-lg" height="100" src="https://storage.googleapis.com/a1aa/image/tSYsfyPeJjhDVki0Vsk8DDATWf9vRxue66bCDKYAEBhL6PVOB.jpg" width="100"/>
+                                            <button class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
+                                                <FaX className="text-xs"/>
+                                            </button>
+                                        </div>
+                                        <div class="relative">
+                                            <img alt="Image of a street" class="w-24 h-24 object-cover rounded-lg" height="100" src="https://storage.googleapis.com/a1aa/image/gwx1kHK9DQYSPN7stTexFkCK510ikafYbvOKxeRQn12K9nKnA.jpg" width="100"/>
+                                            <button class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
+                                                <FaX className="text-xs"/>
+                                            </button>
+                                        </div>
+                                        <div class="relative">
+                                            <img alt="Image of a statue" class="w-24 h-24 object-cover rounded-lg" height="100" src="https://storage.googleapis.com/a1aa/image/j9gNxOarjEr4DZ4gDrQF2iVtefocfFCRhseXPCdbmIoF6PVOB.jpg" width="100"/>
+                                            <button class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
+                                                <FaX className="text-xs"/>
+                                            </button>
+                                        </div>
+                                        <div class="w-24 h-24 flex items-center justify-center bg-gray-200 rounded-lg">
+                                            <FaPlus class="text-gray-500 text-2xl"/>
+                                        </div>
+                                </div>
+                                <div class="mt-6">
+                                        <div class="mb-4">
+                                            <label class="block text-gray-700 text-sm font-bold mb-2">Tên địa điểm </label>
+                                            <p class="text-gray-900">Du lịch Hồ Cốc - Vũng Tàu</p>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label class="block text-gray-700 text-sm font-bold mb-2">Địa chỉ</label>
+                                            <p class="text-gray-900">FFXQ+X94, Bưng Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam </p>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label class="block text-gray-700 text-sm font-bold mb-2">Mô tả</label>
+                                            <p class="text-gray-900">Khu cắm trại Hồ Cốc là khu cắm trại gần biển, dịch vụ giá rẻ phù hợp với mọi người muốn trải nghiệm các hoạt động ngoài trời cùng gia đình, người thân.</p>
+                                        </div>
+                                </div>
+                                <div class="flex justify-end">
+                                        <button class="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center">
+                                            <FaEdit class="mr-2"/>
+                                            Chỉnh sửa
+                                        </button>
+                                </div>
+                                
+                            </div>
+                        )}
+
+                        {currentTab === 'ratingservice' && (
+                            <div class="border border-gray-200 rounded-b-lg p-4">
+                                    <h2 class="text-xl font-bold mb-4">Phòng</h2>
+                                    <div class="grid grid-cols-3 gap-4 mb-8">
+                                        <div class="bg-white rounded-lg shadow-md p-2 flex flex-col space-y-4 bg-room" >
+                                            <div class="border-l-4 border-blue-500 pl-4 w-full">
+                                                <p class="text-lg font-semibold text-gray-800">Phòng 2 người</p>
+                                                <p class="text-gray-600">Số lượng: 12</p>
+                                            </div>
+                                            <div class="flex justify-between items-center w-full">
+                                                <button class="bg-blue-500 text-white px-4 py-2 rounded-md">Xem chi tiết</button>
+                                                <div class="flex flex-col items-center">
+                                                    <p class="text-gray-600">Giá</p>
+                                                    <p class="text-red-600 font-bold text-lg">500.000 VND</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="bg-white rounded-lg shadow-md p-2 flex flex-col space-y-4 bg-room" >
+                                            <div class="border-l-4 border-blue-500 pl-4 w-full">
+                                                <p class="text-lg font-semibold text-gray-800">Phòng 2 người</p>
+                                                <p class="text-gray-600">Số lượng: 12</p>
+                                            </div>
+                                            <div class="flex justify-between items-center w-full">
+                                                <button class="bg-blue-500 text-white px-4 py-2 rounded-md">Xem chi tiết</button>
+                                                <div class="flex flex-col items-center">
+                                                    <p class="text-gray-600">Giá</p>
+                                                    <p class="text-red-600 font-bold text-lg">500.000 VND</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="bg-gray-200 p-4 rounded-lg shadow-md flex items-center justify-center">
+                                            <button class="text-2xl text-gray-600">+</button>
+                                            <p class="ml-2">Thêm phòng mới</p>
+                                        </div>
+                                    </div>
+                                    <h2 class="text-xl font-bold mb-4">Đánh giá từ khách hàng</h2>
+                                    <div class="flex items-center mb-4">
+                                        <img alt="Profile picture of Hoang Huy" class="w-12 h-12 rounded-full mr-4" height="50" src="https://storage.googleapis.com/a1aa/image/O5bug1WBccZwJ527TONg0tRsK6lOKxgmwdTsBcoffjoNNVlTA.jpg" width="50"/>
+                                        <div>
+                                            <p class="font-semibold">To Hoang Huy</p>
+                                            <div class="flex items-center">
+                                                <FaStar class="text-yellow-500"/>
+                                                <FaStar class="text-yellow-500"/>
+                                                <FaStar class="text-yellow-500"/>
+                                                <FaStar class="text-yellow-500"/>                                                
+                                                <FaStarHalfAlt class="text-yellow-500"/>       
+                                                <span class="ml-2 text-gray-600">4.6</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-700">“The location was perfect. The staff was friendly. Our bed was comfy. The pool was fresh with a great view. The breakfast was delicious! We had a hot tub on our balcony which was awesome.”</p>
+                            </div>
+                        )}
+                    </div> 
+  
+                </div>
+
+            </div>
+        </div>
+    );
+};
+
+export default DetailLocationScreen;

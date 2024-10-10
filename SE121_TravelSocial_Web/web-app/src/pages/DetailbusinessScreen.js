@@ -6,14 +6,14 @@ import '../styles/DetailBusinessScreen.css';
 
 const DetailBusinessScreen = () => {
 
-    const [currentTab, setCurrentTab] = useState('profile'); // Trạng thái để quản lý tab hiện tại
+    const [currentTab, setCurrentTab] = useState('profile'); 
 
     const handleProfileClick = () => {
-        setCurrentTab('profile'); // Chọn tab thông tin hồ sơ
+        setCurrentTab('profile'); 
     };
 
     const handleLocationClick = () => {
-        setCurrentTab('businessLocation'); // Chọn tab địa điểm kinh doanh
+        setCurrentTab('businessLocation'); 
     };
 
     return (
