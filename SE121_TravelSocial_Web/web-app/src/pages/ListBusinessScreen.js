@@ -1,9 +1,11 @@
 import React from 'react';
 import '../styles/ListBuninessScreen.css'
 import { FaAngleRight,FaBell, FaEye } from 'react-icons/fa';
-
+import { Link, useNavigate } from 'react-router-dom';
 
 const ListBusinessScreen = () => {
+  const navigate = useNavigate(); 
+
   return (
     <div class="container">
       <div class="containerformobile">
@@ -52,9 +54,13 @@ const ListBusinessScreen = () => {
                         <td>0987654321</td>
                         <td>Camping</td>
                         <td>
-                          <div class="icon-container">
+                          <button type="submit" class="icon-container iconview" onClick={() => navigate("/detailbusiness")}>
+                            <FaEye />
+                          </button>
+                          {/* <div class="icon-container">
                               <FaEye />
-                          </div>
+                              <button type="submit" className="login-button"  onClick={() => navigate("/dashboard")} >Đăng nhập</button>
+                          </div> */}
                         </td>
                   </tr>
 

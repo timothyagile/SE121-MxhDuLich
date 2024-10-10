@@ -11,6 +11,7 @@ import ListBusinessScreen from './pages/ListBusinessScreen';
 import ListLocationScreen from './pages/ListLocationScreen';
 import ListBookingScreen from './pages/ListBookingScreen';
 import StatisticScreen from './pages/StatisticScreen';
+import DetailBusinessScreen from './pages/DetailbusinessScreen';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -30,6 +31,7 @@ root.render(
           <Route path="/listlocation" element={<ListLocationScreen />} />
           <Route path="/listbooking" element={<ListBookingScreen />} />
           <Route path="/statistic" element={<StatisticScreen />} />
+          <Route path="/detailbusiness" element={<DetailBusinessScreen />} />
           {/* <Route path="/listlocation" element={<ListLocation />} />
           <Route path="/chat" element={<Chat />} /> */}
         </Route>
