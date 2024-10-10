@@ -1,5 +1,6 @@
 import React from "react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaAngleRight,FaBell, FaEye,FaSearchLocation, FaEdit, FaStar, FaStarHalfAlt} from 'react-icons/fa';
 import { FaRankingStar, FaX, FaPlus } from "react-icons/fa6";
 import { MdEventNote } from "react-icons/md";
@@ -10,6 +11,7 @@ import { faPhoneAlt, faEnvelope, faUser, faMapMarkerAlt, faMemo } from '@fortawe
 const DetailLocationScreen =() => {
 
     const [currentTab, setCurrentTab] = useState('baseinfo'); 
+    const [currentTab2, setCurrentTab2] = useState('viewratingservice'); 
 
     const handleBaseInfoClick = () => {
         setCurrentTab('baseinfo'); 
@@ -21,7 +23,14 @@ const DetailLocationScreen =() => {
 
     const handleRatingServiceClick =() => {
         setCurrentTab('ratingservice');
-    }
+        setCurrentTab2('viewratingservice');
+    };
+
+    const handleViewDetails = () => {
+        setCurrentTab2('roomDetails'); 
+    };
+
+    const navigate = useNavigate ();
 
 
     return (
@@ -189,57 +198,113 @@ const DetailLocationScreen =() => {
                         )}
 
                         {currentTab === 'ratingservice' && (
-                            <div class="border border-gray-200 rounded-b-lg p-4">
-                                    <h2 class="text-xl font-bold mb-4">Phòng</h2>
-                                    <div class="grid grid-cols-3 gap-4 mb-8">
-                                        <div class="bg-white rounded-lg shadow-md p-2 flex flex-col space-y-4 bg-room" >
-                                            <div class="border-l-4 border-blue-500 pl-4 w-full">
-                                                <p class="text-lg font-semibold text-gray-800">Phòng 2 người</p>
-                                                <p class="text-gray-600">Số lượng: 12</p>
+                            <div>
+                                {currentTab2 === 'viewratingservice' && (
+                                <div class="border border-gray-200 rounded-b-lg p-4">
+                                        <h2 class="text-xl font-bold mb-4">Phòng</h2>
+                                        <div class="grid grid-cols-3 gap-4 mb-8">
+                                            <div class="bg-white rounded-lg shadow-md p-2 flex flex-col space-y-4 bg-room" >
+                                                <div class="border-l-4 border-blue-500 pl-4 w-full">
+                                                    <p class="text-lg font-semibold text-gray-800">Phòng 2 người</p>
+                                                    <p class="text-gray-600">Số lượng: 12</p>
+                                                </div>
+                                                <div class="flex justify-between items-center w-full">
+                                                    <button onClick={() => navigate("/dashboard")} class="bg-blue-500 text-white px-4 py-2 rounded-md">Xem chi tiết</button>
+                                                    <div class="flex flex-col items-center">
+                                                        <p class="text-gray-600">Giá</p>
+                                                        <p class="text-red-600 font-bold text-lg">500.000 VND</p>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="flex justify-between items-center w-full">
-                                                <button class="bg-blue-500 text-white px-4 py-2 rounded-md">Xem chi tiết</button>
-                                                <div class="flex flex-col items-center">
-                                                    <p class="text-gray-600">Giá</p>
-                                                    <p class="text-red-600 font-bold text-lg">500.000 VND</p>
+                                            <div class="bg-white rounded-lg shadow-md p-2 flex flex-col space-y-4 bg-room" >
+                                                <div class="border-l-4 border-blue-500 pl-4 w-full">
+                                                    <p class="text-lg font-semibold text-gray-800">Phòng 2 người</p>
+                                                    <p class="text-gray-600">Số lượng: 12</p>
+                                                </div>
+                                                <div class="flex justify-between items-center w-full">
+                                                    <button onClick={handleViewDetails} class="bg-blue-500 text-white px-4 py-2 rounded-md">Xem chi tiết</button>
+                                                    <div class="flex flex-col items-center">
+                                                        <p class="text-gray-600">Giá</p>
+                                                        <p class="text-red-600 font-bold text-lg">500.000 VND</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="bg-gray-200 p-4 rounded-lg shadow-md flex items-center justify-center">
+                                                <button class="text-2xl text-gray-600">+</button>
+                                                <p class="ml-2">Thêm phòng mới</p>
+                                            </div>
+                                        </div>
+                                        <h2 class="text-xl font-bold mb-4">Đánh giá từ khách hàng</h2>
+                                        <div class="flex items-center mb-4">
+                                            <img alt="Profile picture of Hoang Huy" class="w-12 h-12 rounded-full mr-4" height="50" src="https://storage.googleapis.com/a1aa/image/O5bug1WBccZwJ527TONg0tRsK6lOKxgmwdTsBcoffjoNNVlTA.jpg" width="50"/>
+                                            <div>
+                                                <p class="font-semibold">To Hoang Huy</p>
+                                                <div class="flex items-center">
+                                                    <FaStar class="text-yellow-500"/> 
+                                                    <FaStar class="text-yellow-500"/> 
+                                                    <FaStar class="text-yellow-500"/> 
+                                                    <FaStar class="text-yellow-500"/>                                                 
+                                                    <FaStarHalfAlt class="text-yellow-500"/>       
+                                                    <span class="ml-2 text-gray-600">4.6</span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="bg-white rounded-lg shadow-md p-2 flex flex-col space-y-4 bg-room" >
-                                            <div class="border-l-4 border-blue-500 pl-4 w-full">
-                                                <p class="text-lg font-semibold text-gray-800">Phòng 2 người</p>
-                                                <p class="text-gray-600">Số lượng: 12</p>
-                                            </div>
-                                            <div class="flex justify-between items-center w-full">
-                                                <button class="bg-blue-500 text-white px-4 py-2 rounded-md">Xem chi tiết</button>
-                                                <div class="flex flex-col items-center">
-                                                    <p class="text-gray-600">Giá</p>
-                                                    <p class="text-red-600 font-bold text-lg">500.000 VND</p>
+                                        <p class="text-gray-700">“The location was perfect. The staff was friendly. Our bed was comfy. The pool was fresh with a great view. The breakfast was delicious! We had a hot tub on our balcony which was awesome.”</p>
+                                </div>
+                                )}
+
+                                {currentTab2 === 'roomDetails' && (
+                                    <div class="border border-gray-200 rounded-b-lg p-4">
+                                        <div class="text-gray-500 text-sm mb-4">
+                                            <a class="text-xl font-bold mb-4 text-black">Phòng</a>&gt;<span>Chi tiết phòng</span>
+                                             {/* <a href="#" class="hover:underline">Phòng</a> */}
+                                        </div>
+                                        <h1 class="text-2xl font-bold mb-4">Phòng 2 người</h1>
+                                        <div class="flex items-center mb-4">
+                                            <i class="fas fa-bed text-2xl mr-2"></i>
+                                            <span>1 giường đôi</span>
+                                        </div>
+                                        <div class="mb-4">
+                                            <span>diện tích: 16m2</span>
+                                        </div>
+                                        <div class="mb-4">
+                                            <h2 class="font-bold mb-2">Dịch vụ:</h2>
+                                            <div class="flex flex-wrap gap-2">
+                                                <div class="flex items-center bg-gray-200 rounded-full px-3 py-1">
+                                                    <i class="fas fa-times-circle mr-2"></i>
+                                                    <span>hủy miễn phí trong 24h</span>
+                                                </div>
+                                                <div class="flex items-center bg-gray-200 rounded-full px-3 py-1">
+                                                    <i class="fas fa-bath mr-2"></i>
+                                                    <span>Bồn tắm</span>
+                                                </div>
+                                                <div class="flex items-center bg-gray-200 rounded-full px-3 py-1">
+                                                    <i class="fas fa-wifi mr-2"></i>
+                                                    <span>wifi miễn phí</span>
+                                                </div>
+                                                <div class="flex items-center bg-gray-200 rounded-full px-3 py-1">
+                                                    <i class="fas fa-volume-mute mr-2"></i>
+                                                    <span>Hệ thống chống tiếng ồn</span>
+                                                </div>
+                                                <div class="flex items-center bg-gray-200 rounded-full px-3 py-1">
+                                                    <i class="fas fa-snowflake mr-2"></i>
+                                                    <span>Máy lạnh</span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="bg-gray-200 p-4 rounded-lg shadow-md flex items-center justify-center">
-                                            <button class="text-2xl text-gray-600">+</button>
-                                            <p class="ml-2">Thêm phòng mới</p>
+                                        <div class="mb-4">
+                                            <span class="font-bold">Trạng thái:</span>
+                                            <span class="text-blue-500">còn 5 phòng</span>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <div class="text-green-500 text-2xl font-bold">$50</div>
+                                            <button class="bg-blue-500 text-white px-6 py-2 rounded-full shadow-md hover:bg-blue-600">Chỉnh sửa</button>
                                         </div>
                                     </div>
-                                    <h2 class="text-xl font-bold mb-4">Đánh giá từ khách hàng</h2>
-                                    <div class="flex items-center mb-4">
-                                        <img alt="Profile picture of Hoang Huy" class="w-12 h-12 rounded-full mr-4" height="50" src="https://storage.googleapis.com/a1aa/image/O5bug1WBccZwJ527TONg0tRsK6lOKxgmwdTsBcoffjoNNVlTA.jpg" width="50"/>
-                                        <div>
-                                            <p class="font-semibold">To Hoang Huy</p>
-                                            <div class="flex items-center">
-                                                <FaStar class="text-yellow-500"/>
-                                                <FaStar class="text-yellow-500"/>
-                                                <FaStar class="text-yellow-500"/>
-                                                <FaStar class="text-yellow-500"/>                                                
-                                                <FaStarHalfAlt class="text-yellow-500"/>       
-                                                <span class="ml-2 text-gray-600">4.6</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <p class="text-gray-700">“The location was perfect. The staff was friendly. Our bed was comfy. The pool was fresh with a great view. The breakfast was delicious! We had a hot tub on our balcony which was awesome.”</p>
+                                )}
                             </div>
+                            
+                            
                         )}
                     </div> 
   
