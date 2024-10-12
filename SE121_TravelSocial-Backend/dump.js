@@ -4,10 +4,10 @@ const mongoose = require('mongoose');
 const User = require('./models/User')
 const bcrypt = require('bcryptjs');
 
-const mongoURL = "mongodb+srv://thinhnguyenphuc:6RUfHulVdn6qLyO8@thinhnguyenphuc.dxqeq.mongodb.net/TravelSocial?retryWrites=true&w=majority&appName=thinhnguyenphuc";
 
 app.use(express.json());
 
+const mongoURL = "mongodb+srv://thinhnguyenphuc:6RUfHulVdn6qLyO8@thinhnguyenphuc.dxqeq.mongodb.net/TravelSocial?retryWrites=true&w=majority&appName=thinhnguyenphuc";
 mongoose.connect(mongoURL)
     .then(console.log("Db is connected"))
     .catch(error => console.log(error));
