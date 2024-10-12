@@ -306,7 +306,7 @@ const DetailLocationScreen =() => {
                             
                             
                         )}
-                    </div> 
+                    </div>   
   
                 </div>
 

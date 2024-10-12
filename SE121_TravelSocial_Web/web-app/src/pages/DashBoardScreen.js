@@ -154,17 +154,20 @@ const DashBoardScreen = () => {
           </div>
           </div>
           <div class="rightframe">
+            
             <p class ="staticbydate">Thống kê theo ngày </p>
-          <Calendar
-            className="custom-calendar"
-            onChange={onChange}
-            value={value}
-            locale="vi-VN"
-            navigationLabel={({ date, label, locale, view }) => label}
-            tileContent={({ date, view }) => view === 'month' && date.getDay() === 0 ? null : null}
-          />
+            <div class="flex items-center justify-center mb-4">
+              <Calendar
+                className="custom-calendar w-[90%]"
+                onChange={onChange}
+                value={value}
+                locale="vi-VN"
+                navigationLabel={({ date, label, locale, view }) => label}
+                tileContent={({ date, view }) => view === 'month' && date.getDay() === 0 ? null : null}
+              />
+              </div>
             <div>
-              <p class="new-business">Nhà kinh doanh mới</p>
+              <p class="new-business mb-3">Nhà kinh doanh mới</p>
               <div class="user-info">
                 <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
                 <div class="user-details">
@@ -197,6 +200,8 @@ const DashBoardScreen = () => {
               </div>
 
             </div>
+            
+            
           
           </div>
         </div>

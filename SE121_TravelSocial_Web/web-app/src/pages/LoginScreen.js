@@ -16,7 +16,7 @@ function LoginScreen() {
         <img src="" alt="Logo" className="logo" />
         <h2>Chào mừng bạn trở lại 👋</h2>
         <p>Vui lòng đăng nhập</p>
-        <form>
+        <form class="w-form">
           <div className="input-group">
             <label>Email</label>
             <input type="email" placeholder="Abc@example.com" />

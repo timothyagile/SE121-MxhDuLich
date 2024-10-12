@@ -6,7 +6,7 @@
   /* width: 70%; */
   height: 110%;
   background-image: var(--gradient-blue-sidebar);
-  padding: 20px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -18,7 +18,9 @@
 }
 
 .sidebar-header img {
-  max-width: 100px;
+  /* max-width: 100px; */
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .sidebar-menu {
