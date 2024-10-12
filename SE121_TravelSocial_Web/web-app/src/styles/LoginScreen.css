@@ -13,7 +13,7 @@ body {
 }
 
 *, ::after, ::before {
-  box-sizing: content-box; /* Hoặc sử dụng giá trị khác mà bạn mong muốn */
+  box-sizing: content-box; 
 }
 
 
@@ -34,8 +34,9 @@ body {
     font-size: 18px;
   }
   .container {
-    width: 1190px;
+    width: 1290px;
     font-size: 1rem;
+    height: 800px;
   }
   .sidebar {
     width: 130px;
@@ -50,6 +51,7 @@ body {
   }
   .container {
     width: 1190px;
+    height: 800px;
     font-size: 1rem;
   }
   .sidebar {
@@ -63,12 +65,15 @@ body {
     font-size: 16px;
   }
   .container {
-    width: 950px;
+    height: 800px;
+    width: 900px;
   }
 
   .sidebar {
     width: 127px;
   }
+
+  
 }
 
 @media (min-width: 768px) and (max-width:979px) {
@@ -78,6 +83,12 @@ body {
   .container {
     flex-direction: column;
     width: 734px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .w-form {
+    width: 100%;
   }
   
 }
@@ -89,10 +100,15 @@ body {
   .container {
     flex-direction: column;
     width: 476px;
+    align-items: center;
     
   }
   .containerformobile {
-    height: 560px;
+    height: 400px;
+  }
+
+  .w-form {
+    width: 100%;
   }
   
 }
@@ -221,13 +237,16 @@ input[type="checkbox"]:checked::after {
 
 .login-button {
   width: 100%;
-  padding: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   background-color: var(--button-color);
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
 }
+
+
 
 .login-button:hover {
   background-color: var(--button-color-hover);  

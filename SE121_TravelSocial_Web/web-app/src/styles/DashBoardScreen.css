@@ -26,6 +26,27 @@
   .leftframe {
     width: 60%;
   }
+
+  .business-card .card-header p {
+    margin-left: 70px !important;
+  }
+
+  .custom-table th {
+    font-size: 0.6rem !important;
+  }
+
+  .custom-table td {
+    font-size: 0.6rem !important;
+  }
+
+  .rightframe .user-info {
+    padding: 10px;
+  }
+
+  .rightframe img {
+    width: 30px;
+    height: 30px;
+  }
 }
 
 @media (min-width: 768px) and (max-width:979px) {
@@ -35,6 +56,23 @@
   .rightframe {
     width: 33%;
   }
+
+  .rightframe .user-info {
+    padding: 10px;
+  }
+
+  .rightframe img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .custom-table td {
+    font-size: 0.7rem !important;
+  }
+
+  .rightframe .mb-4 {
+    margin-right: 0px !important;
+  }
   
 }
 
@@ -43,6 +81,7 @@
   .rightframe {
     display: none;
   }
+
   .leftframe {
     width: 500px;
   }
@@ -112,7 +151,7 @@
 
 .chart {
   width: 100%;
-  height: 45%;
+  height: 32%;
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* 2 cột */
   gap: 0.9rem; /* khoảng cách giữa các thẻ */
@@ -240,7 +279,7 @@
 
   .new-booking {
     width: 100%;
-    height: 53%;
+    height: 66.5%;
     margin-top: 10px;
     border-radius: 5px;
     border: 1px solid var(--border-color);
@@ -264,7 +303,7 @@
   
   .custom-table th,
   .custom-table td {
-    padding: 12px 16px;
+    /* padding: 12px 16px; */
     text-align: left;
     border-bottom: 1px solid #ddd;
     font-size: 11px;
@@ -343,19 +382,19 @@
   }
            
   .user-name {
-    font-size: 13px;
+    font-size: 0.82rem;
     font-weight: bold;
     margin-bottom: 0px;
   }
   
   .user-time {
-    font-size: 12px;
+    font-size: 0.85rem;
     color: #6b7280;
     margin-bottom:0px ;
   }
   
   .arrow-icon {
-    margin-left: 10px;
+    margin-left: 0.5rem;
     display: flex;
     align-self: center;
     justify-self: center;

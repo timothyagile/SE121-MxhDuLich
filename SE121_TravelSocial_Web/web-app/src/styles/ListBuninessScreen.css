@@ -7,33 +7,54 @@
     padding: 20px;
 }
 
-@media (min-width:1400px)  {
-
-  
-  }
   
   
   @media (min-width:1200px)  {
+    .containerformobile {
+        width: 100% !important;
+    }
 
+    .widthlistbusiness {
+        width: 100% !important;
+    }
   
   }
   
   @media (min-width: 978px) and (max-width: 1199px) {
     .containerformobile {
-        width: 900px;
+        width: 100%;
     }
     .widthlistbusiness {
+        width: 100% !important;
+    }
+    .listbusinessbody {
         width: 900px;
     }
   }
   
   @media (min-width: 768px) and (max-width:979px) {
-
+    .containerformobile {
+        width: 100%;
+    }
+    .widthlistbusiness {
+        width: 100% !important;
+    }
+    .listbusinessbody {
+        width: 100%;
+    }
     
   }
   
   @media (min-width: 481px) and (max-width:767px) {
-    
+    .containerformobile {
+        width: 100%;
+    }
+    .widthlistbusiness {
+        width: 100% !important;
+    }
+    .listbusinessbody {
+        width: 100%;
+    }
   }
 
 .widthlistbusiness {
@@ -46,6 +67,8 @@
 }
 
 .search {
+    margin-top: 20px;
+    margin-left: 20px;
     width: 30%;
     padding: 10px;
     margin-bottom: 20px;
@@ -58,9 +81,10 @@
 
 
 table {
-    width: 100%;
+    width: calc(100% - 20px) !important;
     border-collapse: separate; 
     border-spacing: 0 10px; 
+    margin-left: 20px;
 }
 
 thead th {

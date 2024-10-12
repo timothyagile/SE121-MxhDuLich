@@ -1,9 +1,13 @@
 import React from 'react';
-import '../styles/ListBookingScreen.css'
+import '../styles/ListBookingScreen.css';
+import { useNavigate } from 'react-router-dom';
 import { FaAngleRight,FaBell, FaEye } from 'react-icons/fa';
 
 
 const ListBookingScreen = () => {
+
+const navigate = useNavigate();
+
   return (
     <div class="container">
       <div class="containerformobile">
@@ -54,9 +58,9 @@ const ListBookingScreen = () => {
                         <td>đang chờ</td>
                         <td>50,000,000đ</td>
                         <td>
-                          <div class="icon-container">
-                              <FaEye />
-                          </div>
+                          <button type="submit" class="icon-container iconview" onClick={() => navigate("/detailbooking")}>
+                            <FaEye />
+                          </button>
                         </td>
                   </tr>
                   
