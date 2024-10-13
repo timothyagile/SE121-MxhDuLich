@@ -157,7 +157,7 @@ const DashBoardScreen = () => {
                 <td>Cắm trại hồ sóc - Vũng Tàu</td>
                 <td>Nguyễn PT</td>
                 <td>camping</td>
-                <td><span class="status-label">đang chờ</span></td>
+                <td><span class="status-label-2">đã duyệt</span></td>
               </tr>
               <tr>
                 <td>
