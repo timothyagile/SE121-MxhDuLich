@@ -3,32 +3,35 @@ import Sidebar from '../components/SideBar.js';
 import { Outlet, useLocation } from 'react-router-dom';
 import Header from '../components/Header.js';
 
+const titleMap = {
+  '/dashboard': { main: 'Bảng Điều Khiển', sub: null },
+  '/listbusiness': { main: 'Danh Sách Doanh Nghiệp', sub: null },
+  '/detailbusiness': { main: 'Danh Sách Doanh Nghiệp', sub: 'Chi Tiết Doanh Nghiệp' },
+  '/listlocation': { main: 'Danh Sách Địa Điểm', sub: null },
+  '/detaillocation': { main: 'Danh Sách Địa Điểm', sub: 'Chi Tiết Địa Điểm' },
+  '/listbooking': { main: 'Danh Sách Đặt Chỗ', sub: null },
+  '/detailbooking': { main: 'Danh Sách Đặt Chỗ', sub: 'Chi Tiết Đặt Chỗ' },
+  '/statistic': { main: 'Thống Kê', sub: null },
+};
+
+
 const Layout = ({ children }) => {
 
 const location =useLocation();
+const { pathname } = location;
+const { main, sub } = titleMap[pathname] || { main: 'Trang Không Tồn Tại', sub: null };
 
-const getTitle = () => {
-  switch (location.pathname) {
-    case '/dashboard':
-        return 'Bảng Điều Khiển';
-      case '/listbusiness':
-        return 'Danh Sách Doanh Nghiệp';
-      case '/listlocation':
-        return 'Danh Sách Địa Điểm';
-      case '/listbooking':
-        return 'Danh Sách Đặt Chỗ';
-      case '/statistic':
-        return 'Thống Kê';
-      case '/detailbusiness':
-        return 'Chi Tiết Doanh Nghiệp';
-      case '/detaillocation':
-        return 'Chi Tiết Địa Điểm';
-      case '/detailbooking':
-        return 'Chi Tiết Đặt Chỗ';
-      default:
-        return 'Trang Không Tồn Tại'; 
-  }
-}
+
+// const getTitle = () => {
+//   const { pathname } = location;
+//   const titleInfo = titleMap[pathname];
+//   return titleInfo
+//     ? titleInfo.sub
+//       ? `${titleInfo.main} - ${titleInfo.sub}` 
+//       : titleInfo.main 
+//     : 'Trang Không Tồn Tại'; 
+// };
+
 
   return (
     <div style={{ display: 'flex' }}>
@@ -37,7 +40,7 @@ const getTitle = () => {
       </div>
       <div class="container">
       <div class="containerformobile" >
-      <Header title={getTitle()}/>
+      <Header mainTitle={main} subTitle={sub}/>
       <Outlet/>
       </div>
       </div>

@@ -99,6 +99,30 @@
   display: flex;
 }
 
+.header-title {
+  width: 100%;
+}
+
+.sub-title {
+  width: 100%;
+  position: relative;
+  margin-left: 10px;
+  font-weight: 400;
+  font-size: 1rem;
+  opacity: 0.6;
+}
+
+.main-title {
+  width: 100%;
+  display: flex;
+  justify-self: start;
+  margin-top: 20px;
+  position: relative;
+  margin-left: 10px;
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
 .notification-icon {
   font-size: 24px;
   color: #333;
@@ -344,6 +368,13 @@
     border-radius: 4px;
   }
 
+  .custom-table .status-label-2 {
+    background-color: rgb(63,194,138,0.1);
+    color: #3FC28A;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+
   .rightframe {
     margin-left: 10px;
     padding-left: 10px;
@@ -469,8 +500,8 @@
   }
 
   .scroll-container::-webkit-scrollbar {
-    width: 8px; /* Chiều rộng của thanh cuộn */
-    background-color: #f1f1f1; /* Màu nền của thanh cuộn */
+    width: 8px; 
+    background-color: #f1f1f1; 
 }
 
 .scroll-container::-webkit-scrollbar-thumb {
@@ -479,7 +510,7 @@
 }
 
 .scroll-container::-webkit-scrollbar-thumb:hover {
-  background-color: #555; /* Màu khi di chuột vào thanh cuộn */
+  background-color: #555; 
 }
 
 .mh-scroll{
