@@ -2,7 +2,7 @@ import React from 'react';
 import '../styles/DetailBookingScreen.css';
 import { FaBell } from 'react-icons/fa';
 import { useState } from 'react';
-
+import pagination from '../components/Pagination';
 
 const DetailBookingScreen = () => {
     
@@ -105,6 +105,7 @@ const DetailBookingScreen = () => {
                                         <div class="mb-4">Camping</div>
                                         
                                     </div>
+                                    
                                     <div>
                                         <div class="mb-2 text-gray-500">Tên địa điểm</div>
                                         <div class="mb-4">Du lịch Hồ Cốc - Vũng Tàu</div>

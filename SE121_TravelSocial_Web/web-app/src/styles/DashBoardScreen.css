@@ -106,16 +106,21 @@
   align-items: center;
   display: flex;
   margin-right: 20px;
+  position: relative;
+  top: 5px;
 }
 
 .admin-info {
+  position: relative;
+  top: 5px;
   display: flex;
   align-items: center;
   justify-content: space-evenly;
+  padding: 2px !important;
 }
 
 .admin-avatar {
-  width: 25%;
+  width: 20%;
   height: 100%;
   border-radius: 50%;
   margin-right: 0px;
@@ -353,6 +358,7 @@
   .staticbydate {
     margin-top: 10px;
     margin-bottom: 10px;
+    font-weight: 600;
   }
 
   .new-business {
@@ -456,3 +462,47 @@
   .custom-calendar .react-calendar__tile--weekend {
     color: #e53935;
   }
+
+  .scroll-container {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .scroll-container::-webkit-scrollbar {
+    width: 8px; /* Chiều rộng của thanh cuộn */
+    background-color: #f1f1f1; /* Màu nền của thanh cuộn */
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background-color: #e3dfdf; 
+  border-radius: 10px; 
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* Màu khi di chuột vào thanh cuộn */
+}
+
+.mh-scroll{
+  max-height: 600px !important;
+}
+
+.mh-900 {
+  max-height: 900px !important;
+}
+
+.w-1{
+  width: 2.2rem;
+  height: auto;
+  opacity: 0.2;
+  transition: opacity 0.3s ease;
+}
+
+.w-1:hover{
+  opacity: 1;
+  color: #2196f3;
+}
+
+.text-blue-500 {
+  background-color: #2196f3 !important;
+  color: white;
+}

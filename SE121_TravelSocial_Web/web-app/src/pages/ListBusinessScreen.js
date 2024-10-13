@@ -2,6 +2,9 @@ import React from 'react';
 import '../styles/ListBuninessScreen.css'
 import { FaAngleRight,FaBell, FaEye } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
+import { IoIosArrowDropleft, IoIosArrowDropright } from "react-icons/io";
+import Pagination from '../components/Pagination';
+
 
 const ListBusinessScreen = () => {
   const navigate = useNavigate(); 
@@ -11,7 +14,7 @@ const ListBusinessScreen = () => {
       <div class="containerformobile">
         
         <div class="containerlistbusiness widthlistbusiness">
-          <div class="listbusinessbody">
+          <div class="listbusinessbody scroll-container mh-900">
             <input type="text" class="search" placeholder="Tìm kiếm nhà kinh doanh"/>
             <table>
                 <thead>
@@ -206,12 +209,7 @@ const ListBusinessScreen = () => {
             </table>
           </div>
           
-          <div class="pagination">
-              <span class="page">1</span>
-              <span class="page">2</span>
-              <span class="page">3</span>
-              <span class="page">4</span>
-          </div>
+         <Pagination totalPages={4}/>
         </div>
       </div>
       
