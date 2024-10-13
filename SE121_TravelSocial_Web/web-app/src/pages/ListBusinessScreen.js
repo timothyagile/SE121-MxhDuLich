@@ -9,18 +9,7 @@ const ListBusinessScreen = () => {
   return (
     <div class="container">
       <div class="containerformobile">
-        <div class="dashboardheader">
-            <div className="notification-icon">
-              <FaBell></FaBell>
-            </div>
-            <div className="admin-info">
-              <img src="avatar.png" alt="Admin Avatar" className="admin-avatar" />
-              <div className="admin-details">
-                <h2 className="admin-name">Tô Hoàng Huy</h2>
-                <p className="admin-role">Quản trị viên</p>
-              </div>
-            </div>
-        </div>
+        
         <div class="containerlistbusiness widthlistbusiness">
           <div class="listbusinessbody">
             <input type="text" class="search" placeholder="Tìm kiếm nhà kinh doanh"/>
