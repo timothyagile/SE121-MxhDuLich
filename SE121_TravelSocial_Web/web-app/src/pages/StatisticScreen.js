@@ -24,17 +24,17 @@ const StatisticScreen = () => {
         data: [30, 40, 35, 50, 49, 60, 70, 1, 60, 45, 35, 30]
     }];
 
-    const successRate = 60;  // Phần trăm thành công
-    const failureRate = 100 - successRate;  // Phần trăm thất bại
+    const successRate = 60;  
+    const failureRate = 100 - successRate;  
   
     const [chartData] = useState({
-      series: [successRate, failureRate],  // Dữ liệu: Thành công và thất bại
+      series: [successRate, failureRate],  
       options: {
         chart: {
           type: 'donut',
         },
-        labels: ['Thành công', 'Thất bại'],  // Nhãn cho các phần
-        colors: ['#69c0ff', 'rgba(244,91,105,0.6)'],  // Màu sắc: Xanh cho thành công, Đỏ cho thất bại
+        labels: ['Thành công', 'Thất bại'],  
+        colors: ['#69c0ff', 'rgba(244,91,105,0.6)'],  
         plotOptions: {
           pie: {
             donut: {
@@ -44,17 +44,17 @@ const StatisticScreen = () => {
                 total: {
                   show: true,
                   label: 'Thành công',
-                  formatter: () => `${successRate}%`,  // Hiển thị tỉ lệ thành công
+                  formatter: () => `${successRate}%`, 
                 },
               },
             },
           },
         },
         dataLabels: {
-          enabled: false,  // Không hiển thị nhãn bên ngoài
+          enabled: false, 
         },
         legend: {
-          position: 'bottom',  // Đưa chú thích xuống dưới
+          position: 'bottom', 
           horizontalAlign: 'center',
           markers: {
             width: 12,
@@ -76,13 +76,13 @@ const StatisticScreen = () => {
     });
 
     const [chartData2] = useState({
-        series: [40, 30, 20, 10],  // Dữ liệu: Phần trăm các loại dịch vụ
+        series: [40, 30, 20, 10],  
         options: {
           chart: {
             type: 'donut',
           },
-          labels: ['Khách sạn', 'Nhà hàng', 'Tour du lịch', 'Phương tiện di chuyển'],  // Nhãn cho từng loại dịch vụ
-          colors: ['#69c0ff', '#00E396', '#FEB019', 'rgba(244,91,105,0.6)'],  // Màu sắc tùy chỉnh cho từng loại dịch vụ
+          labels: ['Khách sạn', 'Nhà hàng', 'Tour du lịch', 'Phương tiện di chuyển'],  
+          colors: ['#69c0ff', '#00E396', '#FEB019', 'rgba(244,91,105,0.6)'], 
           plotOptions: {
             pie: {
               donut: {
@@ -99,13 +99,13 @@ const StatisticScreen = () => {
             },
           },
           dataLabels: {
-            enabled: true,  // Hiển thị nhãn bên ngoài
+            enabled: true,  
             formatter: function (val) {
-              return `${val}%`;  // Hiển thị phần trăm bên ngoài biểu đồ
+              return `${val}%`;  
             },
           },
           legend: {
-            position: 'bottom',  // Đưa chú thích xuống dưới
+            position: 'bottom',
             horizontalAlign: 'center',
           },
           responsive: [{
@@ -126,19 +126,6 @@ const StatisticScreen = () => {
     return (
         <div class="container">
             <div class="containerformobile">
-                <div class="dashboardheader">
-                    <div className="notification-icon">
-                    <FaBell></FaBell>
-                    </div>
-                    <div className="admin-info">
-                    <img src="avatar.png" alt="Admin Avatar" className="admin-avatar" />
-                    <div className="admin-details">
-                        <h2 className="admin-name">Tô Hoàng Huy</h2>
-                        <p className="admin-role">Quản trị viên</p>
-                    </div>
-                    
-                    </div>
-                </div>
                 <div class="containerlistbusiness widthlistbusiness">
                     <Chart
                         options={chartOptions}
@@ -174,9 +161,7 @@ const StatisticScreen = () => {
                     </div>
                     
                 </div>
-                <div>
-                    
-                </div>
+                
             </div>
         </div>
     );

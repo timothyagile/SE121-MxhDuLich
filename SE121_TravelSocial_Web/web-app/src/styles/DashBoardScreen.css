@@ -1,8 +1,7 @@
 @import url(../assets/styles/gradient-color.css);
 
 
-.dashboardheader {
-  display: flex;
+.dashboard-header {
   height: 10%;
   justify-content: end;
 }
@@ -92,6 +91,12 @@
 
 @media (max-width: 480px) {
   
+}
+
+.header-section1 {
+  width: 100%;
+  justify-content: end;
+  display: flex;
 }
 
 .notification-icon {
