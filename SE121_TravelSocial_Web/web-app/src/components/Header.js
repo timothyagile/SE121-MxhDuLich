@@ -1,5 +1,6 @@
 import React from 'react';
-import { FaBell } from 'react-icons/fa';
+import { FaBell, FaArrowDown } from 'react-icons/fa';
+import { IoIosArrowDown } from "react-icons/io";
 
 
 
@@ -8,14 +9,19 @@ const Header = ({ title, avatar = 'avatar.png' }) => {
     return (
       <div className="dashboard-header">
         <div class="header-section1">
-          <div className="notification-icon">
+          <div className="notification-icon bg-gray-100 p-3 rounded-lg">
             <FaBell />
           </div>
-          <div className="admin-info">
+          <div className="admin-info items-center space-x-2 border rounded-lg p-2">
             <img src={avatar} alt="Admin Avatar" className="admin-avatar" />
-            <div className="admin-details">
-              <h2 className="admin-name">Tô Hoàng Huy</h2>
-              <p className="admin-role">Quản trị viên</p>
+            <div className="admin-details ">
+              <div class="font-semibold flex">
+                Tô Hoàng Huy
+                  <IoIosArrowDown/>
+              </div>
+              <div class="text-gray-500 text-sm">
+              Quản trị viên
+              </div>
             </div>
           </div>
         </div>

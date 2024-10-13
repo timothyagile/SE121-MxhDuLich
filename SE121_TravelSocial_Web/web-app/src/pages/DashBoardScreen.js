@@ -4,6 +4,7 @@ import SideBar from '../components/SideBar';
 import '../styles/DashBoardScreen.css';
 import { FaAngleRight,FaBell } from 'react-icons/fa';
 import Calendar from 'react-calendar';
+import pagination from '../components/Pagination';
 
 
 const DashBoardScreen = () => {
@@ -112,9 +113,9 @@ const DashBoardScreen = () => {
               </div>
             </div>
           </div>
-          <div class = "new-booking">
+          <div class = "new-booking scroll-container mh-scroll">
             <p class = "new-booking-text">Địa điểm mới</p>
-          <table class="custom-table">
+          <table class="custom-table ">
             <thead>
               <tr>
                 <th>   </th>
@@ -125,6 +126,94 @@ const DashBoardScreen = () => {
               </tr>
             </thead>
             <tbody>
+              <tr>
+                <td>
+                  <div class="location-icon">
+                    <img src="location-icon.png" alt="Location Icon"></img>
+                  </div>
+                </td>
+                <td>Cắm trại hồ sóc - Vũng Tàu</td>
+                <td>Nguyễn PT</td>
+                <td>camping</td>
+                <td><span class="status-label">đang chờ</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="location-icon">
+                    <img src="location-icon.png" alt="Location Icon"></img>
+                  </div>
+                </td>
+                <td>Cắm trại hồ sóc - Vũng Tàu</td>
+                <td>Nguyễn PT</td>
+                <td>camping</td>
+                <td><span class="status-label">đang chờ</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="location-icon">
+                    <img src="location-icon.png" alt="Location Icon"></img>
+                  </div>
+                </td>
+                <td>Cắm trại hồ sóc - Vũng Tàu</td>
+                <td>Nguyễn PT</td>
+                <td>camping</td>
+                <td><span class="status-label">đang chờ</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="location-icon">
+                    <img src="location-icon.png" alt="Location Icon"></img>
+                  </div>
+                </td>
+                <td>Cắm trại hồ sóc - Vũng Tàu</td>
+                <td>Nguyễn PT</td>
+                <td>camping</td>
+                <td><span class="status-label">đang chờ</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="location-icon">
+                    <img src="location-icon.png" alt="Location Icon"></img>
+                  </div>
+                </td>
+                <td>Cắm trại hồ sóc - Vũng Tàu</td>
+                <td>Nguyễn PT</td>
+                <td>camping</td>
+                <td><span class="status-label">đang chờ</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="location-icon">
+                    <img src="location-icon.png" alt="Location Icon"></img>
+                  </div>
+                </td>
+                <td>Cắm trại hồ sóc - Vũng Tàu</td>
+                <td>Nguyễn PT</td>
+                <td>camping</td>
+                <td><span class="status-label">đang chờ</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="location-icon">
+                    <img src="location-icon.png" alt="Location Icon"></img>
+                  </div>
+                </td>
+                <td>Cắm trại hồ sóc - Vũng Tàu</td>
+                <td>Nguyễn PT</td>
+                <td>camping</td>
+                <td><span class="status-label">đang chờ</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="location-icon">
+                    <img src="location-icon.png" alt="Location Icon"></img>
+                  </div>
+                </td>
+                <td>Cắm trại hồ sóc - Vũng Tàu</td>
+                <td>Nguyễn PT</td>
+                <td>camping</td>
+                <td><span class="status-label">đang chờ</span></td>
+              </tr>
               <tr>
                 <td>
                   <div class="location-icon">
@@ -153,7 +242,7 @@ const DashBoardScreen = () => {
                 tileContent={({ date, view }) => view === 'month' && date.getDay() === 0 ? null : null}
               />
               </div>
-            <div>
+            <div class="scroll-container">
               <p class="new-business mb-3">Nhà kinh doanh mới</p>
               <div class="user-info">
                 <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
@@ -185,7 +274,39 @@ const DashBoardScreen = () => {
                   <FaAngleRight />
                 </div>
               </div>
+              <div class="user-info">
+                <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
+                <div class="user-details">
+                  <h2 class="user-name">Nguyễn Phúc Thịnh</h2>
+                  <p class="user-time">09:30 29/7/2023</p>
+                </div>
+                <div className="arrow-icon">
+                  <FaAngleRight />
+                </div>
+              </div>
+              <div class="user-info">
+                <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
+                <div class="user-details">
+                  <h2 class="user-name">Nguyễn Phúc Thịnh</h2>
+                  <p class="user-time">09:30 29/7/2023</p>
+                </div>
+                <div className="arrow-icon">
+                  <FaAngleRight />
+                </div>
+              </div>
+              <div class="user-info">
+                <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
+                <div class="user-details">
+                  <h2 class="user-name">Nguyễn Phúc Thịnh</h2>
+                  <p class="user-time">09:30 29/7/2023</p>
+                </div>
+                <div className="arrow-icon">
+                  <FaAngleRight />
+                </div>
+              </div>
 
+
+ 
             </div>
             
             

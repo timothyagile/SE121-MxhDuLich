@@ -2,6 +2,7 @@ import React from 'react';
 import '../styles/ListLocationScreen.css'
 import { FaAngleRight,FaBell, FaEye } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import Pagination from '../components/Pagination';
 
 
 const ListLocationScreen = () => {
@@ -12,7 +13,7 @@ const ListLocationScreen = () => {
       <div class="containerformobile">
         
         <div class="containerlistbusiness widthlistbusiness">
-          <div class="listbusinessbody">
+          <div class="listbusinessbody scroll-container mh-900">
             <input type="text" class="search" placeholder="Tìm kiếm nhà kinh doanh"/>
             <table>
                 <thead>
@@ -193,12 +194,7 @@ const ListLocationScreen = () => {
             </table>
           </div>
           
-          <div class="pagination">
-              <span class="page">1</span>
-              <span class="page">2</span>
-              <span class="page">3</span>
-              <span class="page">4</span>
-          </div>
+          <Pagination totalPages={4}/>
         </div>
       </div>
       
