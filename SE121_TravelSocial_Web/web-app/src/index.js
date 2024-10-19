@@ -29,35 +29,40 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    
 
-    {/* <DashBoardScreen/>
-    <SideBar/> */}
     <Router>
       <Routes>
-        <Route path="/" element={<RegistryScreen />} />
-        <Route path="/addinfo" element={<RegistryScreen2 />} />
-        <Route path="/loginscreen" element={<LoginScreen />} />
+        {/* Xác thực và Đăng ký */}
+        <Route path="/" element={<LoginScreen />} />
+        <Route path="/auth/register" element={<RegistryScreen />} />
+        <Route path="/auth/register/step2" element={<RegistryScreen2 />} />
+
+        {/* Layout chính cho các trang có sidebar */}
         <Route element={<Layout />}>
+          {/* Dashboard */}
+          <Route path="/dashboard/admin" element={<DashBoardScreen />} />
+          <Route path="/dashboard/business" element={<DashBoardBusinessScreen />} />
 
-          <Route path="/dashboardbusiness" element={<DashBoardBusinessScreen />} />
-          <Route path="/dashboard" element={<DashBoardScreen />} />
-          <Route path="/listbusiness" element={<ListBusinessScreen />} />
-          <Route path="/listlocation" element={<ListLocationScreen />} />
-          <Route path="/listlocationbusiness" element={<ListLocationBusinessScreen />} />
-          <Route path="/listbooking" element={<ListBookingScreen />} />
-          <Route path="/listbookingbusiness" element={<ListBookingBusinessScreen />} />
+          {/* Doanh nghiệp */}
+          <Route path="/business/list" element={<ListBusinessScreen />} />
+          <Route path="/business/detail" element={<DetailBusinessScreen />} />
+          <Route path="/business/statistic" element={<StatisticBusinessScreen />} />
+          <Route path="/business/chat" element={<ChatBusinessScreen />} />
+
+          {/* Booking */}
+          <Route path="/booking/list" element={<ListBookingScreen />} />
+          <Route path="/booking/list/business" element={<ListBookingBusinessScreen />} />
+          <Route path="/booking/detail" element={<DetailBookingScreen />} />
+
+          {/* Địa điểm */}
+          <Route path="/location/list" element={<ListLocationScreen />} />
+          <Route path="/location/list/business" element={<ListLocationBusinessScreen />} />
+          <Route path="/location/detail" element={<DetailLocationScreen />} />
+          <Route path="/location/detail/business" element={<DetailLocationBusinessScreen />} />
+          <Route path="/location/add" element={<AddLocationScreen />} />
+
+          {/* Thống kê */}
           <Route path="/statistic" element={<StatisticScreen />} />
-          <Route path="/detailbusiness" element={<DetailBusinessScreen />} />
-          <Route path="/detaillocation" element={<DetailLocationScreen />} />
-          <Route path="/detaillocationbusiness" element={<DetailLocationBusinessScreen />} />
-          <Route path="/detailbooking" element={<DetailBookingScreen />} />
-          <Route path="/addlocation" element={<AddLocationScreen />} />
-          <Route path="/chatbusiness" element={<ChatBusinessScreen />} />
-
-          
-          {/* <Route path="/listlocation" element={<ListLocation />} />
-          <Route path="/chat" element={<Chat />} /> */}
         </Route>
       </Routes>
     </Router>
