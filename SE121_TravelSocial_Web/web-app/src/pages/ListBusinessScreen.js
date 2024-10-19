@@ -1,6 +1,6 @@
 import React from 'react';
 import '../styles/ListBuninessScreen.css'
-import { FaAngleRight,FaBell, FaEye } from 'react-icons/fa';
+import { FaAngleRight,FaBell, FaEye, FaSearch } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { IoIosArrowDropleft, IoIosArrowDropright } from "react-icons/io";
 import Pagination from '../components/Pagination';
@@ -15,7 +15,10 @@ const ListBusinessScreen = () => {
         
         <div class="containerlistbusiness widthlistbusiness">
           <div class="listbusinessbody scroll-container mh-900">
-            <input type="text" class="search" placeholder="Tìm kiếm nhà kinh doanh"/>
+            <div class="search">
+              <FaSearch class="icon-search"/>
+              <input type="text" class="input-text" placeholder="Tìm kiếm nhà kinh doanh"/>
+            </div>
             <table>
                 <thead>
                     <tr>

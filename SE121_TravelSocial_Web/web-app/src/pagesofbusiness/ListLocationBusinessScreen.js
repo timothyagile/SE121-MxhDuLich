@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Pagination from '../components/Pagination';
 
 
-const ListLocationScreen = () => {
+const ListLocationBusinessScreen = () => {
   const navigate = useNavigate();
 
   return (
@@ -205,4 +205,4 @@ const ListLocationScreen = () => {
   );
 };
 
-export default ListLocationScreen;
+export default ListLocationBusinessScreen;

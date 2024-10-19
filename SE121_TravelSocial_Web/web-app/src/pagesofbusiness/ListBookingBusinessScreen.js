@@ -5,7 +5,7 @@ import { FaAngleRight,FaBell, FaEye, FaSearch } from 'react-icons/fa';
 import Pagination from '../components/Pagination';
 
 
-const ListBookingScreen = () => {
+const ListBookingBusinessScreen = () => {
 
 const navigate = useNavigate();
 
@@ -25,8 +25,8 @@ const navigate = useNavigate();
                 <thead>
                     <tr>
                         <th>STT</th>
+                        <th>Tên địa điểm</th>
                         <th>Tên khách hàng</th>
-                        <th>Mã phiếu</th>
                         <th>Ngày đặt</th>
                         <th>Trạng thái</th>
                         <th>Tổng tiền</th>
@@ -46,7 +46,12 @@ const navigate = useNavigate();
                           </div>
                           </td>
                         
-                        <td>P3453212</td>
+                          <td>
+                          <div class="namefield">
+                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
+                            <p>Du lịch hồ cốc - vùng tàu</p>
+                          </div>
+                          </td>
                         <td>19/05/2024</td>
                         
 
@@ -68,7 +73,12 @@ const navigate = useNavigate();
                           </div>
                           </td>
                         
-                        <td>P3453212</td>
+                          <td>
+                          <div class="namefield">
+                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
+                            <p>Du lịch hồ cốc - vùng tàu</p>
+                          </div>
+                          </td>
                         <td>19/05/2024</td>
                         
 
@@ -93,7 +103,12 @@ const navigate = useNavigate();
                           </div>
                           </td>
                         
-                        <td>P3453212</td>
+                          <td>
+                          <div class="namefield">
+                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
+                            <p>Du lịch hồ cốc - vùng tàu</p>
+                          </div>
+                          </td>
                         <td>19/05/2024</td>
                         
 
@@ -116,7 +131,12 @@ const navigate = useNavigate();
                           </div>
                           </td>
                         
-                        <td>P3453212</td>
+                          <td>
+                          <div class="namefield">
+                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
+                            <p>Du lịch hồ cốc - vùng tàu</p>
+                          </div>
+                          </td>
                         <td>19/05/2024</td>
                         
 
@@ -139,7 +159,12 @@ const navigate = useNavigate();
                           </div>
                           </td>
                         
-                        <td>P3453212</td>
+                          <td>
+                          <div class="namefield">
+                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
+                            <p>Du lịch hồ cốc - vùng tàu</p>
+                          </div>
+                          </td>
                         <td>19/05/2024</td>
                         
 
@@ -161,7 +186,12 @@ const navigate = useNavigate();
                           </div>
                           </td>
                         
-                        <td>P3453212</td>
+                          <td>
+                          <div class="namefield">
+                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
+                            <p>Du lịch hồ cốc - vùng tàu</p>
+                          </div>
+                          </td>
                         <td>19/05/2024</td>
                         
 
@@ -184,7 +214,12 @@ const navigate = useNavigate();
                           </div>
                           </td>
                         
-                        <td>P3453212</td>
+                          <td>
+                          <div class="namefield">
+                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
+                            <p>Du lịch hồ cốc - vùng tàu</p>
+                          </div>
+                          </td>
                         <td>19/05/2024</td>
                         
 
@@ -206,7 +241,12 @@ const navigate = useNavigate();
                           </div>
                           </td>
                         
-                        <td>P3453212</td>
+                          <td>
+                          <div class="namefield">
+                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
+                            <p>Du lịch hồ cốc - vùng tàu</p>
+                          </div>
+                          </td>
                         <td>19/05/2024</td>
                         
 
@@ -228,7 +268,12 @@ const navigate = useNavigate();
                           </div>
                           </td>
                         
-                        <td>P3453212</td>
+                          <td>
+                          <div class="namefield">
+                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
+                            <p>Du lịch hồ cốc - vùng tàu</p>
+                          </div>
+                          </td>
                         <td>19/05/2024</td>
                         
 
@@ -250,7 +295,12 @@ const navigate = useNavigate();
                           </div>
                           </td>
                         
-                        <td>P3453212</td>
+                          <td>
+                          <div class="namefield">
+                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
+                            <p>Du lịch hồ cốc - vùng tàu</p>
+                          </div>
+                          </td>
                         <td>19/05/2024</td>
                         
 
@@ -275,4 +325,4 @@ const navigate = useNavigate();
   );
 };
 
-export default ListBookingScreen;
+export default ListBookingBusinessScreen;

@@ -1,8 +1,11 @@
 import React from 'react';
 import '../styles/DetailBookingScreen.css';
-import { FaBell } from 'react-icons/fa';
+import { FaBell, FaCalendar, FaEnvelope, FaMoneyBill } from 'react-icons/fa';
 import { useState } from 'react';
 import pagination from '../components/Pagination';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPhoneAlt, faEnvelope, faUser, faMapMarkerAlt, faMemo, faLocation } from '@fortawesome/free-solid-svg-icons';
+
 
 const DetailBookingScreen = () => {
     
@@ -29,17 +32,20 @@ const DetailBookingScreen = () => {
                                     Du lịch Hồ Cốc - Vũng Tàu
                                 </h1>
                                 <div class="flex items-center text-gray-600 mt-2">
-                                    <i class="fas fa-calendar-alt text-gray-500 mr-2"></i>
+                                    <FaCalendar class="mr-2"/>
+                                  
                                         <span>04/08/2024</span>
                                     </div>
                                     <div class="flex items-center mt-2">
-                                        <i class="fas fa-money-bill-wave text-gray-500 mr-2"></i>
-                                        <span class="line-through text-gray-500">68,000,000 đ</span>
+                                        <FaMoneyBill class="mr-2 w-5"/>
+                                        
+                                        <span class="line-through text-gray-400">68,000,000 đ</span>
                                         <span class="text-green-500 ml-2">34,000,000 đ</span>
-                                        <span class="text-green-500 ml-2">- 50%</span>
+                                        <span class="text-green-500 ml-2 status-label-2">- 50%</span>
                                     </div>
                                 <div class="flex items-center text-gray-500 mt-1 ">
-                                    <i class="fas fa-envelope mr-2"></i>
+                                    <FaEnvelope class="mr-2"/>
+                                    
                                     <div class="text-gray-500">
                                     Đặt lúc 15:04 30/07/2024
                                     </div>
@@ -52,6 +58,7 @@ const DetailBookingScreen = () => {
                                     <i class="fas fa-user mr-2">
                                     </i>
                                     <span>
+                                        <FontAwesomeIcon icon={faUser} className="mr-2" />
                                         Thông tin khách hàng
                                     </span>
                                 </button>
@@ -59,6 +66,7 @@ const DetailBookingScreen = () => {
                                     <i class="fas fa-map-marker-alt mr-2">
                                     </i>
                                     <span>
+                                        <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
                                         Thông tin địa điểm
                                     </span>
                                 </button>

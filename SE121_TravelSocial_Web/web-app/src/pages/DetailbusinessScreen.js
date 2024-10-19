@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaAngleRight,FaBell, FaEye } from 'react-icons/fa';
 import '../styles/DetailBusinessScreen.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPhoneAlt, faEnvelope, faUser, faMapMarkerAlt, faMemo, faLocation } from '@fortawesome/free-solid-svg-icons';
 
 
 const DetailBusinessScreen = () => {
@@ -26,18 +28,23 @@ const DetailBusinessScreen = () => {
                             <img alt="Profile picture of a person" class="w-20 h-20 rounded-full mr-4" height="80" src="https://storage.googleapis.com/a1aa/image/0FPVWfLJ1m0nJS9YfULFrbvezZsDHus5bXhqxVDA6tO9UMKnA.jpg" width="80"/>
                             <div>
                                 <h1 class="text-xl font-bold">
+
                                     Du lịch Hồ Cốc - Vũng Tàu
                                 </h1>
                                 <div class="flex items-center text-gray-600 mt-2">
                                     <i class="fas fa-phone-alt mr-2"></i>
                                     <span>
+                                        <FontAwesomeIcon icon={faPhoneAlt} className="mr-2" />
+
                                         0987654321
                                     </span>
                                 </div>
                                 <div class="flex items-center text-gray-600 mt-1">
                                     <i class="fas fa-envelope mr-2"></i>
                                     <span>
+                                        <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
                                         hc.vt@example.com
+
                                     </span>
                                 </div>
                             </div>
@@ -45,15 +52,13 @@ const DetailBusinessScreen = () => {
                         <div class="mt-6">
                             <div class="flex">
                                 <button onClick={handleProfileClick} className={`flex items-center px-4 py-2 ${currentTab === 'profile' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'} rounded-t-lg`}>
-                                    <i class="fas fa-user mr-2">
-                                    </i>
+                                    <FontAwesomeIcon icon={faUser} className="mr-2" />
                                     <span>
                                         Hồ sơ
                                     </span>
                                 </button>
                                 <button  onClick={handleLocationClick} class={`flex items-center px-4 py-2 ${currentTab === 'businessLocation' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'} rounded-t-lg ml-2`}>
-                                    <i class="fas fa-map-marker-alt mr-2">
-                                    </i>
+                                    <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
                                     <span>
                                         Địa điểm kinh doanh
                                     </span>
@@ -139,7 +144,7 @@ const DetailBusinessScreen = () => {
                             )}
                             {currentTab === 'businessLocation' && (
                                 <div class="flex">
-                                    <div class="w-full">
+                                    <div class="w-full scroll-container mh-550">
                                         <table class="min-w-full bg-white">
                                             <thead>
                                                 <tr>
@@ -221,6 +226,32 @@ const DetailBusinessScreen = () => {
                                                     <td class="py-2 px-4 border-b flex items-center">
                                                         <img alt="Image of a camping site" class="w-10 h-10 rounded-full mr-2" height="40" src="https://storage.googleapis.com/a1aa/image/DMI3DZ3pR8qVKJ19uApteCrfCf8Na2RYQTEPRH47JxKKniKnA.jpg" width="40"/>
                                                         Cắm trại du lịch Hồ Cốc - Vũng Tàu Bãi 2
+                                                    </td>
+                                                    <td class="py-2 px-4 border-b text-center">Camping</td>
+                                                    <td class="py-2 px-4 border-b text-center">
+                                                        <span class="bg-yellow-100 text-yellow-600 py-1 px-3 rounded-full text-xs">
+                                                            Tạm dừng
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="py-2 px-4 border-b text-center">1</td>
+                                                    <td class="py-2 px-4 border-b flex items-center">
+                                                        <img alt="Image of a camping site" class="w-10 h-10 rounded-full mr-2" height="40" src="https://storage.googleapis.com/a1aa/image/DMI3DZ3pR8qVKJ19uApteCrfCf8Na2RYQTEPRH47JxKKniKnA.jpg" width="40"/>
+                                                        Cắm trại du lịch Hồ Cốc - Vũng Tàu
+                                                    </td>
+                                                    <td class="py-2 px-4 border-b text-center">Camping</td>
+                                                    <td class="py-2 px-4 border-b text-center">
+                                                        <span class="bg-yellow-100 text-yellow-600 py-1 px-3 rounded-full text-xs">
+                                                            Tạm dừng
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="py-2 px-4 border-b text-center">1</td>
+                                                    <td class="py-2 px-4 border-b flex items-center">
+                                                        <img alt="Image of a camping site" class="w-10 h-10 rounded-full mr-2" height="40" src="https://storage.googleapis.com/a1aa/image/DMI3DZ3pR8qVKJ19uApteCrfCf8Na2RYQTEPRH47JxKKniKnA.jpg" width="40"/>
+                                                        Cắm trại du lịch Hồ Cốc - Vũng Tàu
                                                     </td>
                                                     <td class="py-2 px-4 border-b text-center">Camping</td>
                                                     <td class="py-2 px-4 border-b text-center">
