@@ -8,7 +8,7 @@ import '../styles/DetailLocationScreen.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPhoneAlt, faEnvelope, faUser, faMapMarkerAlt, faMemo } from '@fortawesome/free-solid-svg-icons';
 
-const DetailLocationScreen =() => {
+const DetailLocationBusinessScreen =() => {
 
     const [currentTab, setCurrentTab] = useState('baseinfo'); 
     const [currentTab2, setCurrentTab2] = useState('viewratingservice'); 
@@ -351,4 +351,4 @@ const DetailLocationScreen =() => {
     );
 };
 
-export default DetailLocationScreen;
+export default DetailLocationBusinessScreen;

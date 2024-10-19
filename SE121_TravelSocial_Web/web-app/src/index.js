@@ -14,6 +14,14 @@ import StatisticScreen from './pages/StatisticScreen';
 import DetailBusinessScreen from './pages/DetailbusinessScreen';
 import DetailLocationScreen from './pages/DetailLocationScreen';
 import DetailBookingScreen from './pages/DetailBookingScreen';
+import RegistryScreen from './pagesofbusiness/RegistryScreen';
+import RegistryScreen2 from './pagesofbusiness/RegistryScreen2';
+import DashBoardBusinessScreen from './pagesofbusiness/DashBoardBusinessScreen';
+import ListBookingBusinessScreen from './pagesofbusiness/ListBookingBusinessScreen';
+import StatisticBusinessScreen from './pagesofbusiness/StatisticBusinessScreen';
+import ListLocationBusinessScreen from './pagesofbusiness/ListLocationBusinessScreen';
+import DetailLocationBusinessScreen from './pagesofbusiness/DetailLocationBusinessScreen';
+
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -25,16 +33,22 @@ root.render(
     <SideBar/> */}
     <Router>
       <Routes>
-        <Route path="/" element={<LoginScreen />} />
+        <Route path="/" element={<RegistryScreen />} />
+        <Route path="/addinfo" element={<RegistryScreen2 />} />
+        <Route path="/loginscreen" element={<LoginScreen />} />
         <Route element={<Layout />}>
 
+          <Route path="/dashboardbusiness" element={<DashBoardBusinessScreen />} />
           <Route path="/dashboard" element={<DashBoardScreen />} />
           <Route path="/listbusiness" element={<ListBusinessScreen />} />
           <Route path="/listlocation" element={<ListLocationScreen />} />
+          <Route path="/listlocationbusiness" element={<ListLocationBusinessScreen />} />
           <Route path="/listbooking" element={<ListBookingScreen />} />
+          <Route path="/listbookingbusiness" element={<ListBookingBusinessScreen />} />
           <Route path="/statistic" element={<StatisticScreen />} />
           <Route path="/detailbusiness" element={<DetailBusinessScreen />} />
           <Route path="/detaillocation" element={<DetailLocationScreen />} />
+          <Route path="/detaillocationbusiness" element={<DetailLocationBusinessScreen />} />
           <Route path="/detailbooking" element={<DetailBookingScreen />} />
           
           {/* <Route path="/listlocation" element={<ListLocation />} />

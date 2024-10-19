@@ -45,9 +45,27 @@
     height: 740px;
 }
 
+.icon-search {
+    width: 1rem;
+    height: auto;
+    margin-right: 2px;
+    margin-left: 6px;
+}
+
+.input-text {
+    padding:10px
+}
+
+.input-text:focus {
+    outline: none;
+    transition: all;
+    animation-duration: 200;
+}
+
 .search {
+    display: flex;
     width: 30%;
-    padding: 10px;
+    
     margin-bottom: 20px;
     border: 1px solid #ddd;
     border-radius: 4px;

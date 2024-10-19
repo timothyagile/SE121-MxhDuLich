@@ -103,6 +103,10 @@
   width: 100%;
 }
 
+.header-container {
+  width: 100%;
+}
+
 .sub-title {
   width: 100%;
   position: relative;
@@ -361,14 +365,14 @@
     max-height: 100%;
   }
   
-  .custom-table .status-label {
+  .status-label {
     background-color: #ffd6d6;
     color: #ff4d4f;
     padding: 4px 8px;
     border-radius: 4px;
   }
 
-  .custom-table .status-label-2 {
+  .status-label-2 {
     background-color: rgb(63,194,138,0.1);
     color: #3FC28A;
     padding: 4px 8px;
@@ -494,10 +498,34 @@
     color: #e53935;
   }
 
+  .scroll-container-x {
+    max-width: 100%;
+    overflow-x: auto; 
+  }
+
+  .scroll-container-x::-webkit-scrollbar {
+    height: 8px; /* Độ cao thanh cuộn ngang */
+  }
+  
+  .scroll-container-x::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+  .scroll-container-x::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 10px;
+  }
+  
+  .scroll-container-x::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
   .scroll-container {
     max-height: 400px;
-    overflow-y: auto;
+    overflow-y:auto;
+    overflow-x: hidden;
   }
+
 
   .scroll-container::-webkit-scrollbar {
     width: 8px; 
@@ -505,6 +533,11 @@
 }
 
 .scroll-container::-webkit-scrollbar-thumb {
+  background-color: #e3dfdf; 
+  border-radius: 10px; 
+}
+
+.scroll-container::-webkit-scrollbar-corner {
   background-color: #e3dfdf; 
   border-radius: 10px; 
 }
@@ -521,11 +554,23 @@
   max-height: 900px !important;
 }
 
+.mh-550 {
+  max-height: 550px !important;
+}
+
+.mh-200 {
+  max-height: 200px !important;
+}
+
 .w-1{
   width: 2.2rem;
   height: auto;
   opacity: 0.2;
   transition: opacity 0.3s ease;
+}
+
+.w-420 {
+  min-width: 300px;
 }
 
 .w-1:hover{
@@ -536,4 +581,21 @@
 .text-blue-500 {
   background-color: #2196f3 !important;
   color: white;
+}
+
+.status-room {
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.welcomebusiness {
+  width: 100%;
+  background-color: var(--blue-opacity04-color);
+  height: 16%;
+  margin-bottom: 5px;
+  border-radius: 10px;
+}
+
+.business-card-2 {
+  height: 16%;
 }
