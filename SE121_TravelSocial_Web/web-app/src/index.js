@@ -21,6 +21,8 @@ import ListBookingBusinessScreen from './pagesofbusiness/ListBookingBusinessScre
 import StatisticBusinessScreen from './pagesofbusiness/StatisticBusinessScreen';
 import ListLocationBusinessScreen from './pagesofbusiness/ListLocationBusinessScreen';
 import DetailLocationBusinessScreen from './pagesofbusiness/DetailLocationBusinessScreen';
+import AddLocationScreen from './pagesofbusiness/AddLocationScreen';
+import ChatBusinessScreen from './pagesofbusiness/ChatBusinessScreen';
 
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
@@ -50,6 +52,9 @@ root.render(
           <Route path="/detaillocation" element={<DetailLocationScreen />} />
           <Route path="/detaillocationbusiness" element={<DetailLocationBusinessScreen />} />
           <Route path="/detailbooking" element={<DetailBookingScreen />} />
+          <Route path="/addlocation" element={<AddLocationScreen />} />
+          <Route path="/chatbusiness" element={<ChatBusinessScreen />} />
+
           
           {/* <Route path="/listlocation" element={<ListLocation />} />
           <Route path="/chat" element={<Chat />} /> */}

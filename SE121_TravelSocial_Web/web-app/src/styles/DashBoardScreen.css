@@ -599,3 +599,7 @@
 .business-card-2 {
   height: 16%;
 }
+
+.none-h {
+  height: fit-content !important;
+}
