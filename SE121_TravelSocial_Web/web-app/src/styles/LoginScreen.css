@@ -209,8 +209,8 @@ input[type="checkbox"]:checked {
 input[type="checkbox"]:checked::after {
   content: '';
   position: absolute;
-  top: -1px;
-  left: 4px;
+  top: 1px;
+  left: 6px;
   width: 6px;
   height: 12px;
   border: solid white;
@@ -251,3 +251,4 @@ input[type="checkbox"]:checked::after {
 .login-button:hover {
   background-color: var(--button-color-hover);  
 }
+

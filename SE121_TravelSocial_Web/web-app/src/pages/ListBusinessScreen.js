@@ -4,10 +4,34 @@ import { FaAngleRight,FaBell, FaEye, FaSearch } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { IoIosArrowDropleft, IoIosArrowDropright } from "react-icons/io";
 import Pagination from '../components/Pagination';
+import { businesses } from './BusinessData';
+import { useState } from 'react';
 
+
+const ITEMS_PER_PAGE = 10;
 
 const ListBusinessScreen = () => {
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Tính tổng số trang
+  const totalItems = businesses.length;
+
+  // Lấy dữ liệu của trang hiện tại
+  const currentData = businesses.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
   const navigate = useNavigate(); 
+
+  const handleRowClick = (id) => {
+    navigate(`/business/detail/${id}`); // Điều hướng đến trang chi tiết với ID
+  };
 
   return (
     <div class="container">
@@ -19,200 +43,60 @@ const ListBusinessScreen = () => {
               <FaSearch class="icon-search"/>
               <input type="text" class="input-text" placeholder="Tìm kiếm nhà kinh doanh"/>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>STT</th>
-                        <th>Tên nhà kinh doanh</th>
-                        <th>Mã số</th>
-                        <th>CMND/CCCD</th>
-                        <th>Số điện thoại</th>
-                        <th>Loại</th>
-                        <th></th>
-                    </tr> 
-                </thead>
-              
-                <tbody class="row-container">
-                  
-                  <tr >
-                        <td>1</td>
-                        <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                        
-                          
-                          </td>
-                        <td>KH3453212</td>
-                        <td>079303041265</td>
-                        <td>0987654321</td>
-                        <td>Camping</td>
-                        <td>
-                          <button type="submit" class="icon-container iconview" onClick={() => navigate("/detailbusiness")}>
-                            <FaEye />
-                          </button>
-                          {/* <div class="icon-container">
-                              <FaEye />
-                              <button type="submit" className="login-button"  onClick={() => navigate("/dashboard")} >Đăng nhập</button>
-                          </div> */}
-                        </td>
+            <table className="business-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Tên</th>
+                  <th>Mã</th>
+                  <th>CCCD/CMND</th>
+                  <th>Điện Thoại</th>
+                  <th>Loại</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody className="row-container">
+                {currentData.map((business) => (
+                  <tr 
+                    key={business.id} 
+                   
+                    className="clickable-row"
+                  >
+                    <td>{business.id}</td>
+                    <td>
+                      <div className="namefield">
+                        <img 
+                          src={require(`../assets/images/${business.avatar}`)} 
+                          alt="User Avatar" 
+                          className="user-avatar" 
+                        />
+                        <p>{business.name}</p>
+                      </div>
+                    </td>
+                    <td>{business.code}</td>
+                    <td>{business.contact}</td>
+                    <td>{business.phone}</td>
+                    <td>{business.type}</td>
+                    <td>
+                      <button 
+                        type="button" 
+                        className="icon-container iconview"
+                        onClick={() => handleRowClick(business.id)} 
+                      >
+                        <FaEye />
+                      </button>
+                    </td>
                   </tr>
-
-                  <tr >
-                        <td>1</td>
-                        <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                        
-                          
-                          </td>
-                        <td>KH3453212</td>
-                        <td>079303041265</td>
-                        <td>0987654321</td>
-                        <td>Camping</td>
-                        <td>
-                          <div class="icon-container">
-                              <FaEye />
-                          </div>
-                        </td>
-                  </tr>
-                  
-                  <tr >
-                        <td>1</td>
-                        <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                        
-                          
-                          </td>
-                        <td>KH3453212</td>
-                        <td>079303041265</td>
-                        <td>0987654321</td>
-                        <td>Camping</td>
-                        <td>
-                          <div class="icon-container">
-                              <FaEye />
-                          </div>
-                        </td>
-                  </tr>
-
-                  <tr >
-                        <td>1</td>
-                        <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                        
-                          
-                          </td>
-                        <td>KH3453212</td>
-                        <td>079303041265</td>
-                        <td>0987654321</td>
-                        <td>Camping</td>
-                        <td>
-                          <div class="icon-container">
-                              <FaEye />
-                          </div>
-                        </td>
-                  </tr>
-
-                  <tr >
-                        <td>1</td>
-                        <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                        
-                          
-                          </td>
-                        <td>KH3453212</td>
-                        <td>079303041265</td>
-                        <td>0987654321</td>
-                        <td>Camping</td>
-                        <td>
-                          <div class="icon-container">
-                              <FaEye />
-                          </div>
-                        </td>
-                  </tr>
-
-                  <tr >
-                        <td>1</td>
-                        <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                        
-                          
-                          </td>
-                        <td>KH3453212</td>
-                        <td>079303041265</td>
-                        <td>0987654321</td>
-                        <td>Camping</td>
-                        <td>
-                          <div class="icon-container">
-                              <FaEye />
-                          </div>
-                        </td>
-                  </tr>
-
-                  <tr >
-                        <td>1</td>
-                        <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                        
-                          
-                          </td>
-                        <td>KH3453212</td>
-                        <td>079303041265</td>
-                        <td>0987654321</td>
-                        <td>Camping</td>
-                        <td>
-                          <div class="icon-container">
-                              <FaEye />
-                          </div>
-                        </td>
-                  </tr>
-
-                  <tr >
-                        <td>1</td>
-                        <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                        
-                          
-                          </td>
-                        <td>KH3453212</td>
-                        <td>079303041265</td>
-                        <td>0987654321</td>
-                        <td>Camping</td>
-                        <td>
-                          <div class="icon-container">
-                              <FaEye />
-                          </div>
-                        </td>
-                  </tr>
-                  
-                    
-                </tbody>
-                
+                ))}
+              </tbody>
             </table>
           </div>
           
-         <Pagination totalPages={4}/>
+          <Pagination
+            totalItems={totalItems}
+            itemsPerPage={ITEMS_PER_PAGE}
+            onPageChange={handlePageChange}
+          />
         </div>
       </div>
       

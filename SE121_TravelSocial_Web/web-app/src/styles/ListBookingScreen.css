@@ -135,6 +135,10 @@ tbody td {
     background-color: white;
 }
 
+.bg-blue-important {
+    background-color: var(--blue-color) !important;
+  }
+
 .page:hover {
     background-color: var(--blue-color);
 }

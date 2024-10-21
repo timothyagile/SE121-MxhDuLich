@@ -45,7 +45,7 @@ root.render(
 
           {/* Doanh nghiệp */}
           <Route path="/business/list" element={<ListBusinessScreen />} />
-          <Route path="/business/detail" element={<DetailBusinessScreen />} />
+          <Route path="/business/detail/:id" element={<DetailBusinessScreen />} />
           <Route path="/business/statistic" element={<StatisticBusinessScreen />} />
           <Route path="/business/chat" element={<ChatBusinessScreen />} />
 
@@ -57,7 +57,7 @@ root.render(
           {/* Địa điểm */}
           <Route path="/location/list" element={<ListLocationScreen />} />
           <Route path="/location/list/business" element={<ListLocationBusinessScreen />} />
-          <Route path="/location/detail" element={<DetailLocationScreen />} />
+          <Route path="/location/detail/:id" element={<DetailLocationScreen />} />
           <Route path="/location/detail/business" element={<DetailLocationBusinessScreen />} />
           <Route path="/location/add" element={<AddLocationScreen />} />
 
