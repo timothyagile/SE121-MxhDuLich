@@ -12,12 +12,21 @@ import { useNavigate } from 'react-router-dom';
 
 const DashBoardScreen = () => {
   const [value, setValue] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null);
+  const onChange = (newDate) => {
+    setValue(newDate);
+    setSelectedDate(newDate); // Cập nhật ngày đã chọn
+  };
+
+  const filteredUsers = selectedDate 
+    ? users.filter(user => {
+        // Giả sử mỗi user có một thuộc tính date chứa ngày mà họ có dữ liệu
+        const userDate = new Date(user.time); // Thay đổi 'user.date' thành thuộc tính thực tế của bạn
+        return userDate.toDateString() === selectedDate.toDateString();
+      })
+    : [];
 
   const navigate = useNavigate();
-
-  const onChange = (date) => {
-    setValue(date);
-  };
 
   const handleRowClick = (id) => {
     navigate(`/location/detail/${id}`);
@@ -26,6 +35,8 @@ const DashBoardScreen = () => {
   const handleBusinessDetailClick = (id) => {
     navigate(`/business/detail/${id}`); // Điều hướng đến DetailLocationScreen với ID
   };
+
+  
 
   
 
@@ -184,69 +195,9 @@ const DashBoardScreen = () => {
               </div>
             <div class="scroll-container">
               <p class="new-business mb-3">Nhà kinh doanh mới</p>
-              {/* <div class="user-info">
-                <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                <div class="user-details">
-                  <h2 class="user-name">Nguyễn Phúc Thịnh</h2>
-                  <p class="user-time">09:30 29/7/2023</p>
-                </div>
-                <div className="arrow-icon">
-                  <FaAngleRight />
-                </div>
-              </div>
-              <div class="user-info">
-                <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                <div class="user-details">
-                  <h2 class="user-name">Nguyễn Phúc Thịnh</h2>
-                  <p class="user-time">09:30 29/7/2023</p>
-                </div>
-                <div className="arrow-icon">
-                  <FaAngleRight />
-                </div>
-              </div>
-              <div class="user-info">
-                <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                <div class="user-details">
-                  <h2 class="user-name">Nguyễn Phúc Thịnh</h2>
-                  <p class="user-time">09:30 29/7/2023</p>
-                </div>
-                <div className="arrow-icon">
-                  <FaAngleRight />
-                </div>
-              </div>
-              <div class="user-info">
-                <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                <div class="user-details">
-                  <h2 class="user-name">Nguyễn Phúc Thịnh</h2>
-                  <p class="user-time">09:30 29/7/2023</p>
-                </div>
-                <div className="arrow-icon">
-                  <FaAngleRight />
-                </div>
-              </div>
-              <div class="user-info">
-                <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                <div class="user-details">
-                  <h2 class="user-name">Nguyễn Phúc Thịnh</h2>
-                  <p class="user-time">09:30 29/7/2023</p>
-                </div>
-                <div className="arrow-icon">
-                  <FaAngleRight />
-                </div>
-              </div>
-              <div class="user-info">
-                <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                <div class="user-details">
-                  <h2 class="user-name">Nguyễn Phúc Thịnh</h2>
-                  <p class="user-time">09:30 29/7/2023</p>
-                </div>
-                <div className="arrow-icon">
-                  <FaAngleRight />
-                </div>
-              </div> */}
-
               <div>
-                {users.map((user) => (
+                {filteredUsers.length > 0 ? (
+                filteredUsers.map((user) => (
                   <div
                     className="user-info"
                     key={user.id}
@@ -262,7 +213,10 @@ const DashBoardScreen = () => {
                       <FaAngleRight />
                     </div>
                   </div>
-                ))}
+                ))
+              ) : (
+                <p>Không có nhà kinh doanh nào cho ngày đã chọn.</p> 
+              )}
               </div>
 
 

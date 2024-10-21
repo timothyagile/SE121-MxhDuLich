@@ -32,7 +32,7 @@ const ListBusinessScreen = () => {
 
   const [searchTerm, setSearchTerm] = useState('');
   const filteredData = businesses.filter((business) => {
-    const searchTermLower = searchTerm.toLowerCase(); // Chuyển đổi từ khóa tìm kiếm sang chữ thường
+    const searchTermLower = searchTerm.toLowerCase();
     return (
       business.name.toLowerCase().includes(searchTermLower) || 
       business.code.toLowerCase().includes(searchTermLower) || 

@@ -18,8 +18,20 @@ export const businesses = [
 
 
 export const users = [
-    { id: 1, name: 'Nguyễn Phúc Thịnh', time: '09:30 29/7/2023' },
-    { id: 2, name: 'Nguyễn Phúc Thịnh', time: '09:30 29/7/2023' },
+    { id: 1, name: 'Nguyễn Phúc Thịnh', time: '10/21/2024' },
+    { id: 2, name: 'Nguyễn Phúc Thịnh', time: '10/22/2024' },
     { id: 3, name: 'Nguyễn Phúc Thịnh', time: '09:30 29/7/2023' },
     { id: 4, name: 'Nguyễn Phúc Thịnh', time: '09:30 29/7/2023' },
+  ];
+
+  export const bookings = [
+    {id: 1,name: 'Du lịch hồ cốc - vùng tàu', code: 'P3453212',date: '19/05/2024',status: 'đang chờ',amount: '50,000,000đ',avatar: 'avt.png', },
+    {id: 2,name: 'Du lịch Phú Quốc',code: 'P4567890',date: '01/06/2024', status: 'đã duyệt',amount: '30,000,000đ',avatar: 'avt.png',},
+    { id: 3, name: 'Tour Đà Lạt',code: 'P9876543',date: '10/08/2024',status: 'đang chờ',amount: '15,000,000đ',avatar: 'avt.png',},
+    // Thêm nhiều booking hơn nếu cần
+  ];
+
+  export const locations = [
+    {id: 1, name: 'Du lịch hồ cốc - Vũng Tàu', type: 'Camping', address: 'FFXQ+X94, Bưng Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam',avatar: 'avt.png', },
+    {id: 2,name: 'Khu nghỉ dưỡng suối nước nóng', type: 'Resort', address: '123 Đường Số 5, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam', avatar: 'avt  .png', },
   ];
