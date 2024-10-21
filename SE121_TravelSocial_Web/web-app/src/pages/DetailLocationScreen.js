@@ -6,6 +6,7 @@ import { FaRankingStar, FaX, FaPlus } from "react-icons/fa6";
 import { MdEventNote } from "react-icons/md";
 import '../styles/DetailLocationScreen.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useParams } from "react-router-dom";
 import { faPhoneAlt, faEnvelope, faUser, faMapMarkerAlt, faMemo } from '@fortawesome/free-solid-svg-icons';
 
 const DetailLocationScreen =() => {

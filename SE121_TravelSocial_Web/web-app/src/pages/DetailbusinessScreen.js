@@ -4,9 +4,13 @@ import { FaAngleRight,FaBell, FaEye } from 'react-icons/fa';
 import '../styles/DetailBusinessScreen.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPhoneAlt, faEnvelope, faUser, faMapMarkerAlt, faMemo, faLocation } from '@fortawesome/free-solid-svg-icons';
-
+import { useParams } from 'react-router-dom';
+import { businesses } from './BusinessData';
 
 const DetailBusinessScreen = () => {
+    const { id } = useParams(); // Lấy id từ URL
+    const business = businesses.find((b) => b.id === parseInt(id));
+  
 
     const [currentTab, setCurrentTab] = useState('profile'); 
 

@@ -10,6 +10,10 @@
   .leftframe {
     width: 60%;
   }
+  .business-card .card-body .number{
+
+    margin-left: 80px;
+  }
 
 }
 
@@ -18,12 +22,21 @@
   .leftframe {
     width: 60%;
   }
+  .business-card .card-body .number{
+
+    margin-left: 83px;
+  }
 
 }
 
 @media (min-width: 978px) and (max-width: 1199px) {
   .leftframe {
     width: 60%;
+  }
+
+  .business-card .card-body .number{
+
+    margin-left: 75px;
   }
 
   .business-card .card-header p {
@@ -56,6 +69,11 @@
     width: 33%;
   }
 
+  .business-card .card-body .number{
+
+    margin-left: 72px;
+  }
+
   .rightframe .user-info {
     padding: 10px;
   }
@@ -81,6 +99,11 @@
     display: none;
   }
 
+  .business-card .card-body .number{
+
+    margin-left: 66px;
+  }
+
   .leftframe {
     width: 500px;
   }
@@ -90,8 +113,14 @@
 }
 
 @media (max-width: 480px) {
+  .business-card .card-body .number{
+
+    margin-left: 66px;
+  }
   
 }
+
+
 
 .header-section1 {
   width: 100%;
@@ -235,12 +264,11 @@
     margin-left: 120px;
   }
 
-
+ 
  
   .business-card .card-body .number{
     width:fit-content;
     text-align: end;
-    margin-left: 40%;
     padding:3px;
     padding-left: 4px;
     padding-right: 4px;
@@ -598,4 +626,8 @@
 
 .business-card-2 {
   height: 16%;
+}
+
+.none-h {
+  height: fit-content !important;
 }

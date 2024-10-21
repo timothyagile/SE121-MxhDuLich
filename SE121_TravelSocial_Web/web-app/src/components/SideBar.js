@@ -1,33 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import React from 'react';
 import '../styles/SideBar.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaHome, FaMapMarkerAlt, FaBookOpen, FaServicestack, FaChartBar } from 'react-icons/fa';
 
-const SideBar = () => {
+const SideBar = ({role}) => {
 
   const navigate = useNavigate(); 
 
-  const iconSources = [
+  const adminIconSources = [
     {
       inactive: <FaHome />,
       active: <FaHome className="text-white" />,
-      link: "/dashboard",
+      link: "/dashboard/admin",
     },
     {
       inactive: <FaMapMarkerAlt />,
       active: <FaMapMarkerAlt className="text-white" />,
-      link: "/listbusiness",
+      link: "/business/list",
     },
     {
       inactive: <FaBookOpen />,
       active: <FaBookOpen className="text-white" />,
-      link:"/listlocation",
+      link:"/location/list",
     },
     {
       inactive: <FaServicestack />,
       active: <FaServicestack className="text-white" />,
-      link:"/listbooking",
+      link:"/booking/list",
     },
     {
       inactive: <FaChartBar />,
@@ -36,14 +36,33 @@ const SideBar = () => {
     },
   ];
 
-  const [activeItems, setActiveItems] = useState([
-    true,
-    false,
-    false,
-    false,
-    false,
-  ]);
+  const businessIconSources = [
+    { inactive: <FaHome />, active: <FaHome className="text-white" />, link: "/dashboard" },
+    { inactive: <FaBookOpen />, active: <FaBookOpen className="text-white" />, link: "/listlocation" },
+    { inactive: <FaServicestack />, active: <FaServicestack className="text-white" />, link: "/listbooking" },
+  ];
 
+  const [iconSources, setIconSources] = useState([]);
+
+  useEffect(() => {
+    if (role === 'admin') {
+      setIconSources(adminIconSources);
+    } else if (role === 'business') {
+      setIconSources(businessIconSources);
+    }
+  }, [role]);
+
+  // const [activeItems, setActiveItems] = useState([
+  //   true,
+  //   false,
+  //   false,
+  //   false,
+  //   false,
+  // ]);
+
+  // const [activeIndex, setActiveIndex] = useState(0);
+
+  const [activeItems, setActiveItems] = useState(Array(iconSources.length).fill(false));
   const [activeIndex, setActiveIndex] = useState(0);
 
   const handleClick = (index) => {
@@ -60,7 +79,7 @@ const SideBar = () => {
       </div>
       <div className="sidebar-menu">
         <ul>
-          {activeItems.map((isActive, index) => (
+          {iconSources.map((icon, index) => (
             // <li
             //   key={index}
             //   className={`menu-item ${activeIndex === index ? 'active' : ''}`}
@@ -70,16 +89,16 @@ const SideBar = () => {
             // </li>
 
             <li
-  key={index}
-  className={`menu-item ${activeIndex === index ? 'active' : ''}`}
-  onClick={() => handleClick(index)}
->
-  {activeItems[index] ? (
-    <div className="icon-active">{iconSources[index].active}</div>
-  ) : (
-    iconSources[index].inactive
-  )}
-</li>
+              key={index}
+              className={`menu-item ${activeIndex === index ? 'active' : ''}`}
+              onClick={() => handleClick(index)}
+            >
+              {activeItems[index] ? (
+                <div className="icon-active">{icon.active}</div>
+              ) : (
+                icon.inactive
+              )}
+            </li>
           ))}
         </ul>
       </div>
