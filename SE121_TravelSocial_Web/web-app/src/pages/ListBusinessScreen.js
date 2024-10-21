@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { IoIosArrowDropleft, IoIosArrowDropright } from "react-icons/io";
 import Pagination from '../components/Pagination';
 import { businesses } from './BusinessData';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 
 const ITEMS_PER_PAGE = 10;
@@ -15,13 +15,10 @@ const ListBusinessScreen = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   // Tính tổng số trang
-  const totalItems = businesses.length;
+  // const totalItems = businesses.length;
 
   // Lấy dữ liệu của trang hiện tại
-  const currentData = businesses.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -30,8 +27,31 @@ const ListBusinessScreen = () => {
   const navigate = useNavigate(); 
 
   const handleRowClick = (id) => {
-    navigate(`/business/detail/${id}`); // Điều hướng đến trang chi tiết với ID
+    navigate(`/business/detail/${id}`); 
   };
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const filteredData = businesses.filter((business) => {
+    const searchTermLower = searchTerm.toLowerCase();
+    return (
+      business.name.toLowerCase().includes(searchTermLower) || 
+      business.code.toLowerCase().includes(searchTermLower) || 
+      business.contact.toLowerCase().includes(searchTermLower) || 
+      business.phone.toLowerCase().includes(searchTermLower)
+    );
+  });
+
+  const currentData = filteredData.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  const totalItems = filteredData.length;
+
 
   return (
     <div class="container">
@@ -41,7 +61,13 @@ const ListBusinessScreen = () => {
           <div class="listbusinessbody scroll-container mh-900">
             <div class="search">
               <FaSearch class="icon-search"/>
-              <input type="text" class="input-text" placeholder="Tìm kiếm nhà kinh doanh"/>
+              <input
+                type="text"
+                className="input-text"
+                placeholder="Tìm kiếm nhà kinh doanh"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
             <table className="business-table">
               <thead>

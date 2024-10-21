@@ -52,7 +52,7 @@ root.render(
           {/* Booking */}
           <Route path="/booking/list" element={<ListBookingScreen />} />
           <Route path="/booking/list/business" element={<ListBookingBusinessScreen />} />
-          <Route path="/booking/detail" element={<DetailBookingScreen />} />
+          <Route path="/booking/detail/:id" element={<DetailBookingScreen />} />
 
           {/* Địa điểm */}
           <Route path="/location/list" element={<ListLocationScreen />} />

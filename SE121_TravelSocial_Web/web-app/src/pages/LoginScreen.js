@@ -41,7 +41,7 @@ function LoginScreen() {
       // Tạm thời sử dụng dữ liệu tĩnh thay vì gọi API thực
       const mockResponse = {
         email: 'admin@example.com',
-        role: 'admin', // Thay đổi thành 'business' để test
+        role: 'business', // Thay đổi thành 'business' để test
       };
   
       // Giả lập điều hướng dựa trên role

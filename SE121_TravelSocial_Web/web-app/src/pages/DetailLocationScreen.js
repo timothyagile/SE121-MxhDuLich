@@ -241,8 +241,9 @@ const DetailLocationScreen =() => {
                                         </div>
 
                                         <div class="scroll-container mh-200">
+                                            <h2 class="text-xl font-bold mb-4">Đánh giá từ khách hàng</h2>
                                             <div>
-                                                <h2 class="text-xl font-bold mb-4">Đánh giá từ khách hàng</h2>
+                                                
                                                 <div class="flex items-center mb-4">
                                                     <img alt="Profile picture of Hoang Huy" class="w-12 h-12 rounded-full mr-4" height="50" src="https://storage.googleapis.com/a1aa/image/O5bug1WBccZwJ527TONg0tRsK6lOKxgmwdTsBcoffjoNNVlTA.jpg" width="50"/>
                                                     <div>
@@ -259,8 +260,8 @@ const DetailLocationScreen =() => {
                                                 </div>
                                                 <p class="text-gray-700">“The location was perfect. The staff was friendly. Our bed was comfy. The pool was fresh with a great view. The breakfast was delicious! We had a hot tub on our balcony which was awesome.”</p>
                                             </div>
-                                            <div>
-                                                <h2 class="text-xl font-bold mb-4">Đánh giá từ khách hàng</h2>
+                                            <div class="mt-3">
+                                                
                                                 <div class="flex items-center mb-4">
                                                     <img alt="Profile picture of Hoang Huy" class="w-12 h-12 rounded-full mr-4" height="50" src="https://storage.googleapis.com/a1aa/image/O5bug1WBccZwJ527TONg0tRsK6lOKxgmwdTsBcoffjoNNVlTA.jpg" width="50"/>
                                                     <div>

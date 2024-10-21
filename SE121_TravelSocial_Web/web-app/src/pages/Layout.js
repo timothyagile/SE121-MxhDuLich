@@ -6,11 +6,11 @@ import Header from '../components/Header.js';
 const titleMap = [
   { path: /^\/dashboard\/admin$/, main: 'Bảng Điều Khiển', sub: null },
   { path: /^\/business\/list$/, main: 'Danh Sách Doanh Nghiệp', sub: null },
-  { path: /^\/detailbusiness\/\d+$/, main: 'Danh Sách Doanh Nghiệp', sub: 'Chi Tiết Doanh Nghiệp' },
+  { path: /^\/business\/detail\/\d+$/, main: 'Danh Sách Doanh Nghiệp', sub: 'Chi Tiết Doanh Nghiệp' },
   { path: /^\/location\/list$/, main: 'Danh Sách Địa Điểm', sub: null },
   { path: /^\/location\/detail\/\d+$/, main: 'Danh Sách Địa Điểm', sub: 'Chi Tiết Địa Điểm' },
   { path: /^\/booking\/list$/, main: 'Danh Sách Đặt Chỗ', sub: null },
-  { path: /^\/detailbooking\/\d+$/, main: 'Danh Sách Đặt Chỗ', sub: 'Chi Tiết Đặt Chỗ' },
+  { path: /^\/booking\/detail\/\d+$/, main: 'Danh Sách Đặt Chỗ', sub: 'Chi Tiết Đặt Chỗ' },
   { path: /^\/statistic$/, main: 'Thống Kê', sub: null },
 ];
 
