@@ -23,6 +23,7 @@ import ListLocationBusinessScreen from './pagesofbusiness/ListLocationBusinessSc
 import DetailLocationBusinessScreen from './pagesofbusiness/DetailLocationBusinessScreen';
 import AddLocationScreen from './pagesofbusiness/AddLocationScreen';
 import ChatBusinessScreen from './pagesofbusiness/ChatBusinessScreen';
+import BusinessDetailBookingScreen from './pagesofbusiness/BusinessDetailBookingScreen';
 
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
@@ -51,14 +52,15 @@ root.render(
 
           {/* Booking */}
           <Route path="/booking/list" element={<ListBookingScreen />} />
-          <Route path="/booking/list/business" element={<ListBookingBusinessScreen />} />
+          <Route path="/business/booking/list" element={<ListBookingBusinessScreen />} />
+          <Route path="/business/booking/detail/:id" element={<BusinessDetailBookingScreen />} />
           <Route path="/booking/detail/:id" element={<DetailBookingScreen />} />
 
           {/* Địa điểm */}
           <Route path="/location/list" element={<ListLocationScreen />} />
-          <Route path="/location/list/business" element={<ListLocationBusinessScreen />} />
+          <Route path="/business/location/list" element={<ListLocationBusinessScreen />} />
           <Route path="/location/detail/:id" element={<DetailLocationScreen />} />
-          <Route path="/location/detail/business" element={<DetailLocationBusinessScreen />} />
+          <Route path="/business/location/detail/:id" element={<DetailLocationBusinessScreen />} />
           <Route path="/location/add" element={<AddLocationScreen />} />
 
           {/* Thống kê */}

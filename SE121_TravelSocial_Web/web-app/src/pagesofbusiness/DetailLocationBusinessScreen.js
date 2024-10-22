@@ -7,6 +7,7 @@ import { MdEventNote } from "react-icons/md";
 import '../styles/DetailLocationScreen.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPhoneAlt, faEnvelope, faUser, faMapMarkerAlt, faMemo } from '@fortawesome/free-solid-svg-icons';
+import { locations } from '../pages/BusinessData';
 
 const DetailLocationBusinessScreen =() => {
 
@@ -29,6 +30,30 @@ const DetailLocationBusinessScreen =() => {
     const handleViewDetails = () => {
         setCurrentTab2('roomDetails'); 
     };
+
+    //Nơi này để chỉnh sửa dữ liệu//
+    const [locationInfo, setLocationInfo] = useState(locations);
+    const [isEditing, setIsEditing] = useState(false);
+
+    const handleEditClick = () => {
+        setIsEditing(!isEditing);
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setLocationInfo({
+          ...locationInfo,
+          [name]: value
+        });
+      };
+
+      const handleSaveClick = () => {
+        console.log('Dữ liệu sau khi chỉnh sửa:', locationInfo);
+        setIsEditing(false);
+    
+        // tại đây gọi api để cập nhật dữ liệu lên dtb
+      };
+    ///////////////////////////////
 
     const navigate = useNavigate ();
 
@@ -85,36 +110,103 @@ const DetailLocationBusinessScreen =() => {
                             </div>
                         </div>
                         {currentTab === 'baseinfo' && (
-                            <div class="border border-gray-200 rounded-b-lg p-4">
+                            <div class="relative border border-gray-200 rounded-b-lg p-4">
                                 <div class="grid grid-cols-2 gap-4 mb-4">
                                     <div>
                                         <p class="text-gray-600">Mã địa điểm</p>
+                                        {isEditing ? (
+                                            <input
+                                            type="text"
+                                            name="maDiaDiem"
+                                            value={'Mã địa điểm'}
+                                            onChange={handleInputChange}
+                                            className="border p-2 rounded"
+                                            />
+                                        ) : (
                                         <p class="font-semibold">124335111</p>
+                                        )}
                                     </div>
                                     <div>
                                         <p class="text-gray-600">Tên địa điểm</p>
+                                        {isEditing ? (
+                                            <input
+                                            type="text"
+                                            name="tenDiaDiem"
+                                            value={locationInfo.tenDiaDiem}
+                                            onChange={handleInputChange}
+                                            className="border p-2 rounded"
+                                            />
+                                        ) : (
                                         <p class="font-semibold">Du lịch Hồ Cốc - Vũng Tàu</p>
+                                        )}
                                     </div>
                                     <div>
                                         <p class="text-gray-600">Tên nhà kinh doanh</p>
+                                        {isEditing ? (
+                                            <input
+                                            type="text"
+                                            name="tenDiaDiem"
+                                            value={locationInfo.tenDiaDiem}
+                                            onChange={handleInputChange}
+                                            className="border p-2 rounded"
+                                            />
+                                        ) : (
                                         <p class="font-semibold">Du lịch Hồ Cốc - Vũng Tàu</p>
+                                        )}
                                     </div>
                                     <div>
                                         <p class="text-gray-600">Địa chỉ</p>
+                                        {isEditing ? (
+                                            <input
+                                            type="text"
+                                            name="tenDiaDiem"
+                                            value={locationInfo.tenDiaDiem}
+                                            onChange={handleInputChange}
+                                            className="border p-2 rounded"
+                                            />
+                                        ) : (
                                         <p class="font-semibold">FFXQ+X94, Bung Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam</p>
+                                        )}
                                     </div>
                                     <div>
                                         <p class="text-gray-600">Loại</p>
+                                        {isEditing ? (
+                                            <input
+                                            type="text"
+                                            name="tenDiaDiem"
+                                            value={locationInfo.tenDiaDiem}
+                                            onChange={handleInputChange}
+                                            className="border p-2 rounded"
+                                            />
+                                        ) : (
                                         <p class="font-semibold">camping</p>
+                                        )}
                                     </div>
                                     <div>
                                         <p class="text-gray-600">Ngày đăng ký kinh doanh</p>
+                                        {isEditing ? (
+                                            <input
+                                            type="text"
+                                            name="tenDiaDiem"
+                                            value={locationInfo.tenDiaDiem}
+                                            onChange={handleInputChange}
+                                            className="border p-2 rounded"
+                                            />
+                                        ) : (
                                         <p class="font-semibold"> 12/10/2023 </p>
+                                        )}
                                     </div>
                                 </div>
                                 <div>
                                     <img alt="Satellite view of Du lịch Hồ Cốc - Vũng Tàu" class="w-full max-w-xs mx-auto h-of-map" src="https://storage.googleapis.com/a1aa/image/oPZffFlAjIu7skZYoX8hS47d3ioVwXoWu6YnGKv7e0Wl2jKnA.jpg"/>
                                 </div>
+                                <button
+                                    className="absolute bottom-2 right-3 bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center"
+                                    onClick={isEditing ? handleSaveClick : handleEditClick}
+                                >
+                                    <FaEdit className="mr-2" />
+                                    {isEditing ? 'Lưu' : 'Chỉnh sửa'}
+                                </button>
                             </div>  
                         )}
 
@@ -199,7 +291,7 @@ const DetailLocationBusinessScreen =() => {
                                                         <p class="text-gray-600">Số lượng: 12</p>
                                                     </div>
                                                     <div class="flex justify-between items-center w-full">
-                                                        <button onClick={() => navigate("/dashboard")} class="bg-blue-500 text-white px-4 py-2 rounded-md">Xem chi tiết</button>
+                                                        <button onClick={handleViewDetails} class="bg-blue-500 text-white px-4 py-2 rounded-md">Xem chi tiết</button>
                                                         <div class="flex flex-col items-center">
                                                             <p class="text-gray-600">Giá</p>
                                                             <p class="text-red-600 font-bold text-lg">500.000 VND</p>
@@ -212,7 +304,7 @@ const DetailLocationBusinessScreen =() => {
                                                         <p class="text-gray-600">Số lượng: 12</p>
                                                     </div>
                                                     <div class="flex justify-between items-center w-full">
-                                                        <button onClick={() => navigate("/dashboard")} class="bg-blue-500 text-white px-4 py-2 rounded-md">Xem chi tiết</button>
+                                                        <button onClick={handleViewDetails} class="bg-blue-500 text-white px-4 py-2 rounded-md">Xem chi tiết</button>
                                                         <div class="flex flex-col items-center">
                                                             <p class="text-gray-600">Giá</p>
                                                             <p class="text-red-600 font-bold text-lg">500.000 VND</p>
@@ -246,13 +338,13 @@ const DetailLocationBusinessScreen =() => {
                                                     <img alt="Profile picture of Hoang Huy" class="w-12 h-12 rounded-full mr-4" height="50" src="https://storage.googleapis.com/a1aa/image/O5bug1WBccZwJ527TONg0tRsK6lOKxgmwdTsBcoffjoNNVlTA.jpg" width="50"/>
                                                     <div>
                                                         <p class="font-semibold">To Hoang Huy</p>
-                                                        <div class="flex items-center">
+                                                        <div class="flex items-center">  
                                                             <FaStar class="text-yellow-500"/> 
                                                             <FaStar class="text-yellow-500"/> 
                                                             <FaStar class="text-yellow-500"/> 
                                                             <FaStar class="text-yellow-500"/>                                                 
                                                             <FaStarHalfAlt class="text-yellow-500"/>       
-                                                            <span class="ml-2 text-gray-600">4.6</span>
+                                                            <span class="ml-2 text-gray-600">4.6</span>  
                                                         </div>
                                                     </div>
                                                 </div>

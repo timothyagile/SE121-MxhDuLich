@@ -12,11 +12,22 @@ const titleMap = [
   { path: /^\/booking\/list$/, main: 'Danh Sách Đặt Chỗ', sub: null },
   { path: /^\/booking\/detail\/\d+$/, main: 'Danh Sách Đặt Chỗ', sub: 'Chi Tiết Đặt Chỗ' },
   { path: /^\/statistic$/, main: 'Thống Kê', sub: null },
+
+  { path: /^\/dashboard\/business$/, main: 'Bảng Điều Khiển', sub: null },
+  { path: /^\/business\/booking\/list$/, main: 'Danh Sách Đặt Chỗ', sub: null },
+  { path: /^\/business\/detail\/\d+$/, main: 'Danh Sách Đặt Chỗ', sub: 'Chi Tiết Đặt Chỗ' },
+  { path: /^\/business\/location\/list$/, main: 'Danh Sách Địa Điểm', sub: null },
+  { path: /^\/location\/detail\/\d+$/, main: 'Danh Sách Địa Điểm', sub: 'Chi Tiết Địa Điểm' },
+  
+  { path: /^\/business\/chat$/, main: 'Chăm sóc khách hàng', sub: null },
+  { path: /^\/statistic$/, main: 'Thống Kê', sub: null },
 ];
 
 
+
+
 const Layout = ({ children }) => {
-const userRole = 'admin';
+const userRole = 'business';
 
 const location =useLocation();
 const { pathname } = location;
