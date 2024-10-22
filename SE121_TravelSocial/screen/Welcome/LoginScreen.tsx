@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {Button, Text, View,  StyleSheet, Image, TouchableOpacity, TextInput} from 'react-native';
+import {Button, Text, View,  StyleSheet, Image, TouchableOpacity, TextInput, NativeSyntheticEvent, TextInputChangeEventData} from 'react-native';
 //import CheckBox from '@react-native-community/checkbox';
 import Checkbox from 'expo-checkbox';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
@@ -8,6 +8,7 @@ import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/n
 export default function LoginScreen ({navigation}: {navigation: NativeStackNavigatorProps}) {
 
     const [email, setEmail] = useState('');
+    const [emailVerify, setEmailVerify] = useState(false)
     const [password, setPassword] = useState('');
     const [toggleCheckBox, setToggleCheckBox] = useState(false);
     const [secureTextEntry, setSecureTextEntry] = useState(true);
@@ -22,7 +23,19 @@ export default function LoginScreen ({navigation}: {navigation: NativeStackNavig
         setToggleCheckBox(!toggleCheckBox);
     };
 
-    
+    const isValidEmail = (email: string): boolean => {
+        // Biểu thức chính quy kiểm tra định dạng email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    const handleEmail = (e: NativeSyntheticEvent<TextInputChangeEventData>) => {
+        setEmailVerify(false);
+        const emailVar = e.nativeEvent.text;
+        setEmail(emailVar);
+        if(isValidEmail(emailVar))
+            setEmailVerify(true);
+    }
 
     return (
         <View style={styles.container}>
@@ -49,9 +62,19 @@ export default function LoginScreen ({navigation}: {navigation: NativeStackNavig
                     style={styles.input}
                     placeholder="Enter your email"
                     value={email}
-                    onChangeText={setEmail}
+                    onChange={e => handleEmail(e)}
                 />
             </View>
+
+            {/* {emailVerify ? (
+                <View>
+                    <Text>Dung</Text>
+                </View>
+            ) : (
+                <View>
+                    <Text>Sai</Text>
+                </View>
+            )} */}
             
             <View style ={styles.backgroundinput}>
                 <TextInput
@@ -89,7 +112,7 @@ export default function LoginScreen ({navigation}: {navigation: NativeStackNavig
             <Text style={styles.text3}>Don't have an account </Text>
             <TouchableOpacity
                 style={styles.text4}
-                onPress={() => navigation.navigate('login')}
+                onPress={() => navigation.navigate('register2')}
             >
                 <Text style = {{fontSize:18,fontWeight:'bold',color:'#196EEE'}}> Sign up</Text>
             </TouchableOpacity>

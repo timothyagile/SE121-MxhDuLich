@@ -26,7 +26,7 @@ export default function App() {
   return (
     <NavigationContainer independent={true}>
       <Stack.Navigator
-      initialRouteName='main-screen'>
+      initialRouteName='login'>
         <Stack.Screen 
         name = "welcome1" 
         component={WelcomeScreen1}
