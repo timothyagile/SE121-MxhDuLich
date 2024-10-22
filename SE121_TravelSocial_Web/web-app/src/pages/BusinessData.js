@@ -33,5 +33,5 @@ export const users = [
 
   export const locations = [
     {id: 1, name: 'Du lịch hồ cốc - Vũng Tàu', type: 'Camping', address: 'FFXQ+X94, Bưng Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam',avatar: 'avt.png', },
-    {id: 2,name: 'Khu nghỉ dưỡng suối nước nóng', type: 'Resort', address: '123 Đường Số 5, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam', avatar: 'avt  .png', },
+    {id: 2,name: 'Khu nghỉ dưỡng suối nước nóng', type: 'Resort', address: '123 Đường Số 5, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam', avatar: 'avt.png', },
   ];

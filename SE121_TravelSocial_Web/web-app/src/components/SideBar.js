@@ -3,6 +3,7 @@ import React from 'react';
 import '../styles/SideBar.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaHome, FaMapMarkerAlt, FaBookOpen, FaServicestack, FaChartBar } from 'react-icons/fa';
+import { RiCustomerServiceFill } from "react-icons/ri";
 
 const SideBar = ({role}) => {
 
@@ -37,9 +38,11 @@ const SideBar = ({role}) => {
   ];
 
   const businessIconSources = [
-    { inactive: <FaHome />, active: <FaHome className="text-white" />, link: "/dashboard" },
-    { inactive: <FaBookOpen />, active: <FaBookOpen className="text-white" />, link: "/listlocation" },
-    { inactive: <FaServicestack />, active: <FaServicestack className="text-white" />, link: "/listbooking" },
+    { inactive: <FaHome />, active: <FaHome className="text-white" />, link: "/dashboard/business" },
+    { inactive: <FaBookOpen />, active: <FaBookOpen className="text-white" />, link: "/business/location/list" },
+    { inactive: <FaServicestack />, active: <FaServicestack className="text-white" />, link: "/business/booking/list" },
+    { inactive: <RiCustomerServiceFill/>, active: <RiCustomerServiceFill className="text-white" />, link: "/business/chat" },
+    { inactive: <FaChartBar />,  active: <FaChartBar className="text-white" />,  link:"business/statistic" },
   ];
 
   const [iconSources, setIconSources] = useState([]);

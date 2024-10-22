@@ -1,326 +1,120 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/ListBookingScreen.css';
 import { useNavigate } from 'react-router-dom';
-import { FaAngleRight,FaBell, FaEye, FaSearch } from 'react-icons/fa';
+import { FaSearch, FaEye } from 'react-icons/fa';
 import Pagination from '../components/Pagination';
-
+import { bookings } from '../pages/BusinessData';  
 
 const ListBookingBusinessScreen = () => {
+  const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
 
-const navigate = useNavigate();
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handleRowClick = (id) => {
+    navigate(`/business/booking/detail/${id}`);
+  };
+
+  const filteredData = bookings.filter((booking) => {
+    const searchTermLower = searchTerm.toLowerCase();
+    return (
+      booking.name.toLowerCase().includes(searchTermLower) ||
+      booking.code.toLowerCase().includes(searchTermLower) ||
+      booking.date.toLowerCase().includes(searchTermLower)
+    );
+  });
+
+  const currentData = filteredData.slice(
+    (currentPage - 1) * 10,
+    currentPage * 10
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  const totalItems = filteredData.length;
 
   return (
-    <div class="container">
-      <div class="containerformobile">
-        
-        <div class="containerlistbusiness widthlistbusiness">
-          <div class="listbusinessbody scroll-container mh-900">
-
-            <div class="search">
-              <FaSearch class="icon-search"/>
-              <input type="text" class="input-text" placeholder="Tìm kiếm lượt đặt chỗ"/>
+    <div className="container">
+      <div className="containerformobile">
+        <div className="containerlistbusiness widthlistbusiness">
+          <div className="listbusinessbody scroll-container mh-900">
+            <div className="search">
+              <FaSearch className="icon-search" />
+              <input 
+                type="text" 
+                className="input-text" 
+                placeholder="Tìm kiếm lượt đặt chỗ" 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-            
+
             <table>
-                <thead>
-                    <tr>
-                        <th>STT</th>
-                        <th>Tên địa điểm</th>
-                        <th>Tên khách hàng</th>
-                        <th>Ngày đặt</th>
-                        <th>Trạng thái</th>
-                        <th>Tổng tiền</th>
-                        <th></th>
-                    </tr> 
-                </thead>
-              
-                <tbody class="row-container">
+              <thead>
+                <tr>
+                  <th>STT</th>
+                  <th>Tên địa điểm</th>
+                  <th>Tên khách hàng</th>
+                  <th>Ngày đặt</th>
+                  <th>Trạng thái</th>
+                  <th>Tổng tiền</th>
+                  <th></th>
+                </tr>
+              </thead>
 
-
-                  <tr >
-                        <td>1</td>
-                        <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                          </td>
-                        
-                          <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                          </td>
-                        <td>19/05/2024</td>
-                        
-
-                        <td>đang chờ</td>
-                        <td>50,000,000đ</td>
-                        <td>
-                          <button type="submit" class="icon-container iconview" onClick={() => navigate("/detailbooking")}>
-                            <FaEye />
-                          </button>
-                        </td>
+              <tbody className="row-container">
+                {currentData.map((booking, index) => (
+                  <tr 
+                    key={booking.id} 
+                    className="clickable-row"
+                    onClick={() => handleRowClick(booking.id)}
+                  >
+                    <td>{index + 1}</td>
+                    <td>
+                      <div className="namefield">
+                        <img 
+                          src={require(`../assets/images/${booking.avatar}`)} 
+                          alt="User Avatar" 
+                          className="user-avatar" 
+                        />
+                        <p>{booking.name}</p>
+                      </div>
+                    </td>
+                    <td>{booking.code}</td>
+                    <td>{booking.date}</td>
+                    <td>
+                      <span className={`status-label${booking.status === 'đã duyệt' ? '-2' : ''}`}>
+                        {booking.status}
+                      </span>
+                    </td>
+                    <td>{booking.amount}</td>
+                    <td>
+                      <button 
+                        type="button" 
+                        className="icon-container iconview"
+                        onClick={() => handleRowClick(booking.id)} 
+                      >
+                        <FaEye />
+                      </button>
+                    </td>
                   </tr>
-                  
-                  <tr >
-                        <td>1</td>
-                        <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                          </td>
-                        
-                          <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                          </td>
-                        <td>19/05/2024</td>
-                        
-
-                        <td>
-                          <span class="status-label">đang chờ</span>
-                          </td>
-                        <td>50,000,000đ</td>
-                        <td>
-                          <div class="icon-container">
-                              <FaEye />
-                          </div>
-                        </td>
-                  </tr>
-                  
-
-                  <tr >
-                        <td>1</td>
-                        <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                          </td>
-                        
-                          <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                          </td>
-                        <td>19/05/2024</td>
-                        
-
-                        <td><span class="status-label-2">đã duyệt</span></td>
-                        <td>50,000,000đ</td>
-                        <td>
-                          <div class="icon-container">
-                              <FaEye />
-                          </div>
-                        </td>
-                  </tr>
-                  
-
-                  <tr >
-                        <td>1</td>
-                        <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                          </td>
-                        
-                          <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                          </td>
-                        <td>19/05/2024</td>
-                        
-
-                        <td>đang chờ</td>
-                        <td>50,000,000đ</td>
-                        <td>
-                          <div class="icon-container">
-                              <FaEye />
-                          </div>
-                        </td>
-                  </tr>
-                  
-
-                  <tr >
-                        <td>1</td>
-                        <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                          </td>
-                        
-                          <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                          </td>
-                        <td>19/05/2024</td>
-                        
-
-                        <td>đang chờ</td>
-                        <td>50,000,000đ</td>
-                        <td>
-                          <div class="icon-container">
-                              <FaEye />
-                          </div>
-                        </td>
-                  </tr>
-                  
-                  <tr >
-                        <td>1</td>
-                        <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                          </td>
-                        
-                          <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                          </td>
-                        <td>19/05/2024</td>
-                        
-
-                        <td>đang chờ</td>
-                        <td>50,000,000đ</td>
-                        <td>
-                          <div class="icon-container">
-                              <FaEye />
-                          </div>
-                        </td>
-                  </tr>
-                  
-
-                  <tr >
-                        <td>1</td>
-                        <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                          </td>
-                        
-                          <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                          </td>
-                        <td>19/05/2024</td>
-                        
-
-                        <td>đang chờ</td>
-                        <td>50,000,000đ</td>
-                        <td>
-                          <div class="icon-container">
-                              <FaEye />
-                          </div>
-                        </td>
-                  </tr>
-                  
-                  <tr >
-                        <td>1</td>
-                        <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                          </td>
-                        
-                          <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                          </td>
-                        <td>19/05/2024</td>
-                        
-
-                        <td>đang chờ</td>
-                        <td>50,000,000đ</td>
-                        <td>
-                          <div class="icon-container">
-                              <FaEye />
-                          </div>
-                        </td>
-                  </tr>
-
-                  <tr >
-                        <td>1</td>
-                        <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                          </td>
-                        
-                          <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                          </td>
-                        <td>19/05/2024</td>
-                        
-
-                        <td>đang chờ</td>
-                        <td>50,000,000đ</td>
-                        <td>
-                          <div class="icon-container">
-                              <FaEye />
-                          </div>
-                        </td>
-                  </tr>
-
-                  <tr >
-                        <td>1</td>
-                        <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                          </td>
-                        
-                          <td>
-                          <div class="namefield">
-                            <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                            <p>Du lịch hồ cốc - vùng tàu</p>
-                          </div>
-                          </td>
-                        <td>19/05/2024</td>
-                        
-
-                        <td>đang chờ</td>
-                        <td>50,000,000đ</td>
-                        <td>
-                          <div class="icon-container">
-                              <FaEye />
-                          </div>
-                        </td>
-                  </tr>
-                  
-                </tbody>
-                
+                ))}
+              </tbody>
             </table>
           </div>
-          <Pagination totalPages={4}/>
+
+          <Pagination
+            totalItems={totalItems}
+            itemsPerPage={10}
+            onPageChange={handlePageChange}
+          />
         </div>
       </div>
-      
     </div>
   );
 };

@@ -5,13 +5,35 @@ import '../styles/DashBoardScreen.css';
 import { FaAngleRight,FaBell } from 'react-icons/fa';
 import Calendar from 'react-calendar';
 import pagination from '../components/Pagination';
+import PercentageIndicator from '../components/PercentageIndicator';
+import { bookings,users } from '../pages/BusinessData';
+import { useNavigate } from 'react-router-dom';
 
 
 const DashBoardBusinessScreen = () => {
+  const navigate = useNavigate();
+  const [selectedDate, setSelectedDate] = useState(null);
   const [value, setValue] = useState(new Date());
 
-  const onChange = (date) => {
-    setValue(date);
+  const onChange = (newdate) => {
+    setValue(newdate);
+    setSelectedDate(newdate);
+  };
+
+  const filteredUsers = selectedDate 
+    ? users.filter(user => {
+        
+        const userDate = new Date(user.time);
+        return userDate.toDateString() === selectedDate.toDateString();
+      })
+    : [];
+
+  const handleRowClick =(id) => {
+    navigate(`/booking/detail/${id}`);
+  }
+
+  const handleBusinessDetailClick = (id) => {
+    navigate(`/booking/detail/${id}`);
   };
 
 
@@ -33,11 +55,9 @@ const DashBoardBusinessScreen = () => {
                 <div className="card-header">
                   <div class ="circle">
                   </div>
-                  <p>Tổng nhà kinh doanh</p>
+                  <p>Booking trong tháng</p>
                   <div className="frame">
-                    <p className={`percentage ${1 < 0 ? 'decrease' : 'increase'}`}>
-                        12%
-                    </p>
+                    <PercentageIndicator class="percentage" percentage={-12}/>
                   </div>
                 </div>
                 <div className="card-body">
@@ -56,11 +76,9 @@ const DashBoardBusinessScreen = () => {
                 <div className="card-header">
                   <div class ="circle">
                   </div>
-                  <p>Tổng nhà kinh doanh</p>
+                  <p>Doanh thu trong tháng</p>
                   <div className="frame">
-                    <p className={`percentage ${1 < 0 ? 'decrease' : 'increase'}`}>
-                        12%
-                    </p>
+                    <PercentageIndicator class="percentage" percentage={18}/>
                   </div>
                 </div>
                 <div className="card-body">
@@ -88,105 +106,29 @@ const DashBoardBusinessScreen = () => {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>
-                  <div class="location-icon">
-                    <img src="location-icon.png" alt="Location Icon"></img>
-                  </div>
-                </td>
-                <td>Cắm trại hồ sóc - Vũng Tàu</td>
-                <td>Nguyễn PT</td>
-                <td>3h trước</td>
-                <td><span class="status-label">đang chờ</span></td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="location-icon">
-                    <img src="location-icon.png" alt="Location Icon"></img>
-                  </div>
-                </td>
-                <td>Cắm trại hồ sóc - Vũng Tàu</td>
-                <td>Nguyễn PT</td>
-                <td>35p trước</td>
-                <td><span class="status-label">đang chờ</span></td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="location-icon">
-                    <img src="location-icon.png" alt="Location Icon"></img>
-                  </div>
-                </td>
-                <td>Cắm trại hồ sóc - Vũng Tàu</td>
-                <td>Nguyễn PT</td>
-                <td>1h trước</td>
-                <td><span class="status-label-2">đã duyệt</span></td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="location-icon">
-                    <img src="location-icon.png" alt="Location Icon"></img>
-                  </div>
-                </td>
-                <td>Cắm trại hồ sóc - Vũng Tàu</td>
-                <td>Nguyễn PT</td>
-                <td>3h trước</td>
-                <td><span class="status-label">đang chờ</span></td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="location-icon">
-                    <img src="location-icon.png" alt="Location Icon"></img>
-                  </div>
-                </td>
-                <td>Cắm trại hồ sóc - Vũng Tàu</td>
-                <td>Nguyễn PT</td>
-                <td>2h trước</td>
-                <td><span class="status-label">đang chờ</span></td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="location-icon">
-                    <img src="location-icon.png" alt="Location Icon"></img>
-                  </div>
-                </td>
-                <td>Cắm trại hồ sóc - Vũng Tàu</td>
-                <td>Nguyễn PT</td>
-                <td>6h trước</td>
-                <td><span class="status-label">đang chờ</span></td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="location-icon">
-                    <img src="location-icon.png" alt="Location Icon"></img>
-                  </div>
-                </td>
-                <td>Cắm trại hồ sóc - Vũng Tàu</td>
-                <td>Nguyễn PT</td>
-                <td>1 ngày trước</td>
-                <td><span class="status-label">đang chờ</span></td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="location-icon">
-                    <img src="location-icon.png" alt="Location Icon"></img>
-                  </div>
-                </td>
-                <td>Cắm trại hồ sóc - Vũng Tàu</td>
-                <td>Nguyễn PT</td>
-                <td>camping</td>
-                <td><span class="status-label">đang chờ</span></td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="location-icon">
-                    <img src="location-icon.png" alt="Location Icon"></img>
-                  </div>
-                </td>
-                <td>Cắm trại hồ sóc - Vũng Tàu</td>
-                <td>Nguyễn PT</td>
-                <td>camping</td>
-                <td><span class="status-label">đang chờ</span></td>
-              </tr>
+              {(bookings || []).map((booking) => (
+                <tr
+                  key={booking.id}
+                  className="cursor-pointer hover:bg-blue-100"
+                  onClick={() => handleRowClick(booking.id)}>
+                    <td>
+                    <div className="location-icon">
+                      <img src="location-icon.png" alt="Location Icon" />
+                    </div>
+                    </td>
+                    <td>{booking.name}</td>
+                    <td>{booking.code}</td>
+                    <td>{booking.date}</td>
+                    <td>
+                      <span className={booking.status === 'đã duyệt' ? 'status-label-2' : 'status-label'}>
+                        {booking.status}
+                      </span>
+                    </td>
+                </tr>
+                
+
+              ))}
+
             </tbody>
           </table>
           </div>
@@ -206,65 +148,28 @@ const DashBoardBusinessScreen = () => {
               </div>
             <div class="scroll-container">
               <p class="new-business mb-3">Booking trong ngày</p>
-              <div class="user-info">
-                <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                <div class="user-details">
-                  <h2 class="user-name">Nguyễn Phúc Thịnh</h2>
-                  <p class="user-time">09:30 29/7/2023</p>
-                </div>
-                <div className="arrow-icon">
-                  <FaAngleRight />
-                </div>
-              </div>
-              <div class="user-info">
-                <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                <div class="user-details">
-                  <h2 class="user-name">Nguyễn Phúc Thịnh</h2>
-                  <p class="user-time">09:30 29/7/2023</p>
-                </div>
-                <div className="arrow-icon">
-                  <FaAngleRight />
-                </div>
-              </div>
-              <div class="user-info">
-                <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                <div class="user-details">
-                  <h2 class="user-name">Nguyễn Phúc Thịnh</h2>
-                  <p class="user-time">09:30 29/7/2023</p>
-                </div>
-                <div className="arrow-icon">
-                  <FaAngleRight />
-                </div>
-              </div>
-              <div class="user-info">
-                <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                <div class="user-details">
-                  <h2 class="user-name">Nguyễn Phúc Thịnh</h2>
-                  <p class="user-time">09:30 29/7/2023</p>
-                </div>
-                <div className="arrow-icon">
-                  <FaAngleRight />
-                </div>
-              </div>
-              <div class="user-info">
-                <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                <div class="user-details">
-                  <h2 class="user-name">Nguyễn Phúc Thịnh</h2>
-                  <p class="user-time">09:30 29/7/2023</p>
-                </div>
-                <div className="arrow-icon">
-                  <FaAngleRight />
-                </div>
-              </div>
-              <div class="user-info">
-                <img src="avatar.png" alt="User Avatar" class="user-avatar"></img>
-                <div class="user-details">
-                  <h2 class="user-name">Nguyễn Phúc Thịnh</h2>
-                  <p class="user-time">09:30 29/7/2023</p>
-                </div>
-                <div className="arrow-icon">
-                  <FaAngleRight />
-                </div>
+              <div>
+                {filteredUsers.length > 0 ? (
+                filteredUsers.map((user) => (
+                  <div
+                    className="user-info"
+                    key={user.id}
+                    onClick={() => handleBusinessDetailClick(user.id)} 
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <img src="avatar.png" alt="User Avatar" className="user-avatar" />
+                    <div className="user-details">
+                      <h2 className="user-name">{user.name}</h2>
+                      <p className="user-time">{user.time}</p>
+                    </div>
+                    <div className="arrow-icon">
+                      <FaAngleRight />
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>Không có nhà kinh doanh nào cho ngày đã chọn.</p> 
+              )}
               </div>
             </div>
           </div>
