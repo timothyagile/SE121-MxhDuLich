@@ -13,7 +13,7 @@ module.exports.createNewLocation = async (req, res) => {
         dateCreated,
     } = req.body;
     const newLocation = new Location({
-        ownerId,
+        ownerId: res.locals.user.id,
         name,
         description,
         rating,

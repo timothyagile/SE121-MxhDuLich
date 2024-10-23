@@ -1,10 +1,11 @@
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = 'your_jwt_secret'; // Phải giống với secret ở trên
+const User = require('../models/User')
 
 const requireAuth = (req, res, next) => {
     const token = req.cookies.jwt;
     if(token) {
-        jwt.verify(token, 'jwt', (err, decodeToken) => {
+        jwt.verify(token, 'travel', (err, decodeToken) => {
             if(err) {
                 console.log(err.message);
                 res.redirect('/login');
@@ -24,7 +25,7 @@ const requireAuth = (req, res, next) => {
 const checkUser = (req, res, next) => {
     const token = req.cookies.jwt;
     if (token) {
-      jwt.verify(token, 'net ninja secret', async (err, decodedToken) => {
+      jwt.verify(token, 'travel', async (err, decodedToken) => {
         if (err) {
           res.locals.user = null;
           next();

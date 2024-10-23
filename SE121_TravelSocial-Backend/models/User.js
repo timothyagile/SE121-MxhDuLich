@@ -39,11 +39,11 @@ userSchema.statics.login = async function (userEmail, password) {
             return user;
         }
         else {
-            return "Incorrect password";
+            throw Error("Incorrect password");
         }
     }
     else {
-        return "Incorrect email";
+        throw Error("Incorrect email");
     }
 }
 const User = mongoose.model('User', userSchema);

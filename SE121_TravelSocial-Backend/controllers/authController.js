@@ -22,7 +22,7 @@ module.exports.signup_post = async (req, res) => { //Create new user accouut
     try {
         const savedUser = await user.save()
         const token = createToken(savedUser._id);
-        res.cookie('jwtcookie', token, {httpOnly: true ,maxAge: maxAge * 1000})
+        res.cookie('jwt', token, {httpOnly: true ,maxAge: maxAge * 1000})
         res.status(200).json({
             isSucess: true,
             data: savedUser,
@@ -48,9 +48,11 @@ module.exports.signin_post =  async (req, res) => { //Check login
     const {userEmail, userPassword} = req.body;
     try {
         const user = await User.login(userEmail, userPassword);
+        const token = createToken(user._id);
+        res.cookie('jwt', token, {httpOnly: true ,maxAge: maxAge * 1000})
         res.status(200).json({
             isSucess: true,
-            data: user,
+            data: user._id,
             error: null
         })
     }
