@@ -2,6 +2,7 @@ const User = require('../models/User')
 const authServices = require('../services/authService')
 const cookie = require('cookies');
 const jwt = require('jsonwebtoken');
+
 module.exports.signup_get = (req, res) => { //Render home screen
     res.render('new user')
 }
