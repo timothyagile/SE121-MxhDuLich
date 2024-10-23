@@ -35,7 +35,7 @@ const locationSchema = new Schema({
             type: String,
             required: true,
         },
-        name: {
+        cateName: {
             type: String,
             required: true,
         },

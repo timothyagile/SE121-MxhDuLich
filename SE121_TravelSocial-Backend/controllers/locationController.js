@@ -1,5 +1,44 @@
 const Location = require('../models/Location');
 
+//--CREATE NEW LOCATION
+module.exports.createNewLocation = async (req, res) => {
+    const {
+        ownerId,
+        name,
+        description,
+        rating,
+        image,
+        address,
+        category,
+        dateCreated,
+    } = req.body;
+    const newLocation = new Location({
+        ownerId,
+        name,
+        description,
+        rating,
+        image,
+        address,
+        category,
+    });
+    try {
+        const savedLocation = await newLocation.save(); // Lưu địa điểm mới vào cơ sở dữ liệu
+        res.status(201).json({
+            isSuccess: true,
+            data: savedLocation,
+            error: null,
+        });
+    } catch (error) {
+        res.status(500).json({
+            isSuccess: false,
+            data: null,
+            error: error.message,
+        });
+    }
+
+}
+
+//--GET ALL LOCATION DATA--\\
 module.exports.getAllLocation = async (req, res) => {
     const allLocation = await Location.find();
     console.log(allLocation);
@@ -20,7 +59,7 @@ module.exports.getAllLocation = async (req, res) => {
     }
 }
 
-
+//--GET LOCATION DATA BY CATEGORY--\\
 module.exports.getLocationByCategory = async (req, res) => {
     const { categoryId } = req.params; // Lấy categoryId từ URL
     try {
@@ -39,7 +78,7 @@ module.exports.getLocationByCategory = async (req, res) => {
     }
 };
 
-// Tìm địa điểm theo tên
+//--GET LOCATION DATA BY NAME--\\
 module.exports.getLocationByName = async (req, res) => {
     const { name } = req.query; // Lấy tên từ query string
 
@@ -58,3 +97,7 @@ module.exports.getLocationByName = async (req, res) => {
         });
     }
 };
+
+//--UPDATE LOCATION DATA--\\
+
+//--DELETE LOCATION DATA--\\

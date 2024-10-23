@@ -50,12 +50,16 @@ module.exports.signin_post =  async (req, res) => { //Check login
         const user = await User.login(userEmail, userPassword);
         res.status(200).json({
             isSucess: true,
-            data: user._id,
+            data: user,
             error: null
         })
     }
     catch (error) {
-        console.log(error)
+        res.status(500).json({
+            isSucess: false,
+            data: null,
+            error: error.message
+        })
     }
 }
 
