@@ -1,3 +1,7 @@
+
+
+
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import '../src/styles/index.css';
@@ -26,6 +30,11 @@ import ChatBusinessScreen from './pagesofbusiness/ChatBusinessScreen';
 import BusinessDetailBookingScreen from './pagesofbusiness/BusinessDetailBookingScreen';
 
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+
+const link = document.createElement('link');
+link.href = 'https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css';
+link.rel = 'stylesheet';
+document.head.appendChild(link);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
