@@ -2,6 +2,7 @@ const User = require('../models/User')
 const authServices = require('../services/authService')
 const cookie = require('cookies');
 const jwt = require('jsonwebtoken');
+
 module.exports.signup_get = (req, res) => { //Render home screen
     res.render('new user')
 }
@@ -13,15 +14,16 @@ const createToken = (id) => {
     })
 }
 
-module.exports.signup_post = async (req, res) => { //Create new user accouut 
+module.exports.signup_post = async (req, res, next) => { //Create new user accouut 
     const {userEmail, userPassword} = req.body
-    const user = new User()
-    user.userEmail = userEmail
-    user.userPassword = userPassword
+    const user = new User({
+        userEmail,
+        userPassword,
+    })
     try {
-        const savedUser = await user.save()
+        const savedUser = createUser(user)
         const token = createToken(savedUser._id);
-        res.cookie('jwtcookie', token, {httpOnly: true ,maxAge: maxAge * 1000})
+        res.cookie('jwt', token, {httpOnly: true ,maxAge: maxAge * 1000})
         res.status(200).json({
             isSucess: true,
             data: savedUser,
@@ -29,12 +31,7 @@ module.exports.signup_post = async (req, res) => { //Create new user accouut
          })
     }
     catch(error){
-        console.log(error)
-        res.status(400).json({
-        isSucess: false,
-        data: "Error, user hasn't created",
-        error: error
-    })
+        next(error)
     }
 }
 
@@ -47,6 +44,8 @@ module.exports.signin_post =  async (req, res) => { //Check login
     const {userEmail, userPassword} = req.body;
     try {
         const user = await User.login(userEmail, userPassword);
+        const token = createToken(user._id);
+        res.cookie('jwt', token, {httpOnly: true ,maxAge: maxAge * 1000})
         res.status(200).json({
             isSucess: true,
             data: user._id,
@@ -54,7 +53,11 @@ module.exports.signin_post =  async (req, res) => { //Check login
         })
     }
     catch (error) {
-        console.log(error)
+        res.status(500).json({
+            isSucess: false,
+            data: null,
+            error: error.message
+        })
     }
 }
 
