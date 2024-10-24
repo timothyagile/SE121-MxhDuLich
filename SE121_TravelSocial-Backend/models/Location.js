@@ -44,7 +44,9 @@ const locationSchema = new Schema({
         type: Date,
         default: Date.now,
     },
-},  { collection: 'Location' });
+},  
+{ collection: 'Location' }
+);
 
 const Location = mongoose.model('Location', locationSchema);
 module.exports = Location;

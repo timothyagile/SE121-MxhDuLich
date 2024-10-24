@@ -4,20 +4,12 @@ const cookie = require('cookies')
 
 
 
-const createUser = async ({userEmail, userPassword}) => {
-    const user = new User();
-    user.userEmail = userEmail;
-    user.userPassword = userPassword;
-    try {
-        const savedUser = await user.save();
-        return { 
-            isSuccess: true, 
-            data: savedUser,
-            error: null
-        };
-    } catch (error) {
-        throw new Error("Error, user hasn't created: " + error.message);
-    }
+const createUser = async (user) => {
+    const savedUser = await user.save()
+    if(savedUser)
+        return savedUser
+    else
+        throw Error;
 };
 
 module.exports = {
