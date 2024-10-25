@@ -83,6 +83,23 @@ module.exports.getLocationByName = async (req, res, next) => {
     }
 };
 
+//--GET LOCATION BY ID--\\
+module.exports.getLocationById = async (req, res, next) => {
+    const locationId = req.params.locationId;
+    console.log(locationId)
+    try {
+        const result = await locationSvc.getLocationById(locationId);
+        res.status(200).json({
+            isSuccess: true,
+            data: result,
+            error: null,
+        }); 
+    }
+    catch(error) {
+        next(error)
+    }
+}
+
 //--UPDATE LOCATION DATA--\\
 
 module.exports.updateLocation = async (req, res, next) => {
