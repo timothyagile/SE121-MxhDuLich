@@ -50,7 +50,7 @@ const updateLocation = async(locationId, updateData) => {
         throw new NotFoundException('Not found location to update')
 }
 
-const deleteLocation = async(locationId, updateData) => {
+const deleteLocation = async(locationId) => {
     const deletedLocation = await Location.findByIdAndDelete(locationId)
     if(deletedLocation)
         return deletedLocation

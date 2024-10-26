@@ -14,7 +14,7 @@ module.exports.createNewLocation = async (req, res, next) => {
         dateCreated,
     } = req.body;
         // Tạo locationData
-    console.log(res.locals.user._id)
+    //console.log(res.locals.user._id)
     const locationData = new Location({
         name,
         description,
