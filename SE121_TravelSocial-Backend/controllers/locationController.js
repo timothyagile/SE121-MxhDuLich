@@ -14,7 +14,7 @@ module.exports.createNewLocation = async (req, res, next) => {
         dateCreated,
     } = req.body;
         // Tạo locationData
-    console.log(res.locals.user._id)
+    //console.log(res.locals.user._id)
     const locationData = new Location({
         name,
         description,
@@ -82,6 +82,23 @@ module.exports.getLocationByName = async (req, res, next) => {
         next(error)
     }
 };
+
+//--GET LOCATION BY ID--\\
+module.exports.getLocationById = async (req, res, next) => {
+    const locationId = req.params.locationId;
+    console.log(locationId)
+    try {
+        const result = await locationSvc.getLocationById(locationId);
+        res.status(200).json({
+            isSuccess: true,
+            data: result,
+            error: null,
+        }); 
+    }
+    catch(error) {
+        next(error)
+    }
+}
 
 //--UPDATE LOCATION DATA--\\
 

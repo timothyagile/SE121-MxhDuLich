@@ -1,5 +1,6 @@
 const Location = require('../models/Location');
-const NotFoundException = require('../errors/exception')
+const NotFoundException = require('../errors/exception');
+const { findById } = require('../models/User');
 
 const createLocation = async (locationData) => {
     const savedLocation = await locationData.save();
@@ -33,6 +34,14 @@ const getLocationByName = async (name) => {
         throw new NotFoundException('Not found this location');
 }
 
+const getLocationById = async (locationId) => {
+    const location = await Location.findById(locationId);
+    if(location)
+        return location;
+    else
+        throw new NotFoundException('Not found this location');
+}
+
 const updateLocation = async(locationId, updateData) => {
     const updatedLocation = await Location.findByIdAndUpdate(locationId, updateData, {new: true, runValidators: true})
     if(updatedLocation)
@@ -41,7 +50,7 @@ const updateLocation = async(locationId, updateData) => {
         throw new NotFoundException('Not found location to update')
 }
 
-const deleteLocation = async(locationId, updateData) => {
+const deleteLocation = async(locationId) => {
     const deletedLocation = await Location.findByIdAndDelete(locationId)
     if(deletedLocation)
         return deletedLocation
@@ -50,10 +59,11 @@ const deleteLocation = async(locationId, updateData) => {
 }
 
 module.exports = {
-    getAllLocation,
+    getAllLocation, 
     createLocation,
     getLocationByCategory,
     getLocationByName,
+    getLocationById,
     updateLocation,
     deleteLocation
 }
