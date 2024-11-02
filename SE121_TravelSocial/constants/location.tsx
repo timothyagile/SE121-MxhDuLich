@@ -5,7 +5,7 @@ export default [
         imgSource: require('@/assets/images/bai-truoc-20.jpg'),
         name: "Vung Tau",
         rating: "4.1",
-        long: "2N/1D"
+        long: "hot deal"
     },
     {
         id: "2",

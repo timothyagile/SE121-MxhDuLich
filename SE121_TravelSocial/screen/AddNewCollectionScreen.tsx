@@ -14,22 +14,22 @@ export default function AddNewCollectionScreen({ navigation }: {navigation: Nati
         >
           <Image source={require('../assets/icons/exit.png')} style={styles.exitIcon} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>New collection</Text>
+        <Text style={styles.headerTitle}>Bộ sưu tập mới</Text>
         <TouchableOpacity
           style={styles.createButton}
           onPress={() => console.log('Create button pressed')}
         >
-          <Text style={styles.createButtonText}>Create</Text>
+          <Text style={styles.createButtonText}>Tạo</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.content}>
-        <Text style={styles.modalText}>New collection</Text>
+        <Text style={styles.modalText}>Bộ sưu tập mới</Text>
         <TextInput
           style={[
             styles.modalInput,
             isFocused && { borderColor: '#196EEE', color: '#196EEE' },
           ]}
-          placeholder="Name of collection"
+          placeholder="Tên của bộ sưu tập"
           placeholderTextColor={isFocused ? '#196EEE' : '#000000'}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}

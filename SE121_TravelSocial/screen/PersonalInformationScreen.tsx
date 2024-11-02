@@ -21,13 +21,23 @@ export default function PersonalInformationScreen({ navigation }: {navigation: N
     citizenId: false,
   });
 
+  const fieldTranslations = {
+    name: 'Tên',
+    phoneNumber: 'Số điện thoại',
+    email: 'Email',
+    address: 'Địa chỉ',
+    dob: 'Ngày sinh',
+    nationality: 'Quốc tịch',
+    citizenId: 'CMND/CCCD'
+  };
+
   const [name, setName] = useState({ firstName: 'To', lastName: 'Hoang Huy' });
   const [phoneNumber, setPhoneNumber] = useState('0386441295');
   const [email, setEmail] = useState('22520573@gm.uit.edu.vn');
-  const [address, setAddress] = useState('Not provided yet');
-  const [dob, setDob] = useState('Not provided yet');
-  const [nationality, setNationality] = useState('Not provided yet');
-  const [citizenId, setCitizenId] = useState('Not provided yet');
+  const [address, setAddress] = useState('Chưa được cung cấp');
+  const [dob, setDob] = useState('Chưa được cung cấp');
+  const [nationality, setNationality] = useState('Chưa được cung cấp');
+  const [citizenId, setCitizenId] = useState('Chưa được cung cấp');
 
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -40,15 +50,15 @@ export default function PersonalInformationScreen({ navigation }: {navigation: N
 
   const handleSave = (field: EditFields) => {
     if (field === 'name' && (name.firstName.trim() === '' || name.lastName.trim() === '')) {
-      Alert.alert('Error', 'First name and last name cannot be empty');
+      Alert.alert('Error', 'Họ và tên không được để trống');
       return;
     }
     if (field === 'phoneNumber' && phoneNumber.trim() === '') {
-      Alert.alert('Error', 'Phone number cannot be empty');
+      Alert.alert('Error', 'Số điện thoại không được để trống');
       return;
     }
     if (field === 'email' && email.trim() === '') {
-      Alert.alert('Error', 'Email cannot be empty');
+      Alert.alert('Error', 'Email không được để trống');
       return;
     }
     if (field === 'address') {
@@ -89,16 +99,16 @@ export default function PersonalInformationScreen({ navigation }: {navigation: N
               style={styles.input}
               value={name.firstName}
               onChangeText={(text) => setName({ ...name, firstName: text })}
-              placeholder="First Name"
+              placeholder="Họ"
             />
             <TextInput
               style={styles.input}
               value={name.lastName}
               onChangeText={(text) => setName({ ...name, lastName: text })}
-              placeholder="Last Name"
+              placeholder="Tên"
             />
             <TouchableOpacity style={styles.saveButton} onPress={() => handleSave('name')}>
-              <Text style={styles.saveButtonText}>Save</Text>
+              <Text style={styles.saveButtonText}>Lưu</Text>
             </TouchableOpacity>
           </>
         ) : (
@@ -114,7 +124,7 @@ export default function PersonalInformationScreen({ navigation }: {navigation: N
               keyboardType="phone-pad"
             />
             <TouchableOpacity style={styles.saveButton} onPress={() => handleSave('phoneNumber')}>
-              <Text style={styles.saveButtonText}>Save</Text>
+              <Text style={styles.saveButtonText}>Lưu</Text>
             </TouchableOpacity>
           </>
           
@@ -126,7 +136,7 @@ export default function PersonalInformationScreen({ navigation }: {navigation: N
           <>
             <TextInput style={styles.input} value={email} onChangeText={setEmail} keyboardType="email-address" />
             <TouchableOpacity style={styles.saveButton} onPress={() => handleSave('email')}>
-              <Text style={styles.saveButtonText}>Save</Text>
+              <Text style={styles.saveButtonText}>Lưu</Text>
             </TouchableOpacity>
           </>
         ) : (
@@ -147,10 +157,10 @@ export default function PersonalInformationScreen({ navigation }: {navigation: N
             </Picker>
 
             <Picker
-        selectedValue={selectedDistrict?.value}
-        style={styles.picker}
-        onValueChange={(itemValue) => handleDistrictChange(itemValue)}
-      >
+              selectedValue={selectedDistrict?.value}
+              style={styles.picker}
+              onValueChange={(itemValue) => handleDistrictChange(itemValue)}
+            >
         {districts.map((district) => (
           <Picker.Item key={district.value} label={district.label} value={district.value} />
         ))}
@@ -166,7 +176,7 @@ export default function PersonalInformationScreen({ navigation }: {navigation: N
       </Picker>
 
             <TouchableOpacity style={styles.saveButton} onPress={() => handleSave('address')}>
-              <Text style={styles.saveButtonText}>Save</Text>
+              <Text style={styles.saveButtonText}>Lưu</Text>
             </TouchableOpacity>
           </>
         ) : (
@@ -191,7 +201,7 @@ export default function PersonalInformationScreen({ navigation }: {navigation: N
                   />
                 )}
               <TouchableOpacity style={styles.saveButton} onPress={() => handleSave('dob')}>
-                <Text style={styles.saveButtonText}>Save</Text>
+                <Text style={styles.saveButtonText}>Lưu</Text>
               </TouchableOpacity>
             </>
           ) : (
@@ -203,7 +213,7 @@ export default function PersonalInformationScreen({ navigation }: {navigation: N
           <>
             <TextInput style={styles.input} value={nationality} onChangeText={setNationality} />
             <TouchableOpacity style={styles.saveButton} onPress={() => handleSave('nationality')}>
-              <Text style={styles.saveButtonText}>Save</Text>
+              <Text style={styles.saveButtonText}>Lưu</Text>
             </TouchableOpacity>
           </>
         ) : (
@@ -214,7 +224,7 @@ export default function PersonalInformationScreen({ navigation }: {navigation: N
           <>
             <TextInput style={styles.input} value={citizenId} onChangeText={setCitizenId} keyboardType="phone-pad"/>
             <TouchableOpacity style={styles.saveButton} onPress={() => handleSave('citizenId')}>
-              <Text style={styles.saveButtonText}>Save</Text>
+              <Text style={styles.saveButtonText}>Lưu</Text>
             </TouchableOpacity>
           </>
         ) : (
@@ -353,16 +363,16 @@ export default function PersonalInformationScreen({ navigation }: {navigation: N
         <TouchableOpacity style={styles.arrowleftbutton} onPress={() => navigation.goBack()}>
           <Image source={require('../assets/icons/arrowleft.png')} style={styles.arrowlefticon} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Personal Information</Text>
+        <Text style={styles.headerTitle}>Thông tin cá nhân</Text>
       </View>
 
       <ScrollView>
         {(['name', 'phoneNumber', 'email', 'address', 'dob', 'nationality', 'citizenId'] as EditFields[]).map((field) => (
           <View key={field} style={styles.borderview}>
             <View style={styles.containertext}>
-              <Text style={styles.firsttext}>{field.charAt(0).toUpperCase() + field.slice(1)}</Text>
+            <Text style={styles.firsttext}>{fieldTranslations[field]}</Text>
               <TouchableOpacity onPress={() => handleEditToggle(field)}>
-                <Text style={styles.edittext}>{isEditing[field] ? 'Cancel' : 'Edit'}</Text>
+                <Text style={styles.edittext}>{isEditing[field] ? 'Hủy' : 'Chỉnh sửa'}</Text>
               </TouchableOpacity>
             </View>
             {renderEditField(field)}
@@ -472,7 +482,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   picker: {
-    height: 50,
+    height: 120,
     width: '100%',
     marginVertical: 10,
   },

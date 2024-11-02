@@ -1,6 +1,8 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import { FaAngleRight,FaBell, FaEye,FaSearchLocation, FaEdit, FaStar, FaStarHalfAlt, FaBed, FaTimesCircle, FaHotTub, FaWifi, FaVolumeOff, FaSnowflake} from 'react-icons/fa';
 import { FaRankingStar, FaX, FaPlus } from "react-icons/fa6";
 import { MdEventNote } from "react-icons/md";
@@ -8,11 +10,16 @@ import '../styles/DetailLocationScreen.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPhoneAlt, faEnvelope, faUser, faMapMarkerAlt, faMemo } from '@fortawesome/free-solid-svg-icons';
 import { locations } from '../pages/BusinessData';
+import MapComponent from "../components/MapComponent";
+import MapBoxComponent from "../components/MapBoxComponent";
 
-const DetailLocationBusinessScreen =() => {
+const DetailLocationBusinessScreen =({ mapLoaded }) => {
 
     const [currentTab, setCurrentTab] = useState('baseinfo'); 
     const [currentTab2, setCurrentTab2] = useState('viewratingservice'); 
+
+    const [latitude] = useState(10.8231);  // Thay bằng tọa độ mong muốn
+    const [longitude] = useState(106.6297); // Thay bằng tọa độ mong muốn
 
     const handleBaseInfoClick = () => {
         setCurrentTab('baseinfo'); 
@@ -31,7 +38,7 @@ const DetailLocationBusinessScreen =() => {
         setCurrentTab2('roomDetails'); 
     };
 
-    //Nơi này để chỉnh sửa dữ liệu//
+    //Nơi này để chỉnh sửa dữ liệu của base-ìno//
     const [locationInfo, setLocationInfo] = useState(locations);
     const [isEditing, setIsEditing] = useState(false);
 
@@ -55,7 +62,39 @@ const DetailLocationBusinessScreen =() => {
       };
     ///////////////////////////////
 
+    //Nơi này để thay đổi dữ liệu của specificinfo
+    const [editMode, setEditMode] = useState(false);
+    const [images, setImages] = useState([
+        "https://storage.googleapis.com/a1aa/image/ouHZc2gP3LKELBzF9b9WhRW9eF7SEgifV3ddt1F1gtse8nKnA.jpg",
+        "https://storage.googleapis.com/a1aa/image/sCsVlOJSeD3UTaLoIIrOT6PxhfRdIWZr15lz5azFe8KJ9nKnA.jpg",
+        "https://storage.googleapis.com/a1aa/image/2DNYdCQdMDJbBZyhIyouoG7XtT5NuAbJKXjf12XkQuoPfTlTA.jpg",
+        "https://storage.googleapis.com/a1aa/image/tSYsfyPeJjhDVki0Vsk8DDATWf9vRxue66bCDKYAEBhL6PVOB.jpg",
+        "https://storage.googleapis.com/a1aa/image/gwx1kHK9DQYSPN7stTexFkCK510ikafYbvOKxeRQn12K9nKnA.jpg",
+        "https://storage.googleapis.com/a1aa/image/j9gNxOarjEr4DZ4gDrQF2iVtefocfFCRhseXPCdbmIoF6PVOB.jpg",
+    ]);
+    
+      const handleDeleteImage = (index) => {
+        const newImages = images.filter((_, i) => i !== index);
+        setImages(newImages);
+      };
+    
+      const handleAddImage = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const imageUrl = URL.createObjectURL(file);
+          setImages([...images, imageUrl]);
+        }
+      };
+
     const navigate = useNavigate ();
+
+    const { id } = useParams();
+    const [address, setAddress] = useState("FFXQ+X94, Bung Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam");
+
+    useEffect(() => {
+        // Đây là nơi bạn cập nhật địa chỉ mới khi cần
+        setAddress("FFXQ+X94, Bung Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam");
+    }, [id]);
 
 
     return (
@@ -197,9 +236,14 @@ const DetailLocationBusinessScreen =() => {
                                         )}
                                     </div>
                                 </div>
-                                <div>
-                                    <img alt="Satellite view of Du lịch Hồ Cốc - Vũng Tàu" class="w-full max-w-xs mx-auto h-of-map" src="https://storage.googleapis.com/a1aa/image/oPZffFlAjIu7skZYoX8hS47d3ioVwXoWu6YnGKv7e0Wl2jKnA.jpg"/>
-                                </div>
+                                {/* <div>
+                                    {address === "Địa chỉ không khả dụng" ? (
+                                        <p className="text-red-500">Không tìm thấy địa chỉ cho địa điểm này.</p>
+                                    ) : (
+                                        <MapComponent address={address} />
+                                    )}
+                                   
+                                </div> */}
                                 <button
                                     className="absolute bottom-2 right-3 bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center"
                                     onClick={isEditing ? handleSaveClick : handleEditClick}
@@ -212,68 +256,84 @@ const DetailLocationBusinessScreen =() => {
 
                         {currentTab === 'specificinfo' && (
                             <div class="border border-gray-200 rounded-b-lg p-4">
-                               
-                                <div class="flex space-x-4 overflow-x-auto pb-4">
-                                        <div class="relative">
-                                            <img alt="Image of a castle" class="w-24 h-24 object-cover rounded-lg" height="100" src="https://storage.googleapis.com/a1aa/image/ouHZc2gP3LKELBzF9b9WhRW9eF7SEgifV3ddt1F1gtse8nKnA.jpg" width="100"/>
-                                            <button class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
-                                                <FaX className="text-xs"/>
-                                            </button>
-                                        </div>
-                                        <div class="relative">
-                                            <img alt="Image of a ferris wheel" class="w-24 h-24 object-cover rounded-lg" height="100" src="https://storage.googleapis.com/a1aa/image/sCsVlOJSeD3UTaLoIIrOT6PxhfRdIWZr15lz5azFe8KJ9nKnA.jpg" width="100"/>
-                                            <button class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
-                                                <FaX className="text-xs"/>
-                                            </button>
-                                        </div>
-                                        <div class="relative">
-                                            <img alt="Image of a ticket" class="w-24 h-24 object-cover rounded-lg" height="100" src="https://storage.googleapis.com/a1aa/image/2DNYdCQdMDJbBZyhIyouoG7XtT5NuAbJKXjf12XkQuoPfTlTA.jpg" width="100"/>
-                                            <button class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
-                                                <FaX className="text-xs"/>
-                                            </button>
-                                        </div>
-                                        <div class="relative">
-                                            <img alt="Image of a castle with flowers" class="w-24 h-24 object-cover rounded-lg" height="100" src="https://storage.googleapis.com/a1aa/image/tSYsfyPeJjhDVki0Vsk8DDATWf9vRxue66bCDKYAEBhL6PVOB.jpg" width="100"/>
-                                            <button class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
-                                                <FaX className="text-xs"/>
-                                            </button>
-                                        </div>
-                                        <div class="relative">
-                                            <img alt="Image of a street" class="w-24 h-24 object-cover rounded-lg" height="100" src="https://storage.googleapis.com/a1aa/image/gwx1kHK9DQYSPN7stTexFkCK510ikafYbvOKxeRQn12K9nKnA.jpg" width="100"/>
-                                            <button class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
-                                                <FaX className="text-xs"/>
-                                            </button>
-                                        </div>
-                                        <div class="relative">
-                                            <img alt="Image of a statue" class="w-24 h-24 object-cover rounded-lg" height="100" src="https://storage.googleapis.com/a1aa/image/j9gNxOarjEr4DZ4gDrQF2iVtefocfFCRhseXPCdbmIoF6PVOB.jpg" width="100"/>
-                                            <button class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
-                                                <FaX className="text-xs"/>
-                                            </button>
-                                        </div>
-                                        <div class="w-24 h-24 flex items-center justify-center bg-gray-200 rounded-lg">
-                                            <FaPlus class="text-gray-500 text-2xl"/>
-                                        </div>
-                                </div>
-                                <div class="mt-6">
-                                        <div class="mb-4">
-                                            <label class="block text-gray-700 text-sm font-bold mb-2">Tên địa điểm </label>
-                                            <p class="text-gray-900">Du lịch Hồ Cốc - Vũng Tàu</p>
-                                        </div>
-                                        <div class="mb-4">
-                                            <label class="block text-gray-700 text-sm font-bold mb-2">Địa chỉ</label>
-                                            <p class="text-gray-900">FFXQ+X94, Bưng Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam </p>
-                                        </div>
-                                        <div class="mb-4">
-                                            <label class="block text-gray-700 text-sm font-bold mb-2">Mô tả</label>
-                                            <p class="text-gray-900">Khu cắm trại Hồ Cốc là khu cắm trại gần biển, dịch vụ giá rẻ phù hợp với mọi người muốn trải nghiệm các hoạt động ngoài trời cùng gia đình, người thân.</p>
-                                        </div>
-                                </div>
-                                <div class="flex justify-end">
-                                        <button class="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center">
-                                            <FaEdit class="mr-2"/>
-                                            Chỉnh sửa
+                                <div className="flex space-x-4 scroll-container-x overflow-x-auto pb-4 whitespace-nowrap">
+                                    {images.map((image, index) => (
+                                    <div key={index} className="relative w-24 h-24 inline-block">
+                                        <img alt="Location" className="w-full h-full object-cover rounded-lg" src={image} />
+                                        {editMode && (
+                                        <button
+                                            onClick={() => handleDeleteImage(index)}
+                                            className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
+                                        >
+                                            <FaX className="text-xs" />
                                         </button>
+                                        )}
+                                    </div>
+                                    ))}
+                                    {editMode && (
+                                    <div className="w-24 h-24 flex items-center justify-center bg-gray-200 rounded-lg inline-block">
+                                        <input type="file" accept="image/*" className="hidden" id="image-upload" onChange={handleAddImage} />
+                                        <label htmlFor="image-upload">
+                                        <FaPlus className="text-gray-500 text-2xl cursor-pointer" />
+                                        </label>
+                                    </div>
+                                    )}
                                 </div>
+                                <div className="mt-6">
+                                    <div className="mb-4">
+                                    <label className="block text-gray-700 text-sm font-bold mb-2">Tên địa điểm</label>
+                                    {editMode ? (
+                                        <input
+                                        type="text"
+                                        name="name"
+                                        value={locationInfo.name}
+                                        onChange={handleInputChange}
+                                        className="w-full p-2 border rounded-lg"
+                                        />
+                                    ) : (
+                                        <p className="text-gray-900">Du lịch Hồ Cốc - Vũng Tàu</p>
+                                    )}
+                                    </div>
+
+                                    <div className="mb-4">
+                                    <label className="block text-gray-700 text-sm font-bold mb-2">Địa chỉ</label>
+                                    {editMode ? (
+                                        <input
+                                        type="text"
+                                        name="address"
+                                        value={locationInfo.address}
+                                        onChange={handleInputChange}
+                                        className="w-full p-2 border rounded-lg"
+                                        />
+                                    ) : (
+                                        <p className="text-gray-900">FFXQ+X94, Bưng Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam</p>
+                                    )}
+                                    </div>
+
+                                    <div className="mb-4">
+                                    <label className="block text-gray-700 text-sm font-bold mb-2">Mô tả</label>
+                                    {editMode ? (
+                                        <textarea
+                                        name="description"
+                                        value={locationInfo.description}
+                                        onChange={handleInputChange}
+                                        className="w-full p-2 border rounded-lg"
+                                        />
+                                    ) : (
+                                        <p className="text-gray-900">Khu cắm trại Hồ Cốc là khu cắm trại gần biển, dịch vụ giá rẻ phù hợp với mọi người muốn trải nghiệm các hoạt động ngoài trời cùng gia đình, người thân.</p>
+                                    )}
+                                    </div>
+                                </div>
+                                
+                                <div className="flex justify-end">
+                                <button
+                                onClick={() => setEditMode(!editMode)}
+                                className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center"
+                                >
+                                <FaEdit className="mr-2" />
+                                {editMode ? 'Lưu' : 'Chỉnh sửa'}
+                                </button>
+                            </div>
                                 
                             </div>
                         )}
