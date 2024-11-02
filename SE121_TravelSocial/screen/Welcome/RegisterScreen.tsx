@@ -6,10 +6,10 @@ import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/n
 export default function RegisterScreen ({navigation}: {navigation: NativeStackNavigatorProps}) {
     return (
         <View style={styles.container}>
-            <Text style={styles.textwelcome}>Welcome</Text>
-            <Text style={styles.text1}>Please login or signup to start</Text>
+            <Text style={styles.textwelcome}>Xin Chào </Text>
+            <Text style={styles.text1}>Đăng nhập hoặc đăng ký để bắt đầu</Text>
             <Image source={require('../../assets/images/Traveling-rafiki 1.png')} style={styles.image} />
-            <Text style={styles.text2}>Login with</Text>
+            <Text style={styles.text2}>Đăng nhập với</Text>
 
             <View style={styles.buttonRow}>
                 <TouchableOpacity
@@ -30,15 +30,15 @@ export default function RegisterScreen ({navigation}: {navigation: NativeStackNa
                 style={styles.signupButton}
                 onPress={() => navigation.navigate('register2')}
             >
-                <Text style={styles.signupButtonText}>Sign up</Text>
+                <Text style={styles.signupButtonText}>Đăng ký</Text>
             </TouchableOpacity>
             <View style={styles.buttonRow}>
-            <Text style={styles.text3}>You already have an account? </Text>
+            <Text style={styles.text3}>Bạn đã có tài khoản? </Text>
             <TouchableOpacity
                 style={styles.text4}
                 onPress={() => navigation.navigate('login')}
             >
-                <Text style = {{fontSize:18,fontWeight:'bold',color:'#196EEE'}}> Login</Text>
+                <Text style = {{fontSize:18,fontWeight:'bold',color:'#196EEE'}}>Đăng nhập</Text>
             </TouchableOpacity>
             
             </View>
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
         fontSize:18,
         top:90,
         textAlign:'left',
-        width: '65%', 
+        width: '50%', 
         left: 30,
     },
     text4: {
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
         color: '#196EEE',
         fontWeight:'bold',
         textAlign:'left',
-        width: '35%',
+        width: '50%',
     },
     image: {
         width: 283,
@@ -114,9 +114,17 @@ const styles = StyleSheet.create({
         borderRadius: 30,  
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f0f0f0', 
+        backgroundColor: 'white', 
         marginTop: 20,  
         left: 100,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5,
     },
 
     circleButtonFacebook: {
@@ -125,15 +133,23 @@ const styles = StyleSheet.create({
         borderRadius: 30,  
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f0f0f0', 
+        backgroundColor: 'white', 
         marginTop: 20,  
         right: 100,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5,
     },
 
     buttonIcon: {
         
-        width: 120, 
-        height: 120,  
+        width: 40, 
+        height: 40,  
     },
 
     signupButton: {
@@ -143,6 +159,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 140,
         backgroundColor: '#196EEE',
         borderRadius: 16,
+        
     },
     signupButtonText: {
         color: 'white',

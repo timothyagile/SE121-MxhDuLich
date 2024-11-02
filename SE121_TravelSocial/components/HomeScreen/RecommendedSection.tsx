@@ -11,7 +11,7 @@ export default function RecommendedSection() {
     return (
 
         <View>
-            <Text style = {styles.titleText}>Recommended</Text>
+            <Text style = {styles.titleText}>Đề xuất</Text>
             <FlatList
             data={locationData}
             
@@ -32,10 +32,10 @@ export default function RecommendedSection() {
                             <View style = {styles.footer}>
                                 <View>
                                     <Text style = {[styles.textStyle, {fontSize: 20}]}>{item.name}</Text>
-                                    <Text style = {styles.textStyle}>Hot deal</Text>
+                                    
                                 </View>
                                 <View style = {styles.textBox}>
-                                    <Text style = {[styles.textStyle, {marginHorizontal: 5, color: 'white'}]}>{item.long}</Text>
+                                    <Text style = {[styles.textStyle2, {marginHorizontal: 5, color: 'white'}]}>{item.long}</Text>
                                 </View>
                             </View>
                         </View>
@@ -82,7 +82,11 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         alignItems: 'center',
         height: 30,
-        marginVertical: 5
+        marginVertical: 5,
+        left:3,
+        borderWidth:3,
+        borderColor:'white',
+        bottom:20,
     },
     star: {
         width: 24,
@@ -94,6 +98,12 @@ const styles = StyleSheet.create({
         color: 'black',
         marginLeft: 5,
         marginVertical: 2,
+    },
+    textStyle2: {
+        fontWeight: 'medium',
+        color: 'black',
+        marginLeft: 5,
+        
     },
     footer: {
         flexDirection: 'row', 

@@ -10,7 +10,7 @@ export default function NotificationsScreen({ navigation }: {navigation: NativeS
             <TouchableOpacity style={styles.arrowleftbutton} onPress={() => navigation.goBack()}>
               <Image source={require('../assets/icons/arrowleft.png')} style={styles.arrowlefticon} />
             </TouchableOpacity>
-            <Text style={styles.headerTitle}>Personal Information</Text>
+            <Text style={styles.headerTitle}>Thông báo</Text>
           </View>
         </View>
 );

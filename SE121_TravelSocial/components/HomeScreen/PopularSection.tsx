@@ -1,6 +1,7 @@
-import {Text, View, FlatList, Dimensions, TouchableOpacity, StyleSheet, Image} from 'react-native'
+import {Text, View, FlatList, Dimensions, TouchableOpacity, StyleSheet, Image, } from 'react-native';
+
 import locationData from '@/constants/location';
-import React from 'react';
+import React, { useState } from 'react';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 
 const {width, height} = Dimensions.get('window')
@@ -9,10 +10,15 @@ const CARD_HEIGHT = height - 600;
 const CARD_WIDTH_SPACING = CARD_WIDTH + 24;
 
 export default function PopularSection({navigation} : any) {
+    const [isLiked, setIsLiked] = useState(false);
+
+    const handlePress = () => {
+        setIsLiked(!isLiked); // Đổi trạng thái giữa đã thích và chưa thích
+    };
     return (
 
         <View>
-            <Text style = {styles.titleText}>Popular</Text>
+            <Text style = {styles.titleText}>Phổ biến</Text>
         <FlatList
         data={locationData}
         
@@ -36,11 +42,23 @@ export default function PopularSection({navigation} : any) {
                                 <View style = {styles.textBox}>
                                     <Text style = {[styles.textStyle, {fontSize: 20}]}>{item.name}</Text>
                                 </View>
-                                <View style = {[styles.textBox, {top: 10, width: 70}]}>
-                                    <Image source={require('@/assets/icons/star.png')}
-                                    style = {styles.star}></Image>
-                                    <Text style = {[styles.textStyle, {fontSize: 15}]}>{item.rating}</Text>
+                                <View>
+                                    <View style = {[styles.textBox, {top: 10, width: 70}]}>
+                                        <Image source={require('@/assets/icons/star.png')}
+                                        style = {styles.star}></Image>
+                                        <Text style = {[styles.textStyle, {fontSize: 15}]}>{item.rating}</Text>
+                                    </View>
+                                    
+                                    <TouchableOpacity onPress={handlePress} style= {{right:100, bottom: 15,}}>
+                                        <Image source={require('@/assets/icons/heart.png')}
+                                        style={[
+                                        styles.heart, 
+                                        { tintColor: isLiked ? 'red' : 'white' } // Đổi màu khi được click
+                                    ]}></Image>
+                                    </TouchableOpacity>
+                                    
                                 </View>
+                                
                             </View>
                         </View>
 
@@ -91,6 +109,12 @@ const styles = StyleSheet.create({
     star: {
         width: 24,
         height: 24,
+        left: 10
+    },
+
+    heart: {
+        width: 30,
+        height:30,
         left: 10
     },
     textStyle: {

@@ -10,7 +10,7 @@ const CARD_WIDTH_SPACING = CARD_WIDTH + 24;
 export default function DailySection() {
     return (
         <View>
-            <Text style = {styles.titleText}>Daily suggestion</Text>
+            <Text style = {styles.titleText}>Gợi ý hằng ngày</Text>
             <View style = {styles.container}>
                 {locationData.map((item, index) => {
                     return (

@@ -35,12 +35,12 @@ export default function CollectionScreen ()
                     </TouchableOpacity>                   
                     <TextInput
                         style={styles.input}
-                        placeholder="Find things to do"
+                        placeholder="Tìm kiếm"
                         placeholderTextColor="#000000"
                     />
                 </View>
             </View>
-            <Text style={styles.collections }>Collections</Text>
+            <Text style={styles.collections }>Bộ sưu tập</Text>
             <View style={styles.list}>
                 <View style ={{width:'50%', alignItems:'center', flexDirection:'column'}}>
                     <TouchableOpacity 
@@ -49,7 +49,7 @@ export default function CollectionScreen ()
                         
                         <Image source={require('../assets/icons/plus.png')} style={styles.iconplus} />
                     </TouchableOpacity>
-                    <Text style={{marginTop:10, fontSize: 20,}}>Add new</Text>
+                    <Text style={{marginTop:10, fontSize: 20,}}>Thêm mới</Text>
                 </View>
                 
                 <View style ={{width:'50%',alignItems:'center'}}>
@@ -58,7 +58,7 @@ export default function CollectionScreen ()
                     onPress={() => navigation.navigate('register')}>
                         <Image source={require('../assets/icons/plus.png')} style={styles.iconplus} />
                     </TouchableOpacity>
-                    <Text style={{marginTop:10, fontSize: 20,}}>Add new</Text>
+                    <Text style={{marginTop:10, fontSize: 20,}}>Thêm mới</Text>
                 </View>
             </View>
 
@@ -77,12 +77,12 @@ export default function CollectionScreen ()
                             <Image source={require('../assets/icons/exit.png')} style={styles.exitIcon} />
                         </TouchableOpacity>
                         <Image source={require('../assets/images/collectionstart.png')}></Image>
-                        <Text style={styles.modalText}>Save your favorites in one place</Text>
-                        <Text style={styles.modalText2}>Tap the heart icon in anywhere to save and enjoy your favorites list</Text>
+                        <Text style={styles.modalText}>Lưu lại những địa điểm yêu thích của bạn</Text>
+                        <Text style={styles.modalText2}>Nhấn vào biểu tượng trái tim ở bất cứ địa điểm nào và trải nghiệm với bộ sưu tập của bạn</Text>
                         <TouchableOpacity
                                 style={styles.closeButton}
                                 onPress={() => setModalVisible(!modalVisible)}>
-                            <Text style={styles.closeButtonText}>I got it</Text>
+                            <Text style={styles.closeButtonText}>Tôi đã hiểu</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
