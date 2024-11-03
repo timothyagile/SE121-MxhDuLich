@@ -41,7 +41,7 @@ const MapComponent = ({ address }) => {
                 center={location}
                 zoom={15}
                 // onLoad={(map) => setMapInstance(map)}
-                options={{ mapId: MAP_ID }} // truyền mapId ở đây
+                options={{ mapId: MAP_ID }} 
             >
                  {location.lat !== 0 && location.lng !== 0 && (
                     <Marker position={location} />

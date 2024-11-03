@@ -18,6 +18,7 @@ import PaymentMethodScreen from '@/screen/PaymentMethodScreen'
 import AddNewPaymentMethodScreen from '@/screen/AddNewPaymentMethodScreen'
 import ReservationRequiredScreen from '@/screen/ReservationRequiredScreen'
 import AvailableRoomScreen from '@/screen/AvailableRoomScreen'
+import DetailScreen1 from '@/screen/HomeScreen/DetailScreen1'
 import DetailScreen from '@/screen/HomeScreen/DetailScreen'
 
 const Stack = createNativeStackNavigator()
@@ -137,6 +138,8 @@ export default function App() {
         component={DetailScreen}
         options={{
           headerShown: false}}/>
+
+
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -22,8 +22,8 @@ export default function ChatScreen({ navigation }: {navigation: NativeStackNavig
 
           <View style={styles.textInputContainer}>
                 <TextInput
-                    style={styles.textInput}
-                    placeholder="Enter your message"
+                    style={[styles.textInput]}
+                    placeholder="Nhập tin nhắn"
                     placeholderTextColor="#000000"
                     
                 />
@@ -131,13 +131,13 @@ const styles = StyleSheet.create({
       position:'absolute',
       bottom:30,
       width:'100%',
-      justifyContent:'center',
+      justifyContent:'flex-start',
       
       paddingHorizontal: 20,
       paddingVertical: 10,
   },
   textInput: {
-      width:'100%',
+      width:'87%',
       height: 47,
       fontSize:17,
       borderRadius: 24,
