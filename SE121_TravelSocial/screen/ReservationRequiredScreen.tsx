@@ -41,16 +41,16 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                 style={styles.input}
                 value={name.firstName}
                 onChangeText={(text) => setName({ ...name, firstName: text })}
-                placeholder="First Name"
+                placeholder="Họ"
                 />
                 <TextInput
                 style={styles.input}
                 value={name.lastName}
                 onChangeText={(text) => setName({ ...name, lastName: text })}
-                placeholder="Last Name"
+                placeholder="Tên"
                 />
                 <TouchableOpacity style={styles.saveButton} onPress={() => handleSave('name')}>
-                <Text style={styles.saveButtonText}>Save</Text>
+                <Text style={styles.saveButtonText}>Lưu</Text>
                 </TouchableOpacity>
             </>
             ) : (
@@ -84,7 +84,7 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                 <TouchableOpacity style={styles.arrowleftbutton} onPress={() => navigation.goBack()}>
                 <Image source={require('../assets/icons/arrowleft.png')} style={styles.arrowlefticon} />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Reservation Required</Text>
+                <Text style={styles.headerTitle}>Yêu Cầu Đặt Chỗ</Text>
             </View>
 
             <View style={{flexDirection:'row'}}>
@@ -101,52 +101,52 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                         </View>
                         <View style={styles.featureBox}>
                             <Image source={require('../assets/icons/clock.png')} style ={{marginRight:3,}}></Image>
-                            <Text style={styles.boxText}>free cancel in 24h</Text>
+                            <Text style={styles.boxText}>mễn phí hủy trong 24h</Text>
                         </View>
                     </View>
                 </View>
             </View>
             <View style ={{width:'100%', height:10, backgroundColor:'#E0DCDC', marginVertical:10, }}></View>
             <View style={styles.bookingcontainer}>
-                <Text style={styles.yourbooking}>Your booking</Text>
+                <Text style={styles.yourbooking}>Booking của bạn</Text>
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
-                    <Text style={styles.firsttext}>Date</Text>
+                    <Text style={styles.firsttext}>Ngày</Text>
                     <Text style={styles.secondtext}>26/6 - 27/6</Text>
                 </View>
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
-                    <Text style={styles.firsttext}>Customer</Text>
+                    <Text style={styles.firsttext}>Số người</Text>
                     <Text style={styles.secondtext}>4</Text>
                 </View>
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
-                    <Text style={styles.firsttext}>Zoom for two people</Text>
+                    <Text style={styles.firsttext}>Số phòng</Text>
                     <Text style={styles.secondtext}>2</Text>
                 </View>
             </View>
 
             <View style ={{width:'100%', height:10, backgroundColor:'#E0DCDC', marginVertical:10, }}></View>
             <View style={styles.bookingcontainer}>
-                <Text style={styles.yourbooking}>Price detail</Text>
+                <Text style={styles.yourbooking}>Chi tiết giá</Text>
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>$50 x 2</Text>
                     <Text style={styles.secondtext1}>$100.00</Text>
                 </View>
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
-                    <Text style={styles.firsttext}>Cleaning fee</Text>
+                    <Text style={styles.firsttext}>Phí dọn dẹp</Text>
                     <Text style={styles.secondtext1}>$6.00</Text>
                 </View>
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
-                    <Text style={styles.firsttext}>Service fee</Text>
+                    <Text style={styles.firsttext}>Phí dịch vụ</Text>
                     <Text style={styles.secondtext1}>$20.00</Text>
                 </View>
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
-                    <Text style={styles.firsttext}>Tax</Text>
+                    <Text style={styles.firsttext}>Thuế</Text>
                     <Text style={styles.secondtext1}>$8.00</Text>
                 </View>
 
                 <View style ={{width:'100%', height:1, backgroundColor:'#E0DCDC', marginVertical:10, }}></View>
                 
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
-                    <Text style={styles.firsttext}>Total</Text>
+                    <Text style={styles.firsttext}>Tổng cộng</Text>
                     <Text style={styles.secondtext1}>$134.00</Text>
                 </View>
 
@@ -155,11 +155,11 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
             <View style ={{width:'100%', height:10, backgroundColor:'#E0DCDC', marginVertical:10, }}></View>
             <View style={styles.bookingcontainer}>
                 <View style={{flexDirection:'row'}}>
-                    <Text style={styles.yourbooking}>Payment Method</Text>
+                    <Text style={styles.yourbooking}>Phương thức thanh toán</Text>
                     <Text style={{color:'red', fontSize:20, marginLeft:5}}>*</Text>
                 </View>
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
-                    <Text style={styles.firsttext}>Pay all</Text>
+                    <Text style={styles.firsttext}>Trả hết</Text>
                     <Text style={styles.secondtext}>$134.00</Text>
                     <View style={{position:'absolute', right:0,}}>
                         <RadioButton
@@ -171,7 +171,7 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                     
                 </View>
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
-                    <Text style={styles.firsttext}>Pay half first</Text>
+                    <Text style={styles.firsttext}>Trả một nửa</Text>
                     <Text style={styles.secondtext}>$67.00</Text>
                     <View style={{position:'absolute', right:0,}}>
                         <RadioButton
@@ -182,7 +182,7 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                     </View>
                     
                 </View>
-                <Text style={{width:'60%',}}>Need to pay $67.00 today and the remaining %67.00 on the 25th</Text>
+                <Text style={{width:'60%',}}>Cần trả $67.00 hôm nay và $67.00 vào ngày 25</Text>
                 
             </View>
 
@@ -190,7 +190,7 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
             
             <View style={styles.bookingcontainer}>
                 <View style={{flexDirection:'row'}}>
-                    <Text style={styles.yourbooking}>Contact Infor</Text>
+                    <Text style={styles.yourbooking}>Thông tin liên lạc</Text>
                     <Text style={{color:'red', fontSize:20, marginLeft:5}}>*</Text>
                     
                 </View>
@@ -198,7 +198,7 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                 style={styles.rowwithicon}         
                 onPress={() => setIsEditing(isEditing === 'phoneNumber' ? null : 'phoneNumber')}
                 >
-                    <Text style={styles.firsttext}>{phoneNumber ? phoneNumber : 'Phone number'}</Text>
+                    <Text style={styles.firsttext}>{phoneNumber ? phoneNumber : 'Số điện thoại'}</Text>
                     <Image
                         source={isEditing === 'phoneNumber'
                             ? require('../assets/icons/arrowdown.png')
@@ -211,7 +211,7 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                 style={styles.rowwithicon} 
                 onPress={() => setIsEditing(isEditing === 'name' ? null : 'name')}
                 >
-                    <Text style={styles.firsttext}>{name.firstName || name.lastName ? `${name.firstName} ${name.lastName}` : 'Name'}</Text>
+                    <Text style={styles.firsttext}>{name.firstName || name.lastName ? `${name.firstName} ${name.lastName}` : 'Tên'}</Text>
                     <Image
                         source={isEditing === 'name'
                             ? require('../assets/icons/arrowdown.png')
@@ -226,7 +226,7 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
             <View style ={{width:'100%', height:10, backgroundColor:'#E0DCDC', marginVertical:10, }}></View>
             <View style={styles.bookingcontainer}>
             <View style={{flexDirection:'row'}}>
-                    <Text style={styles.yourbooking}>General Rules</Text>
+                    <Text style={styles.yourbooking}>Lưu ý</Text>
                     <Text style={{color:'red', fontSize:20, marginLeft:5}}>*</Text>
                 </View>
             </View>
@@ -235,7 +235,7 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                 <View style = {{  alignItems:'center', justifyContent:'center',alignContent:'center',width:'100%'}}>
                     
                     <TouchableOpacity style={styles.addpaymentmethod2} onPress={()=> navigation.navigate('payment-method-screen')} >
-                            <Text style={styles.boxText3}>Next to Payment</Text>
+                            <Text style={styles.boxText3}>Tiếp tục để thanh toán</Text>
                     </TouchableOpacity>
                 </View>
             </View>
