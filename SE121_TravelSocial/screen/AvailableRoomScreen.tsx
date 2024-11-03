@@ -7,19 +7,19 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
     const [isModalVisible, setModalVisible] = useState(false);
     const [roomCount, setRoomCount] = useState(0);
     const [selectedRooms, setSelectedRooms] = useState(0);
-    const [buttonText, setButtonText] = useState("Select");
+    const [buttonText, setButtonText] = useState("Chọn");
     
 
     const handleApply = () => {
         if (roomCount > 0) {
             setSelectedRooms(roomCount); 
-            setButtonText(`Selected ${roomCount} Room${roomCount > 1 ? 's' : ''}`);
+            setButtonText(`Đã chọn ${roomCount} phòng `);
         }
 
 
         if(roomCount===0){
             setSelectedRooms(roomCount); 
-            setButtonText('Select');
+            setButtonText('Chọn');
         }
         setModalVisible(false);
     };
@@ -50,20 +50,26 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                 </TouchableOpacity>
                 <View style ={{flexDirection:'row', alignItems:'center', alignContent:'center',justifyContent:'center', }}>
                     <View>
-                        <Text style={{fontSize:18,fontWeight:'bold',}}>Available Room</Text>
+                        <Text style={{fontSize:18,fontWeight:'bold',}}>Phòng có sẵn</Text>
                     </View>
                 </View>
+                <TouchableOpacity
+                    style={styles.createButton}
+                    onPress={() => console.log('Create button pressed')}
+                    >
+                    <Text style={styles.createButtonText}>Xác nhận</Text>
+                </TouchableOpacity>
             </View>
 
             <ScrollView style={styles.body}>
                     <View style={styles.roomcontainer}>
-                        <Text style={styles.title}>Room for two people</Text>
+                        <Text style={styles.title}>Phòng cho 2 người</Text>
 
                         <View style={styles.bedandarea} >
                             <Image source={require('../assets/icons/bed.png')}></Image>
-                            <Text style ={styles.bed}>1 double - bed</Text>
+                            <Text style ={styles.bed}>1 giường đôi</Text>
                             <View style={styles.areacontainer}>
-                                <Text style={styles.area}>area: </Text>
+                                <Text style={styles.area}>diện tích: </Text>
                                 <Text style={styles.area}>16m2</Text>
                             </View>
                         </View>
@@ -71,48 +77,48 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                         <View style={styles.servicecontainer}>
                             <View style = {styles.bedandarea}>
                                 <Image source={require('../assets/icons/service.png')}></Image>
-                                <Text style={styles.area}>   Service:</Text>
+                                <Text style={styles.area}>   Dịch vụ:</Text>
                             </View>
 
                             <View style={styles.featureContainer}>
                                 <View style={styles.backgroundBox}>
                                     <Image source = {require('../assets/icons/clock.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> free cancle in 24h</Text>
+                                    <Text style={styles.boxText}> hủy miễn phí trong 24h</Text>
                                 </View>
 
                                 <View style={styles.backgroundBox}>
                                     <Image source = {require('../assets/icons/wifi.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> free wifi</Text>
+                                    <Text style={styles.boxText}> miễn phí wifi</Text>
                                 </View>
 
                                 <View style={styles.backgroundBox}>
                                     <Image source = {require('../assets/icons/tub.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> tub</Text>
+                                    <Text style={styles.boxText}> bồn tắm</Text>
                                 </View>
 
                                 <View style={styles.backgroundBox}>
                                     <Image source = {require('../assets/icons/airconditioner.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> air conditioner</Text>
+                                    <Text style={styles.boxText}> điều hòa</Text>
                                 </View>
 
                                 <View style={styles.backgroundBox}>
                                     <Image source = {require('../assets/icons/unsound.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> soundproofing system</Text>
+                                    <Text style={styles.boxText}> cách âm</Text>
                                 </View>
                             </View>
 
                             <View style={styles.state}>
-                                <Text style={styles.area}>State: </Text>
+                                <Text style={styles.area}>Trạng thái: </Text>
                                 <Text style={styles.statetext}> 5 </Text>
-                                <Text style={styles.statetext}>room lefts</Text>
+                                <Text style={styles.statetext}>phòng</Text>
                             </View>
                             
                         </View>
 
                         <View style ={styles.endcontainer}>
                             <View style={{flex:1}}>
-                                <Text style={styles.area}>Price</Text>
-                                <Text style={styles.pricetext}>$50</Text>
+                                <Text style={styles.area}>Giá</Text>
+                                <Text style={styles.pricetext}>200,000 VND</Text>
                             </View>
                             <View style={{flex:5, justifyContent:'center', alignItems:'center',}}>
                                 <TouchableOpacity style={styles.choosebutton} onPress={toggleModal}>
@@ -121,15 +127,14 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                             </View>
                         </View>
                     </View>
-
                     <View style={styles.roomcontainer}>
-                        <Text style={styles.title}>Room for two people</Text>
+                        <Text style={styles.title}>Phòng cho 2 người</Text>
 
                         <View style={styles.bedandarea} >
                             <Image source={require('../assets/icons/bed.png')}></Image>
-                            <Text style ={styles.bed}>1 double - bed</Text>
+                            <Text style ={styles.bed}>1 giường đôi</Text>
                             <View style={styles.areacontainer}>
-                                <Text style={styles.area}>area: </Text>
+                                <Text style={styles.area}>diện tích: </Text>
                                 <Text style={styles.area}>16m2</Text>
                             </View>
                         </View>
@@ -137,48 +142,48 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                         <View style={styles.servicecontainer}>
                             <View style = {styles.bedandarea}>
                                 <Image source={require('../assets/icons/service.png')}></Image>
-                                <Text style={styles.area}>   Service:</Text>
+                                <Text style={styles.area}>   Dịch vụ:</Text>
                             </View>
 
                             <View style={styles.featureContainer}>
                                 <View style={styles.backgroundBox}>
                                     <Image source = {require('../assets/icons/clock.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> free cancle in 24h</Text>
+                                    <Text style={styles.boxText}> hủy miễn phí trong 24h</Text>
                                 </View>
 
                                 <View style={styles.backgroundBox}>
                                     <Image source = {require('../assets/icons/wifi.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> free wifi</Text>
+                                    <Text style={styles.boxText}> miễn phí wifi</Text>
                                 </View>
 
                                 <View style={styles.backgroundBox}>
                                     <Image source = {require('../assets/icons/tub.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> tub</Text>
+                                    <Text style={styles.boxText}> bồn tắm</Text>
                                 </View>
 
                                 <View style={styles.backgroundBox}>
                                     <Image source = {require('../assets/icons/airconditioner.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> air conditioner</Text>
+                                    <Text style={styles.boxText}> điều hòa</Text>
                                 </View>
 
                                 <View style={styles.backgroundBox}>
                                     <Image source = {require('../assets/icons/unsound.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> soundproofing system</Text>
+                                    <Text style={styles.boxText}> cách âm</Text>
                                 </View>
                             </View>
 
                             <View style={styles.state}>
-                                <Text style={styles.area}>State: </Text>
+                                <Text style={styles.area}>Trạng thái: </Text>
                                 <Text style={styles.statetext}> 5 </Text>
-                                <Text style={styles.statetext}>room lefts</Text>
+                                <Text style={styles.statetext}>phòng</Text>
                             </View>
                             
                         </View>
 
                         <View style ={styles.endcontainer}>
                             <View style={{flex:1}}>
-                                <Text style={styles.area}>Price</Text>
-                                <Text style={styles.pricetext}>$50</Text>
+                                <Text style={styles.area}>Giá</Text>
+                                <Text style={styles.pricetext}>200,000 VND</Text>
                             </View>
                             <View style={{flex:5, justifyContent:'center', alignItems:'center',}}>
                                 <TouchableOpacity style={styles.choosebutton} onPress={toggleModal}>
@@ -187,6 +192,9 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                             </View>
                         </View>
                     </View>
+
+
+                    
                     
                     
             </ScrollView>
@@ -198,9 +206,9 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                         <TouchableOpacity onPress={toggleModal} style={styles.closeButton}>
                             <Text style={styles.closeButtonText}>X</Text>
                         </TouchableOpacity>
-                        <Text style={styles.modalTitle}>Select number of rooms</Text>
+                        <Text style={styles.modalTitle}>Chọn số lượng phòng</Text>
                         <View style={styles.modalBody}>
-                            <Text style={styles.modalText}>Number of rooms</Text>
+                            <Text style={styles.modalText}>Số lượng phòng</Text>
                             <View style={styles.counterContainer}>
                                 <TouchableOpacity onPress={decrementRoomCount} style={styles.counterButton}>
                                     <Text style={styles.counterButtonText}>-</Text>
@@ -212,7 +220,7 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                             </View>
                         </View>
                         <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
-                            <Text style={styles.applyButtonText}>Apply</Text>
+                            <Text style={styles.applyButtonText}>Xác nhận</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -459,156 +467,18 @@ const styles = StyleSheet.create({
         fontSize: 18,
     },
 
+    createButton: {
+        position: 'absolute',
+        right: 10,
+      },
+      createButtonText: {
+        color: '#196EEE',
+        fontWeight: 'bold',
+        fontSize: 16,
+      },
+
     
 });
 
 
-
-// const RoomContainer = ({ room, onSelectRoom }) => {
-//     const [isModalVisible, setModalVisible] = useState(false);
-//     const [roomCount, setRoomCount] = useState(room.selectedRooms);
-//     const [buttonText, setButtonText] = useState(room.buttonText);
-
-//     const handleApply = () => {
-//         if (roomCount > 0) {
-//             setButtonText(`Selected ${roomCount} Room${roomCount > 1 ? 's' : ''}`);
-//         } else {
-//             setButtonText("Select");
-//         }
-//         onSelectRoom(room.id, roomCount, buttonText);
-//         setModalVisible(false);
-//     };
-
-//     const toggleModal = () => {
-//         setModalVisible(!isModalVisible);
-//     };
-
-//     const incrementRoomCount = () => {
-//         setRoomCount(prevCount => prevCount + 1);
-//     };
-
-//     const decrementRoomCount = () => {
-//         if (roomCount > 0) {
-//             setRoomCount(prevCount => prevCount - 1);
-//         }
-//     };
-
-//     return (
-//         <View style={styles.roomcontainer}>
-//             <Text style={styles.title}>{room.title}</Text>
-//             <View style={styles.bedandarea}>
-//                 <Image source={require('../assets/icons/bed.png')} />
-//                 <Text style={styles.bed}>1 double - bed</Text>
-//                 <View style={styles.areacontainer}>
-//                     <Text style={styles.area}>area: </Text>
-//                     <Text style={styles.area}>16m2</Text>
-//                 </View>
-//             </View>
-//             <View style={styles.servicecontainer}>
-//                 <View style={styles.bedandarea}>
-//                     <Image source={require('../assets/icons/service.png')} />
-//                     <Text style={styles.area}>Service:</Text>
-//                 </View>
-//                 <View style={styles.featureContainer}>
-//                     <View style={styles.backgroundBox}>
-//                         <Image source={require('../assets/icons/clock.png')} style={{ height: 20, width: 20, marginRight: 3 }} />
-//                         <Text style={styles.boxText}> free cancel in 24h</Text>
-//                     </View>
-//                     <View style={styles.backgroundBox}>
-//                         <Image source={require('../assets/icons/wifi.png')} style={{ height: 20, width: 20, marginRight: 3 }} />
-//                         <Text style={styles.boxText}> free wifi</Text>
-//                     </View>
-//                     <View style={styles.backgroundBox}>
-//                         <Image source={require('../assets/icons/tub.png')} style={{ height: 20, width: 20, marginRight: 3 }} />
-//                         <Text style={styles.boxText}> tub</Text>
-//                     </View>
-//                     <View style={styles.backgroundBox}>
-//                         <Image source={require('../assets/icons/airconditioner.png')} style={{ height: 20, width: 20, marginRight: 3 }} />
-//                         <Text style={styles.boxText}> air conditioner</Text>
-//                     </View>
-//                     <View style={styles.backgroundBox}>
-//                         <Image source={require('../assets/icons/unsound.png')} style={{ height: 20, width: 20, marginRight: 3 }} />
-//                         <Text style={styles.boxText}> soundproofing system</Text>
-//                     </View>
-//                 </View>
-//                 <View style={styles.state}>
-//                     <Text style={styles.area}>State: </Text>
-//                     <Text style={styles.statetext}> 5 </Text>
-//                     <Text style={styles.statetext}>room left</Text>
-//                 </View>
-//             </View>
-//             <View style={styles.endcontainer}>
-//                 <View style={{ flex: 1 }}>
-//                     <Text style={styles.area}>Price</Text>
-//                     <Text style={styles.pricetext}>${room.price}</Text>
-//                 </View>
-//                 <View style={{ flex: 5, justifyContent: 'center', alignItems: 'center' }}>
-//                     <TouchableOpacity style={styles.choosebutton} onPress={toggleModal}>
-//                         <Text style={styles.choosetext}>{buttonText}</Text>
-//                     </TouchableOpacity>
-//                 </View>
-//             </View>
-
-//             <Modal visible={isModalVisible} animationType="slide" transparent={true}>
-//                 <View style={styles.modalOverlay}>
-//                     <View style={styles.modalContent}>
-//                         <TouchableOpacity onPress={toggleModal} style={styles.closeButton}>
-//                             <Text style={styles.closeButtonText}>X</Text>
-//                         </TouchableOpacity>
-//                         <Text style={styles.modalTitle}>Select number of rooms</Text>
-//                         <View style={styles.modalBody}>
-//                             <Text style={styles.modalText}>Number of rooms</Text>
-//                             <View style={styles.counterContainer}>
-//                                 <TouchableOpacity onPress={decrementRoomCount} style={styles.counterButton}>
-//                                     <Text style={styles.counterButtonText}>-</Text>
-//                                 </TouchableOpacity>
-//                                 <Text style={styles.counterValue}>{roomCount}</Text>
-//                                 <TouchableOpacity onPress={incrementRoomCount} style={styles.counterButton}>
-//                                     <Text style={styles.counterButtonText}>+</Text>
-//                                 </TouchableOpacity>
-//                             </View>
-//                         </View>
-//                         <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
-//                             <Text style={styles.applyButtonText}>Apply</Text>
-//                         </TouchableOpacity>
-//                     </View>
-//                 </View>
-//             </Modal>
-//         </View>
-//     );
-// };
-
-// export default function AvailableRoomScreen({ navigation }: { navigation: NativeStackNavigatorProps }) {
-//     const [rooms, setRooms] = useState([
-//         { id: 1, title: "Room for two people", price: 50, selectedRooms: 0, buttonText: "Select" },
-//         { id: 2, title: "Room for three people", price: 75, selectedRooms: 0, buttonText: "Select" }
-//     ]);
-
-//     const handleSelectRoom = (roomId, selectedRooms, buttonText) => {
-//         setRooms(prevRooms => prevRooms.map(room =>
-//             room.id === roomId ? { ...room, selectedRooms, buttonText } : room
-//         ));
-//     };
-
-//     return (
-//         <View style={styles.container}>
-//             <View style={styles.header}>
-//                 <TouchableOpacity style={styles.arrowleftbutton} onPress={() => navigation.goBack()}>
-//                     <Image source={require('../assets/icons/arrowleft.png')} style={styles.arrowlefticon} />
-//                 </TouchableOpacity>
-//                 <View style={{ flexDirection: 'row', alignItems: 'center', alignContent: 'center', justifyContent: 'center' }}>
-//                     <View>
-//                         <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Available Room</Text>
-//                     </View>
-//                 </View>
-//             </View>
-
-//             <ScrollView style={styles.body}>
-//                 {rooms.map(room => (
-//                     <RoomContainer key={room.id} room={room} onSelectRoom={handleSelectRoom} />
-//                 ))}
-//             </ScrollView>
-//         </View>
-//     );
-// }
 

@@ -20,20 +20,20 @@ export default function ChatBoardScreen({ navigation }: {navigation: NativeStack
                     </TouchableOpacity>                   
                     <TextInput
                         style={styles.input}
-                        placeholder="Find things to do"
+                        placeholder="Tìm kiếm"
                         placeholderTextColor="#000000"
                     />
                 </View>
             </View>
 
-            <View style ={{flexDirection:'row', alignItems:'center', alignContent:'center',justifyContent:'center', marginTop:20,}}>
+            <TouchableOpacity onPress={()=>navigation.navigate('chat-screen')} style ={{flexDirection:'row', alignItems:'center', alignContent:'center',justifyContent:'center', marginTop:20,}}>
 
                 <View style={styles.avatarContainer}>
                     <Image source={require('../assets/images/avt.png')} style={styles.avatar} />
                 </View>
-                <View>
+                <View style={{width:'60%'}}>
                     <Text style={{fontSize:18,fontWeight:'bold',}}>Ho Coc camping Vung Tau</Text>
-                    <Text style={{opacity:0.8,marginTop:5,}}>The location was perfect. The staff was...</Text>
+                    <Text style={{opacity:0.8,marginTop:5,}} numberOfLines={1} ellipsizeMode='tail'>Địa điểm rất tuyệt vời, sdsdsdfsdf tôi rất thích, cảm ơn rất nhiều.</Text>
                 </View>
                 <View style={{marginLeft:20,}}>
                     <Text style ={{opacity:0.8,}}>26/3</Text>
@@ -41,7 +41,7 @@ export default function ChatBoardScreen({ navigation }: {navigation: NativeStack
                         <Text style={{color:'white'}}>1</Text>
                     </View>
                 </View>
-            </View>
+            </TouchableOpacity>
         </View>
 );
 }
