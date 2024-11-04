@@ -24,7 +24,10 @@ const userSchema = new Schema({
     userPhoneNumber: String, 
     userDateOfBirth: String,
     userAvatar: String,
-    providerType: Enumerator, //Google/Facebook
+    providerType: {
+        type: String,
+        enum: ["Google", "Facebook"]
+    }, //Google/Facebook
     providerId: String, //Token tra ve khi dung dang nhap bang google/facebook
 }, { collection: 'User' });
 
