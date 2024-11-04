@@ -19,10 +19,13 @@ const userSchema = new Schema({
         required: [true, 'Hãy nhập mật khẩu của bạn'],
         minLength: [6, 'Mật khẩu cần tối thiểu 6 kí tự']
     },
+    latitude: Number,
+    longtitude: Number,
     userPhoneNumber: String, 
     userDateOfBirth: String,
-    userAddress: String,
     userAvatar: String,
+    providerType: Enumerator, //Google/Facebook
+    providerId: String, //Token tra ve khi dung dang nhap bang google/facebook
 }, { collection: 'User' });
 
 userSchema.pre('save', async function(next){
