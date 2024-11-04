@@ -270,7 +270,7 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
                 <Text style={styles.price}>500.000 VND</Text>
             </View>
           
-          <TouchableOpacity style={styles.bookNowButton}>
+          <TouchableOpacity onPress={()=> navigation.navigate('reservation-required-screen')} style={styles.bookNowButton}>
             <Text style={styles.bookNowText}>Đặt ngay</Text>
             <FontAwesome size={20} name='arrow-right' style={styles.iconBookNow}></FontAwesome>
           </TouchableOpacity>
