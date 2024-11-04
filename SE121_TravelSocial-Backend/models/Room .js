@@ -16,11 +16,12 @@ const roomSchema = new Schema({
         ref: 'Location', 
         required: true },
     name: { type: String, required: true },
-    status: { type: String, required: true, enum: ['available', 'unavailable'] },
+    quantity: {type: String, required: true, min: 0},
     rating: { type: Number, min: 0, max: 5 },
     price: { type: Number, required: true },
     description: { type: String},
-    facility: { type: [facilitySchema], default: [] }
+    facility: { type: [facilitySchema], default: [] },
+    image: { type: [String], default: []}
     }, 
     {collection: 'Room'}
 )

@@ -44,6 +44,8 @@ const locationSchema = new Schema({
         type: Date,
         default: Date.now,
     },
+    latitude: Number,
+    longtitude: Number,
 },  
 { collection: 'Location' }
 );

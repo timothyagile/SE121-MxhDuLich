@@ -8,6 +8,7 @@ module.exports.signup_get = (req, res) => { //Render home screen
 }
 
 const maxAge = 30 * 60;
+
 const createToken = (id) => {
     return jwt.sign({id}, 'travel', {
         expiresIn: maxAge   
@@ -21,7 +22,7 @@ module.exports.signup_post = async (req, res, next) => { //Create new user accou
         userPassword,
     })
     try {
-        const savedUser = createUser(user)
+        const savedUser = authServices.createUser(user)
         const token = createToken(savedUser._id);
         res.cookie('jwt', token, {httpOnly: true ,maxAge: maxAge * 1000})
         res.status(200).json({
