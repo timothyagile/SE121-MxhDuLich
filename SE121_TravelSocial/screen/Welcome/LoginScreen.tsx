@@ -1,14 +1,9 @@
 import React, { useState } from 'react';
-import {Button, Text, View,  StyleSheet, Image, TouchableOpacity, TextInput, NativeSyntheticEvent, TextInputChangeEventData} from 'react-native';
+import {Button, Text, View,  StyleSheet, Image, TouchableOpacity, TextInput, NativeSyntheticEvent, TextInputChangeEventData, Alert} from 'react-native';
 //import CheckBox from '@react-native-community/checkbox';
 import Checkbox from 'expo-checkbox';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 import { Ionicons, FontAwesome6 } from '@expo/vector-icons';
-
-
-
-
-
 
 
 export default function LoginScreen ({navigation}: {navigation: NativeStackNavigatorProps}) {
@@ -23,6 +18,30 @@ export default function LoginScreen ({navigation}: {navigation: NativeStackNavig
         console.log('Email:', email);
         console.log('Password:', password);
         navigation.navigate('login');
+    };
+
+    const handleLogin = async () => {
+        try {
+            const response = await fetch('http://192.168.1.6:3000/signin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userEmail: email, userPassword: password }),
+            });
+            console.log('Response status:', response.status);
+            console.log('a', password)
+            const data = await response.json(); 
+            console.log(data);
+            if (response.ok) {
+            
+                navigation.navigate('main-screen');
+            } else {
+                
+                Alert.alert('Login Failed', data.error || 'Please try again.');
+            }
+        } catch (error) {
+            console.error(error);
+            Alert.alert('An error occurred', 'Please check your connection and try again.');
+        }
     };
 
     const handleCheckBox = () => {
@@ -70,16 +89,6 @@ export default function LoginScreen ({navigation}: {navigation: NativeStackNavig
                     onChange={e => handleEmail(e)}
                 />
             </View>
-
-            {/* {emailVerify ? (
-                <View>
-                    <Text>Dung</Text>
-                </View>
-            ) : (
-                <View>
-                    <Text>Sai</Text>
-                </View>
-            )} */}
             
             <View style ={styles.backgroundinput}>
                 <TextInput
@@ -106,7 +115,8 @@ export default function LoginScreen ({navigation}: {navigation: NativeStackNavig
 
             <TouchableOpacity
                 style={styles.signupButton}
-                onPress={() => navigation.navigate('main-screen')}
+                onPress={handleLogin}
+                //onPress={() => navigation.navigate('main-screen')}
             >
                 <Text style={styles.signupButtonText}>Đăng nhập</Text>
             </TouchableOpacity>

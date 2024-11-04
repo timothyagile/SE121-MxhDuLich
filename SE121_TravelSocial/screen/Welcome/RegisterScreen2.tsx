@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {Button, Text, View,  StyleSheet, Image, TouchableOpacity, TextInput} from 'react-native';
+import {Button, Text, View,  StyleSheet, Image, TouchableOpacity, TextInput, Alert} from 'react-native';
 //import CheckBox from '@react-native-community/checkbox';
 import Checkbox from 'expo-checkbox';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
@@ -12,10 +12,40 @@ export default function RegisterScreen2 ({navigation}: {navigation: NativeStackN
     const [toggleCheckBox, setToggleCheckBox] = useState(false);
     const [secureTextEntry, setSecureTextEntry] = useState(true);
 
-    const handleSignUp = () => {
+    const handleSignUp = async () => {
+        if (!email || !password) {
+            Alert.alert('Lỗi', 'Vui lòng nhập email và mật khẩu.');
+            return;
+        }
+
         console.log('Email:', email);
         console.log('Password:', password);
-        navigation.navigate('login');
+
+        try {
+            const response = await fetch('http://192.168.1.6:3000/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userEmail: email,
+                    userPassword: password,
+                }),
+            });
+
+            const data = await response.json();
+
+            console.log('Response:', data);
+            if (response.ok) {
+                Alert.alert('Thành công', 'Tạo tài khoản thành công.');
+                navigation.navigate('login'); // Chuyển hướng đến trang đăng nhập
+            } else {
+                Alert.alert('Lỗi', data.error || 'Có lỗi xảy ra.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Alert.alert('Lỗi', 'Không thể kết nối với máy chủ. Vui lòng thử lại.');
+        }
     };
 
     const handleCheckBox = () => {
@@ -88,7 +118,7 @@ export default function RegisterScreen2 ({navigation}: {navigation: NativeStackN
 
             <TouchableOpacity
                 style={styles.signupButton}
-                onPress={() => navigation.navigate('login')}
+                onPress={handleSignUp}
             >
                 <Text style={styles.signupButtonText}>Đăng ký</Text>
             </TouchableOpacity>
