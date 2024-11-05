@@ -38,7 +38,7 @@ export default function RegisterScreen2 ({navigation}: {navigation: NativeStackN
             console.log('Response:', data);
             if (response.ok) {
                 Alert.alert('Thành công', 'Tạo tài khoản thành công.');
-                navigation.navigate('login'); // Chuyển hướng đến trang đăng nhập
+                //navigation.navigate('login'); // Chuyển hướng đến trang đăng nhập
             } else {
                 Alert.alert('Lỗi', data.error || 'Có lỗi xảy ra.');
             }
