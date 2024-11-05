@@ -22,7 +22,7 @@ export default function LoginScreen ({navigation}: {navigation: NativeStackNavig
 
     const handleLogin = async () => {
         try {
-            const response = await fetch('http://192.168.1.6:3000/signin', {
+            const response = await fetch('http://192.168.1.11:3000/signin', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userEmail: email, userPassword: password }),
