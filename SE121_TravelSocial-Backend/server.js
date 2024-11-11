@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser')
 const authRoute = require('./routes/authRoute')
 const locationRoute = require('./routes/locationRoute')
 const businessRoute = require('./routes/businessRoute')
+const roomRoute = require('./routes/roomRoute')
 const {requireAuth, checkUser} = require('./middleware/authMiddleware');
 const {errorHandler} = require('./middleware/errorMiddleware')
 const app = express();
@@ -37,4 +38,5 @@ app.get('/signin', (req, res) => {res.render('signin')})
 app.use(authRoute)
 app.use(locationRoute)
 app.use(businessRoute)
+app.use(roomRoute)
 app.use(errorHandler);
