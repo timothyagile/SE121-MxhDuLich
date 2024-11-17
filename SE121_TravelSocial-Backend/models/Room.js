@@ -3,11 +3,16 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema;
 
 const facilitySchema = new Schema({
-
     name: { type: String, required: true },
-    quantity: { type: Number, required: true },
+    quantity: { type: Number, default: 1},
     icon: { type: String, default: null }, // có thể thay đổi thành type khác nếu cần
     description: { type: String}
+})
+
+const bedSchema = new Schema({
+    category: { type: String, required: true , enum: ['single', 'double']}, //enum
+    quantity: { type: Number, required: true ,},
+    icon: { type: String, default: null }, // có thể thay đổi thành type khác nếu cần
 })
 
 const roomSchema = new Schema({
@@ -21,6 +26,7 @@ const roomSchema = new Schema({
     price: { type: Number, required: true },
     description: { type: String},
     facility: { type: [facilitySchema], default: [] },
+    bed: {type: [bedSchema], default: []},
     image: { type: [String], default: []}
     }, 
     {collection: 'Room'}
