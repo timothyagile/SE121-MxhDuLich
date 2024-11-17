@@ -1,10 +1,10 @@
 export default [
     {
-        id: "1",
+        id: "coffee-shop",
         name: "Địa điểm"
     },
     {
-        id: "2",
+        id: "restaurant",
         name: "Homestay"
     },
     {

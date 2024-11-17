@@ -21,7 +21,7 @@ export default function ProfileScreen({ navigation }: { navigation: NativeStackN
     };
 
     const logout = async () => {
-        console.log('bat dau dang xuat')
+        console.log('da dang xuat')
         try {
             const response = await fetch('http://192.168.1.11:3000/logout', {
                 method: 'GET',

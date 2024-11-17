@@ -1,0 +1,30 @@
+[
+    {
+        "category": {
+            "id": "hotel",
+            "name": "Khách sạn"
+        },
+        "_id": "6704f3650722c4f99305dc5e",
+        "ownerId": "6704df9d3d81e2f463846c21",
+        "name": "Khách Sạn Biển Xanh",
+        "description": "Khách sạn ven biển với phòng nghỉ sang trọng và dịch vụ tuyệt vời.",
+        "rating": 4,
+        "image": null,
+        "address": "456 Đường Biển, Nha Trang",
+        "dateCreated": "2024-10-08T03:00:00.000Z"
+    },
+    {
+        "category": {
+            "id": "hotel",
+            "name": "Khách sạn"
+        },
+        "_id": "6704f3650722c4f99305dc5f",
+        "ownerId": "6704df9d3d81e2f463846c21",
+        "name": "Khách Sạn Biển Xanh",
+        "description": "Khách sạn ven biển với phòng nghỉ sang trọng và dịch vụ tuyệt vời.",
+        "rating": 4,
+        "image": null,
+        "address": "456 Đường Biển, Nha Trang",
+        "dateCreated": "2024-10-08T03:00:00.000Z"
+    }
+]
