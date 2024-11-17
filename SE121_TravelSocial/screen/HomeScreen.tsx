@@ -1,8 +1,8 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import React from 'react';
 import {View, Text, StyleSheet, TextInput, FlatList, ScrollView, TouchableOpacity, Image} from 'react-native'
 
-import CategoryItem from "@/components/HomeScreen/CategoryItem"
+import CategoryItem from "@/components/HomeScreen/CategoryItem";
 import categoryData from '@/constants/category';
 
 import PopularSection from '@/components/HomeScreen/PopularSection';
@@ -16,11 +16,35 @@ export default function HomeScreen ({navigation} : {navigation : NativeStackNavi
     
     const [findContent, setFindContent] = useState("");
     const [selectedCategory, setSelectedCategory] = useState(categoryData.at(0));
-    
+    const [locations, setLocations] = useState([]);
 
+    // useEffect(() => {
+    //     if (selectedCategory) {
+    //         fetchLocationsByCategory(selectedCategory.id);
+    //     }
+    // }, [selectedCategory]);
+
+    // const fetchLocationsByCategory = async (categoryId: string) => {
+    //     try {
+    //         const response = await fetch(`http://192.168.1.18:3000/locationbycategory/${categoryId}`);
+    //         const data = await response.json();
+    //         if (data.isSuccess) {
+    //             setLocations(data.data);
+    //         } else {
+    //             console.error("Error fetching locations:", data.error);
+    //         }
+    //     } catch (error) {
+    //         console.error("Fetch error:", error);
+    //     }
+    // };
+
+    const handleSetCategory = (category: typeof categoryData[0]) => {
+        setSelectedCategory(category); // Cập nhật danh mục được chọn
+    };
+
+    
     return (
         <View style = {styles.container}>
-            {/* <Image source={require('../assets/icons/logo.png')} style={styles.logo} /> */}
             <View style = {{alignItems:'center', width:'100%'}}>
                 <View style={styles.search}>
                     <TouchableOpacity onPress={() => console.log('Search icon pressed')}>
@@ -36,10 +60,11 @@ export default function HomeScreen ({navigation} : {navigation : NativeStackNavi
             <View style  = {styles.categoryContainer}>
                     <FlatList
                     data= {categoryData}
-                    renderItem={({item}) => <CategoryItem 
+                    renderItem={({item}) => (<CategoryItem 
                         item = {item}
                         selectedCategory = {selectedCategory}
-                        setSelectedCategory = {setSelectedCategory}/>}
+                        setSelectedCategory = {setSelectedCategory}
+                        setLocations={setLocations}/>)}
 
                     horizontal
                     showsHorizontalScrollIndicator = {false}
@@ -49,9 +74,9 @@ export default function HomeScreen ({navigation} : {navigation : NativeStackNavi
            
 
             <ScrollView style = {{}}>
-                    <PopularSection navigation = {navigation}/>
+                    <PopularSection categoryId={selectedCategory?.id} navigation = {navigation}/>
                     <RecommendedSection/>
-                    <DailySection/>
+                    <DailySection categoryId={selectedCategory?.id}/>
             </ScrollView>
         </View>
     )

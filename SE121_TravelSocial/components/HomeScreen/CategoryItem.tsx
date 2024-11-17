@@ -8,22 +8,38 @@ interface item {
 }
 interface props {
     item: item,
-    selectedCategory: any,
-    setSelectedCategory: any
+    selectedCategory: item | undefined; 
+    setSelectedCategory: (category: item) => void;
+    setLocations: (locations: any) => void;
 }
 
-export default function CategoryItem({item, selectedCategory, setSelectedCategory} : props) {
+export default function CategoryItem({item, selectedCategory, setSelectedCategory,setLocations } : props) {
+
+    const handlePress = async () => {
+        setSelectedCategory(item);
+        try {
+            console.log(item.id);
+            const response = await fetch(`http://192.168.1.18:3000/locationbycategory/${item.id}`);
+            const data = await response.json();
+            if (data.isSuccess) {
+                setLocations(data.data); 
+                console.log(data);
+            } else {
+                console.error('API error:', data.error);
+            }
+        } catch (error) {
+            console.error('Network error:', error);
+        }
+    };
+
     return (
         <TouchableOpacity 
-            // style = {{borderRadius:10,
-            //     borderWidth:1,
-            // }}
-            onPress={() => {setSelectedCategory(item)}}>
+            onPress={handlePress}>
             <Button style = {[styles.text, 
-                selectedCategory == item ? styles.selectedItemText : null
+                selectedCategory?.id == item.id ? styles.selectedItemText : null
             ]}
             labelStyle={{ 
-                color: selectedCategory === item ? '#196EEE' : '#000' // Đổi màu chữ khi được chọn
+                color: selectedCategory?.id === item.id ? '#196EEE' : '#000' // Đổi màu chữ khi được chọn
             }}>{item.name}</Button>
         </TouchableOpacity>
     )

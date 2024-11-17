@@ -1,26 +1,93 @@
-import {Text, View, FlatList, Dimensions, TouchableOpacity, StyleSheet, Image, } from 'react-native';
+import {Text, View, FlatList, Dimensions, TouchableOpacity, StyleSheet, Image, Modal, } from 'react-native';
 
 import locationData from '@/constants/location';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
+import CustomModal from '../CollectionScreen/AddIntoCollection';
 
 const {width, height} = Dimensions.get('window')
 const CARD_WIDTH = 240;
 const CARD_HEIGHT = height - 600;
 const CARD_WIDTH_SPACING = CARD_WIDTH + 24;
 
-export default function PopularSection({navigation} : any) {
-    const [isLiked, setIsLiked] = useState(false);
+type LikedItems = {
+    [key: string]: boolean;
+};
 
-    const handlePress = () => {
-        setIsLiked(!isLiked); // Đổi trạng thái giữa đã thích và chưa thích
+interface PopularSectionProps {
+    categoryId: string | undefined;
+    navigation: any; 
+}
+
+export default function PopularSection({ categoryId, navigation }: PopularSectionProps) {
+    const [likedItems, setLikedItems] = useState<LikedItems>({});
+    const [locations, setLocations] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [modalVisible, setModalVisible] = useState(false);
+
+    const handlePress = (id: string) => {
+        setLikedItems((prevState) => ({
+            ...prevState,
+            [id]: !prevState[id], 
+        }));
+
+        setModalVisible(true); 
     };
+
+    useEffect(() => {
+        if (categoryId) {
+            fetchPopularLocations(categoryId);
+        }
+    }, [categoryId]);
+
+    // const getAllLocations = async () => {
+        
+        
+    //     try {
+    //         const response = await fetch('http://192.168.1.18:3000/alllocation');
+             
+            
+    //         const data = await response.json();
+    //         console.log(data);
+
+    //         if (data.isSuccess) {
+    //             setLocations(data.data); 
+    //         } else {
+    //             console.error(data.error);
+    //         }
+    //     } catch (error) {
+    //         console.error(error);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
+
+    // useEffect(() => {
+    //     getAllLocations();
+    // }, []);
+    
+    const fetchPopularLocations = async (id: string) => {
+        try {
+            const response = await fetch(`http://192.168.1.18:3000/locationbycategory/${id}`);
+            const data = await response.json();
+            if (data.isSuccess) {
+                setLocations(data.data);
+            } else {
+                console.error("Error fetching popular locations:", data.error);
+            }
+        } catch (error) {
+            console.error("Fetch error:", error);
+        }
+    };
+    
+    
+
     return (
 
         <View>
             <Text style = {styles.titleText}>Phổ biến</Text>
         <FlatList
-        data={locationData}
+        data={locations}
         
         horizontal
         snapToInterval={CARD_WIDTH_SPACING}
@@ -49,11 +116,11 @@ export default function PopularSection({navigation} : any) {
                                         <Text style = {[styles.textStyle, {fontSize: 15}]}>{item.rating}</Text>
                                     </View>
                                     
-                                    <TouchableOpacity onPress={handlePress} style= {{right:100, bottom: 15,}}>
+                                    <TouchableOpacity onPress={()=>handlePress(item._id.toString())} style= {{left:175, bottom: 15,}}>
                                         <Image source={require('@/assets/icons/heart.png')}
                                         style={[
                                         styles.heart, 
-                                        { tintColor: isLiked ? 'red' : 'white' } // Đổi màu khi được click
+                                        { tintColor: likedItems[item._id] ? 'red' : 'white' } 
                                     ]}></Image>
                                     </TouchableOpacity>
                                     
@@ -62,11 +129,12 @@ export default function PopularSection({navigation} : any) {
                             </View>
                         </View>
 
-                </TouchableOpacity>                            )
-        }
+                </TouchableOpacity>
+            )}
         }>
 
         </FlatList>
+        <CustomModal visible={modalVisible} onClose={() => setModalVisible(false)} ></CustomModal>
     </View>
     )
 }
@@ -115,7 +183,7 @@ const styles = StyleSheet.create({
     heart: {
         width: 30,
         height:30,
-        left: 10
+        
     },
     textStyle: {
         fontWeight: 'medium',

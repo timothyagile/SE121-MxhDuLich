@@ -1,29 +1,65 @@
-import {Text, View, FlatList, Dimensions, TouchableOpacity, StyleSheet, Image} from 'react-native'
+import {Text, View, FlatList, Dimensions, TouchableOpacity, StyleSheet, Image, ActivityIndicator} from 'react-native'
 import locationData from '@/constants/location';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const {width, height} = Dimensions.get('window')
 const CARD_WIDTH =  width - 190;
 const CARD_HEIGHT = 200;
 const CARD_WIDTH_SPACING = CARD_WIDTH + 24;
+type LikedItems = {
+    [key: string]: boolean; 
+};
+
 
 export default function RecommendedSection() {
-    const [isLiked, setIsLiked] = useState(false);
+    const [likedItems, setLikedItems] = useState<LikedItems>({});
+    const [locations, setLocations] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    const handlePress = () => {
-        setIsLiked(!isLiked); // Đổi trạng thái giữa đã thích và chưa thích
+    const handlePress = (id: string) => {
+        setLikedItems((prevState) => ({
+            ...prevState,
+            [id]: !prevState[id] 
+        }));
     };
+
+    const getAllLocations = async () => {
+        try {
+            const response = await fetch('http://192.168.1.18:3000/alllocation'); 
+            
+            const data = await response.json();
+
+            if (data.isSuccess) {
+                setLocations(data.data); 
+            } else {
+                console.error(data.error);
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        getAllLocations();
+    }, []);
+
+    if (loading) {
+        return <ActivityIndicator size="large" color="#0000ff" />; // Hiển thị loading indicator
+    }
+
     return (
 
         <View>
             <Text style = {styles.titleText}>Đề xuất</Text>
             <FlatList
-            data={locationData}
+            data={locations}
             
             horizontal
             snapToInterval={CARD_WIDTH_SPACING}
             decelerationRate={"fast"}
-            keyExtractor={item => item.id}
+            keyExtractor={item => item._id}
             renderItem={({item, index}) => {
                 return (
                     <TouchableOpacity style = {{
@@ -40,11 +76,11 @@ export default function RecommendedSection() {
                                         <Text style = {[styles.textrating, {fontSize: 15}]}>{item.rating}</Text>
                                     </View>
                                     
-                                    <TouchableOpacity onPress={handlePress} style= {[styles.textBox2,{ bottom: 25,}]}>
+                                    <TouchableOpacity onPress={()=>handlePress(item._id.toString())} style= {[styles.textBox2,{ bottom: 25,}]}>
                                         <Image source={require('@/assets/icons/heart.png')}
                                         style={[
                                         styles.heart, 
-                                        { tintColor: isLiked ? 'red' : 'white' } // Đổi màu khi được click
+                                        { tintColor: likedItems[item._id] ? 'red' : 'white' } 
                                     ]}></Image>
                                     </TouchableOpacity>
                                 </View>
@@ -53,8 +89,8 @@ export default function RecommendedSection() {
                                 <View>
                                     <Text style = {[styles.textStyle, {fontSize: 20}]}>{item.name}</Text>
                                 </View>
-                                <View style = {styles.textBox}>
-                                    <Text style = {[styles.textStyle2, {marginHorizontal: 5, color: 'white'}]}>{item.long}</Text>
+                                <View style = {[styles.textBox,{borderWidth:3, borderColor:'white'}]}>
+                                    <Text style = {[styles.textStyle2, {marginHorizontal: 5, color: 'white'}]}>hot deal</Text>
                                 </View>
                             </View>
                         </View>
