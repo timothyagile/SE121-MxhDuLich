@@ -23,7 +23,7 @@ export default function ProfileScreen({ navigation }: { navigation: NativeStackN
     const logout = async () => {
         console.log('da dang xuat')
         try {
-            const response = await fetch('http://192.168.1.11:3000/logout', {
+            const response = await fetch('http://192.168.1.2:3000/logout', {
                 method: 'GET',
                 credentials: 'include', 
             });

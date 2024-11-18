@@ -4,6 +4,8 @@ import locationData from '@/constants/location';
 import React, { useEffect, useState } from 'react';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 import CustomModal from '../CollectionScreen/AddIntoCollection';
+import * as Network from 'expo-network';
+import { NetworkInfo } from 'react-native-network-info';
 
 const {width, height} = Dimensions.get('window')
 const CARD_WIDTH = 240;
@@ -66,9 +68,20 @@ export default function PopularSection({ categoryId, navigation }: PopularSectio
     //     getAllLocations();
     // }, []);
     
+    const getIPAddress = async () => {
+        const ipAddress = await NetworkInfo.getIPAddress();
+        console.log('Device IP Addresss:', ipAddress);
+        return ipAddress;
+    };
+
     const fetchPopularLocations = async (id: string) => {
         try {
-            const response = await fetch(`http://192.168.1.18:3000/locationbycategory/${id}`);
+            //getIPAddress();
+            // const ipAddresss = await NetworkInfo.getIPAddress();
+            // console.log('Device IP Addresss:', ipAddresss);
+            const ipAddress = await Network.getIpAddressAsync();
+            console.log('Device IP Address:', ipAddress);
+            const response = await fetch(`http://192.168.1.2:3000/locationbycategory/${id}`);
             const data = await response.json();
             if (data.isSuccess) {
                 setLocations(data.data);
@@ -99,7 +112,7 @@ export default function PopularSection({ categoryId, navigation }: PopularSectio
                 style = {{
                     marginLeft: 24,
                     marginRight:  index === locationData.length - 1 ? 24 : 0}}
-                onPress={() => navigation.navigate('detail-screen')}>
+                onPress={() => navigation.navigate('detail-screen', {id: item._id})}>
                         <View style = {styles.card}>
                             <View style = {styles.imageBox}>
                                 <Image source={require('@/assets/images/bai-truoc-20.jpg')}

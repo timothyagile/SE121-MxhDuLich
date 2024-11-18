@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {Image, View, StyleSheet, TouchableOpacity, Text, Dimensions, ActivityIndicator} from 'react-native';
 import locationData from '@/constants/location'
+import * as Network from 'expo-network';
 
 const {width, height} = Dimensions.get('window')
 const CARD_WIDTH =  width - 240;
@@ -18,7 +19,7 @@ export default function DailySection({ categoryId }: DailySectionProps) {
 
     useEffect(() => {
         if (categoryId) {
-            fetchLocationsByCategory(categoryId);
+            fetchPopularLocations(categoryId);
         }
     }, [categoryId]);
 
@@ -50,20 +51,23 @@ export default function DailySection({ categoryId }: DailySectionProps) {
     //     fetchLocations();
     // }, []);
 
-    const fetchLocationsByCategory = async (id: string) => {
+    const fetchPopularLocations = async (id: string) => {
         try {
-            const response = await fetch(`http://192.168.1.18:3000/locationbycategory/${id}`);
+            //getIPAddress();
+            // const ipAddresss = await NetworkInfo.getIPAddress();
+            // console.log('Device IP Addresss:', ipAddresss);
+            const ipAddress = await Network.getIpAddressAsync();
+            console.log('Device IP Address:', ipAddress);
+            const response = await fetch(`http://192.168.1.2:3000/locationbycategory/${id}`);
             const data = await response.json();
             if (data.isSuccess) {
                 setLocations(data.data);
             } else {
-                console.error("Error fetching locations:", data.error);
+                console.error("Error fetching popular locations:", data.error);
             }
         } catch (error) {
             console.error("Fetch error:", error);
-        }  finally {
-                    setLoading(false);
-                 }
+        }
     };
 
     // Hiển thị vòng quay khi đang tải
