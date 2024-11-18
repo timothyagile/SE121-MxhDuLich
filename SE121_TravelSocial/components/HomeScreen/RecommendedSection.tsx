@@ -1,6 +1,7 @@
 import {Text, View, FlatList, Dimensions, TouchableOpacity, StyleSheet, Image, ActivityIndicator} from 'react-native'
 import locationData from '@/constants/location';
 import React, { useEffect, useState } from 'react';
+import * as Network from 'expo-network';
 
 const {width, height} = Dimensions.get('window')
 const CARD_WIDTH =  width - 190;
@@ -25,7 +26,9 @@ export default function RecommendedSection() {
 
     const getAllLocations = async () => {
         try {
-            const response = await fetch('http://192.168.1.18:3000/alllocation'); 
+            const ipAddress = await Network.getIpAddressAsync();
+            console.log('Device IP Address:', ipAddress);
+            const response = await fetch('http://192.168.1.2:3000/alllocation'); 
             
             const data = await response.json();
 

@@ -5,6 +5,7 @@ import Facility from '@/components/HomeScreen/Facility';
 import axios from 'axios';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useRoute,RouteProp } from '@react-navigation/native';
 
 
 const { width, height } = Dimensions.get('window');
@@ -12,7 +13,17 @@ const { width, height } = Dimensions.get('window');
 const GOOGLE_MAPS_API_KEY = 'AIzaSyBeCTs9sMcGjsjlIIIiML2TXrLqOZSEY6sxoacainaymoixaiduoc';
 const ADDRESS = 'FFXQ+X94, Bung Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam';
 
+
+type RootStackParamList = {
+  'detail-screen': { id: string }; 
+};
+
+type DetailScreenRouteProp = RouteProp<RootStackParamList, 'detail-screen'>;
+
 export default function DetailScreen({navigation} : {navigation : NativeStackNavigatorProps}) {
+  const route = useRoute<DetailScreenRouteProp>();
+  const { id } = route.params; 
+  
     const [isExpanded, setIsExpanded] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
 
@@ -22,6 +33,8 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
     const [showPicker2, setShowPicker2] = useState(false);
     const [selectedDate1, setSelectedDate1] = useState('');
     const [selectedDate2, setSelectedDate2] = useState('');
+    const [locationDetails, setLocationDetails] = useState<any>(null);
+
 
     const showDatePicker1 = () => {
       setShowPicker1(true);
@@ -100,6 +113,30 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
             console.log('Tọa độ không khả dụng');
         }
     };
+
+    useEffect(() => {
+      if (id) {
+        fetchLocationDetails(id); // Gọi API lấy thông tin chi tiết
+      }
+    }, [id]);
+
+    const fetchLocationDetails = async (id: string) => {
+      try {
+        const response = await fetch(`http://192.168.1.2:3000/locationbyid/${id}`);
+        const data = await response.json();
+        if (data.isSuccess) {
+          console.log('Location details:', data.data);
+          setLocationDetails(data.data);
+        } else {
+          console.error('API error:', data.error);
+        }
+      } catch (error) {
+        console.error('Fetch error:', error);
+      }
+    };
+  
+  
+  
   return (
     <ScrollView style={styles.container}>
       {/* Hình ảnh và nút quay lại */}
@@ -123,7 +160,7 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
       {/* Thông tin địa điểm */}
       <View style={styles.infoSection}>
       <View style = {styles.header}>
-        <Text style={styles.title}>Hồ Cốc - Vũng Tàu</Text>
+        <Text style={styles.title}>{locationDetails?.name || 'Tên địa điểm'}</Text>
         <TouchableOpacity onPress={openMap} >
             <Text style = {styles.showMap}>Map</Text>
         </TouchableOpacity>
@@ -131,13 +168,13 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
         
         <View style={styles.rating}>
           <FontAwesome name="star" size={16} color="#FFD700" />
-          <Text style={styles.ratingText}>4.5 (355 Đánh giá)</Text>
+          <Text style={styles.ratingText}>{locationDetails?.rating || '0'} ({locationDetails?.reviews || 0} Đánh giá)</Text>
         </View>
         <View>
         <Text style={styles.description}  
                 numberOfLines={isExpanded ? undefined : 4}
                 ellipsizeMode="tail">
-            Du lịch Hồ Cốc là một địa điểm cấm trại vô cùng nổi tiếng với các dịch vụ giá rẻ, phù hợp với mọi đối tượng từ sinh viên đến người đã đii làm. Với mức giá phải chăng, Hồ Cốc mang lại một trải nghiệm tuyệt vời cho khách du lịch với các hoạt động như lửa trại, BBQ, tắm biển,... Khách hàng còn được trải nghiệm chèo sup ở Hồ Cốc - một hồ nước ngọt ngay cạnh bên khu cắm trại. Còn chần chờ gì nữa mà không thử ngay.     
+                {locationDetails?.description || 'Mô tả chưa có sẵn.'}
             </Text>
             <TouchableOpacity onPress={toggleExpanded}>
                 <Text style={styles.readMore}>
@@ -275,11 +312,7 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
             <FontAwesome size={20} name='arrow-right' style={styles.iconBookNow}></FontAwesome>
           </TouchableOpacity>
         </View>
-      </View>
-
-      
-
-     
+      </View>   
     </ScrollView>
   );
 }
