@@ -32,6 +32,9 @@ const getLocationByName = async (name) => {
         return locations;
     else
         throw new NotFoundException('Not found this location');
+    //Thêm chức năng tìm kiếm không dấu: thêm một trường tên không dấu trong database.
+    //Tìm kiếm không theo thứ tự: tìm hiểu TFIDF
+    //VN core nlp
 }
 
 const getLocationById = async (locationId) => {

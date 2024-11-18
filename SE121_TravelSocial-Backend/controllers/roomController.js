@@ -28,6 +28,23 @@ module.exports.getRoomById = async (req, res, next) => {
         next(error)
     }
 }
+
+module.exports.getRoomByLocationId = async(req, res, next) => {
+    const {locationId} = req.params
+    try{
+        const rooms = await roomSvc.getRoomByLocationId(locationId)
+        res.status(201).json({
+            isSuccess: true,
+            data: rooms,
+            error: null
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
+//CREATE: cân nhắc hỗ trợ import thông tin từ file excel
 module.exports.createRoom = async (req, res, next) => {
     const {
         locationId,

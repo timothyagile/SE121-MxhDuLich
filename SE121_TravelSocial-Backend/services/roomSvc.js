@@ -2,6 +2,7 @@ const Room = require("../models/Room")
 
 const {NotFoundException, ForbiddenError} = require("../errors/exception")
 const { findByIdAndUpdate } = require("../models/Business")
+const { default: mongoose } = require("mongoose")
 
 const getAllRoom = async () => {
     const rooms = await Room.find()
@@ -17,6 +18,16 @@ const getRoomById = async (id) => {
     else
         throw new NotFoundException('Khong tim thay phong nao')
 }
+
+const getRoomByLocationId = async(locationId) => {
+    const result = await Room.find({ locationId: locationId });
+
+    if(result.length !== 0)
+        return result
+    else
+        throw new NotFoundException('Dia diem nay chua co phong nao')
+}
+
 const createRoom = async (roomData) => {
     const savedRoom = await roomData.save()
     if(savedRoom)
@@ -42,6 +53,7 @@ const deteleRoom = async (roomId) => {
 module.exports = {
     getAllRoom,
     getRoomById,
+    getRoomByLocationId,
     createRoom,
     updateRoom,
     deteleRoom,
