@@ -27,8 +27,11 @@ const checkUser = (req, res, next) => {
     if (token) {
       jwt.verify(token, 'travel', async (err, decodedToken) => {
         if (err) {
-          res.locals.user = null;
-          next();
+          return res.status(401).json({
+            isSuccess: false,
+            message: 'Error',
+            data: null
+        });
         } else {
           let user = await User.findById(decodedToken.id);
           res.locals.user = user;
@@ -36,8 +39,11 @@ const checkUser = (req, res, next) => {
         }
       });
     } else {
-      res.locals.user = null;
-      next();
+      return res.status(401).json({
+        isSuccess: false,
+        message: 'Token không hợp lệ hoặc không tồn tại.',
+        data: null
+    });
     }
   };
 

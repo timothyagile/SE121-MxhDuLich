@@ -5,6 +5,8 @@ const authRoute = require('./routes/authRoute')
 const locationRoute = require('./routes/locationRoute')
 const businessRoute = require('./routes/businessRoute')
 const roomRoute = require('./routes/roomRoute')
+const bookingRoute = require('./routes/bookingRoute')
+const userCollectionRoute = require('./routes/userCollectionRoute')
 const {requireAuth, checkUser} = require('./middleware/authMiddleware');
 const {errorHandler} = require('./middleware/errorMiddleware')
 const app = express();
@@ -30,13 +32,16 @@ app.listen(PORT, () => {
 
 
 //Route
-app.get('*', checkUser)
+//app.get('*', checkUser)
 app.get('/', (req, res) => res.render('home'))
 app.get('/signup', (req, res) => {res.render('signup')})
 app.get('/signin', (req, res) => {res.render('signin')})
 
 app.use(authRoute)
 app.use(locationRoute)
+app.use(bookingRoute)
 app.use(businessRoute)
 app.use(roomRoute)
+app.use(userCollectionRoute)
+
 app.use(errorHandler);

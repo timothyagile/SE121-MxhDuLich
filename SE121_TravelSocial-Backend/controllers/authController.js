@@ -67,3 +67,62 @@ module.exports.logout_get = (req, res) => {
     res.redirect('/');
 
 }
+
+module.exports.getAllUser = async (req, res, next) => {
+    try {
+        const result = await authServices.getAllUser()
+        res.status(201).json({
+            isSuccess: true,
+            data: result,
+            error: null
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+module.exports.getUserById = async (req, res, next) => {
+    const userId = req.params.id
+    try {
+        const result = await authServices.getUserById(userId)
+        res.status(201).json({
+            isSuccess: true,
+            data: result,
+            error: null
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+module.exports.updateUser = async (req, res, next) => {
+    const userId = req.params.id
+    const userData = req.body
+    try {
+        const result = await authServices.updateUser(userId, userData)
+        res.status(201).json({
+            isSuccess: true,
+            data: result,
+            error: null
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+module.exports.deleteUser = async (req, res, next) => {
+    const userId = req.params.id
+    try {
+        const result = await authServices.deleteUser(userId)
+        res.status(201).json({
+            isSuccess: true,
+            data: result,
+            error: null
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
+
