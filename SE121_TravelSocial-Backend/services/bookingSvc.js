@@ -15,8 +15,16 @@ const getBookingById = async (id) => {
         return result
     else
         throw new NotFoundException('Not found specific booking')
-
 }
+
+const getBookingByUserId = async (userId) => {
+    const result = await Booking.find({userId : userId})
+    if(result.length !== 0)
+        return result
+    else
+        throw new NotFoundException('Not found')
+}
+
 const createBooking = async (bookingData) => {
     const result = bookingData.save()
     if(result)
@@ -39,12 +47,12 @@ const deleteBooking = async (bookingId) => {
         return result
     else
         throw new NotFoundException('Not allow to delete')
-
 }
 
 module.exports = {
     getAllBooking,
     getBookingById,
+    getBookingByUserId,
     createBooking,
     updateBooking,
     deleteBooking,

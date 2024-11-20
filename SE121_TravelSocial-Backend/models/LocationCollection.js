@@ -13,9 +13,7 @@ const UCollectionSchema = new Schema({
         ref: 'Location',
         require: true,
     }
-}, {collection: 'UserCollection'});
+}, {collection: 'LocationCollection'});
 
-const UserCollection = mongoose.model('UserCollection', UCollectionSchema);
-module.exports = UserCollection
-
-s
+const LocationCollection = mongoose.model('LocationCollection', UCollectionSchema);
+module.exports = LocationCollection
