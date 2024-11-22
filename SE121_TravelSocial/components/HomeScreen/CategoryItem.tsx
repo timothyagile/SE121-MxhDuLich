@@ -22,7 +22,7 @@ export default function CategoryItem({item, selectedCategory, setSelectedCategor
         setSelectedCategory(item);
         try {
             console.log(item.id);
-            const response = await fetch(`http://192.168.1.2:3000/locationbycategory/${item.id}`);
+            const response = await fetch(`http://192.168.1.3:3000/locationbycategory/${item.id}`);
             const data = await response.json();
             if (data.isSuccess) {
                 setLocations(data.data); 
@@ -31,7 +31,7 @@ export default function CategoryItem({item, selectedCategory, setSelectedCategor
                 console.error('API error:', data.error);
             }
         } catch (error) {
-            console.error('Network error:', error);
+            console.error('Network errore:', error);
         }
     };
 
@@ -39,7 +39,7 @@ export default function CategoryItem({item, selectedCategory, setSelectedCategor
         <TouchableOpacity 
             onPress={handlePress}>
             <Button style = {[styles.text, 
-                selectedCategory?.id == item.id ? styles.selectedItemText : null
+                selectedCategory?.id == item.id ? null: null
             ]}
             labelStyle={{ 
                 color: selectedCategory?.id === item.id ? '#196EEE' : '#000' // Đổi màu chữ khi được chọn

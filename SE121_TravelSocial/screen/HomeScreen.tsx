@@ -76,7 +76,7 @@ export default function HomeScreen ({navigation} : {navigation : NativeStackNavi
             <ScrollView style = {{}}>
                     <PopularSection categoryId={selectedCategory?.id} navigation = {navigation}/>
                     <RecommendedSection/>
-                    <DailySection categoryId={selectedCategory?.id}/>
+                    <DailySection categoryId={selectedCategory?.id} navigation={undefined}/>
             </ScrollView>
         </View>
     )

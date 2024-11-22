@@ -10,7 +10,7 @@ import { useRoute,RouteProp } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
-const GOOGLE_MAPS_API_KEY = 'AIzaSyBeCTs9sMcGjsjlIIIiML2TXrLqOZSEY6sxoacainaymoixaiduoc';
+const GOOGLE_MAPS_API_KEY = 'AIzaSyBeCTs9sMcGjsjlIIIiML2TXrLqOZSEY6s';
 const ADDRESS = 'FFXQ+X94, Bung Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam';
 
 
@@ -100,10 +100,17 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
         }
     };
 
-    // Gọi hàm lấy tọa độ khi component được render
+    //Gọi hàm lấy tọa độ khi component được render
     // useEffect(() => {
     //     getCoordinatesFromAddress(ADDRESS);
     // }, []);
+
+    useEffect(() => {
+      console.log(locationDetails?.address)
+      if (locationDetails?.address) {
+          getCoordinatesFromAddress(locationDetails?.address);
+      }
+  }, [locationDetails]);
 
     const openMap = () => {
         if (latitude && longitude) {
@@ -122,7 +129,7 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
 
     const fetchLocationDetails = async (id: string) => {
       try {
-        const response = await fetch(`http://192.168.1.2:3000/locationbyid/${id}`);
+        const response = await fetch(`http://192.168.1.3:3000/locationbyid/${id}`);
         const data = await response.json();
         if (data.isSuccess) {
           console.log('Location details:', data.data);
@@ -277,7 +284,9 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
         </View>
 
         {/* Search Button */}
-        <TouchableOpacity onPress={()=>navigation.navigate('available-room-screen')} style={styles.searchButton}>
+        <TouchableOpacity onPress={()=> {
+          console.log('Navigating with ID: ', locationDetails._id);
+          navigation.navigate('available-room-screen', {id: locationDetails._id});}} style={styles.searchButton}>
           <Text style={styles.searchButtonText}>Tìm kiếm</Text>
         </TouchableOpacity>
       </View>

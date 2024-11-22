@@ -1,46 +1,123 @@
+import { RouteProp, useRoute } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { Text, View, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView, Alert, Platform, Modal } from 'react-native';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
+import {iconMapping} from '../constants/icon'
+
+
+
+
+type RootStackParamList = {
+    'room-screen': { id: string }; 
+  };
+
+type DetailScreenRouteProp = RouteProp<RootStackParamList, 'room-screen'>;
+
+interface Room {
+    _id: string;
+    name: string;
+    bedType: string;
+    area: number; 
+    quantity: number; 
+    price: number; 
+    facility: {
+        name: string; 
+        description?: string; 
+        icon: string;
+    }[];
+    bed: {
+        category: string;
+        icon: string;
+        quantity: number;
+    }[];
+}
 
 export default function AvailableRoomScreen({ navigation }: {navigation: NativeStackNavigatorProps}) {
-
+    const route = useRoute<DetailScreenRouteProp>();
+    const { id } = route.params; 
+    const [rooms, setRooms] = useState<Room[]>([]);
+    const [services, setServices] = useState([]);
     const [isModalVisible, setModalVisible] = useState(false);
     const [roomCount, setRoomCount] = useState(0);
     const [selectedRooms, setSelectedRooms] = useState(0);
+    const [selectedRoomCounts, setSelectedRoomCounts] = useState<Record<string, number>>({});
+    const [currentRoomId, setCurrentRoomId] = useState<string | null>(null);
     const [buttonText, setButtonText] = useState("Chọn");
+    // const baseUrl = "http://localhost:3000/"; // URL trỏ đến thư mục assets
+    // const fullUrl = `${baseUrl}${icon}`;
     
 
+    const getIcon = (iconName: string) => {
+        return iconMapping[iconName] || iconMapping["default.png"];
+    };
+    
+    useEffect(() => {
+        const fetchRooms = async (id: string) => {
+            try {
+                console.log('idd: ',id);
+                const response = await fetch(`http://192.168.1.3:3000/room/getbylocationid/${id}`); // Thay đổi URL theo API của bạn
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                if (Array.isArray(data.data)) {
+                    setRooms(data.data);
+                    
+                } else {
+                    console.error('Expected data to be an array, but got:', data);
+                }
+            } catch (error) {
+                console.error('Error fetching rooms:', error);
+            }
+        };
+
+        fetchRooms(id);
+    }, [id]);
+
     const handleApply = () => {
-        if (roomCount > 0) {
-            setSelectedRooms(roomCount); 
-            setButtonText(`Đã chọn ${roomCount} phòng `);
-        }
+        // if (roomCount > 0) {
+        //     setSelectedRooms(roomCount); 
+        //     setButtonText(`Đã chọn ${roomCount} phòng `);
+        // }
+        {selectedRoomCounts[currentRoomId!] ? `Đã chọn ${selectedRoomCounts[currentRoomId!]} phòng` : "Chọn"}
 
 
-        if(roomCount===0){
-            setSelectedRooms(roomCount); 
-            setButtonText('Chọn');
-        }
+        // if(roomCount===0){
+        //     setSelectedRooms(roomCount); 
+        //     setButtonText('Chọn');
+        // }
         setModalVisible(false);
     };
     
 
-    const toggleModal = () => {
+    
+    const toggleModal = (roomId?: string) => {
+        setCurrentRoomId(roomId || null);
         setModalVisible(!isModalVisible);
     };
 
-    const incrementRoomCount = () => {
-        setRoomCount(prevCount => prevCount + 1);
-       
+
+    const incrementRoomCount = (roomId: string) => {
+        setSelectedRoomCounts(prevCounts => ({
+            ...prevCounts,
+            [roomId]: (prevCounts[roomId] || 0) + 1, // Tăng số lượng phòng đã chọn cho roomId
+        }));
     };
 
-    const decrementRoomCount = () => {
-        if (roomCount > 0) {
-            setRoomCount(prevCount => prevCount - 1);
-            
-        }
+    const decrementRoomCount = (roomId: string) => {
+        setSelectedRoomCounts(prevCounts => {
+            const currentCount = prevCounts[roomId] || 0;
+            if (currentCount > 0) {
+                return {
+                    ...prevCounts,
+                    [roomId]: currentCount - 1, // Giảm số lượng phòng đã chọn cho roomId
+                };
+            }
+            return prevCounts;
+        });
     };
 
+    
     return (
 
         <View style={styles.container}>
@@ -62,139 +139,80 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
             </View>
 
             <ScrollView style={styles.body}>
-                    <View style={styles.roomcontainer}>
-                        <Text style={styles.title}>Phòng cho 2 người</Text>
 
-                        <View style={styles.bedandarea} >
-                            <Image source={require('../assets/icons/bed.png')}></Image>
-                            <Text style ={styles.bed}>1 giường đôi</Text>
+
+                <View style={styles.container}>
+            
+
+            <View style={styles.body}>
+                {rooms.map((room, index) => (
+                    <View key={index} style={styles.roomcontainer}>
+                        <Text style={styles.title}>{room?.name || ''}</Text>
+                        <View style={styles.bedandarea}>
+                            
+                            {room.bed.map((bed, index) => (
+                                <View key={index} style={styles.backgroundBox}>
+                                    
+                                        <Image source={getIcon(bed.icon)}/>
+                                        <Text style={styles.bed}>{bed.category} : {bed.quantity} </Text>
+                                    
+                                </View>
+                            ))}
+                            
                             <View style={styles.areacontainer}>
-                                <Text style={styles.area}>diện tích: </Text>
-                                <Text style={styles.area}>16m2</Text>
+                                <Text style={styles.area}>Diện tích: </Text>
+                                <Text style={styles.area}>{room.area} m²</Text>
                             </View>
+                        </View>
+
+                        <View style = {styles.bedandarea}>
+                            <Image source={require('../assets/icons/service.png')}></Image>
+                            <Text style={styles.area}>   Dịch vụ:</Text>
+                        </View>
+
+                        <View style={styles.featureContainer}>
+                        
+                            {room.facility.map((facility, index) => (
+                                
+                                <View key={index} style={styles.backgroundBox}>
+                                    <Image
+                                        
+                                        source={getIcon(facility.icon)}
+                                        style={{height:20, width:20, marginRight:3,}}
+                                    />
+                                    <Text style={styles.area}>{facility.name}</Text>
+                                </View>
+                            ))}
                         </View>
 
                         <View style={styles.servicecontainer}>
-                            <View style = {styles.bedandarea}>
-                                <Image source={require('../assets/icons/service.png')}></Image>
-                                <Text style={styles.area}>   Dịch vụ:</Text>
-                            </View>
-
-                            <View style={styles.featureContainer}>
-                                <View style={styles.backgroundBox}>
-                                    <Image source = {require('../assets/icons/clock.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> hủy miễn phí trong 24h</Text>
-                                </View>
-
-                                <View style={styles.backgroundBox}>
-                                    <Image source = {require('../assets/icons/wifi.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> miễn phí wifi</Text>
-                                </View>
-
-                                <View style={styles.backgroundBox}>
-                                    <Image source = {require('../assets/icons/tub.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> bồn tắm</Text>
-                                </View>
-
-                                <View style={styles.backgroundBox}>
-                                    <Image source = {require('../assets/icons/airconditioner.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> điều hòa</Text>
-                                </View>
-
-                                <View style={styles.backgroundBox}>
-                                    <Image source = {require('../assets/icons/unsound.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> cách âm</Text>
-                                </View>
-                            </View>
-
                             <View style={styles.state}>
                                 <Text style={styles.area}>Trạng thái: </Text>
-                                <Text style={styles.statetext}> 5 </Text>
-                                <Text style={styles.statetext}>phòng</Text>
+                                <Text style={styles.statetext}>{room.quantity}</Text>
+                                <Text style={styles.statetext}> phòng</Text>
                             </View>
-                            
                         </View>
 
-                        <View style ={styles.endcontainer}>
-                            <View style={{flex:1}}>
+                        <View style={styles.endcontainer}>
+                            <View style={{ flex: 1 }}>
                                 <Text style={styles.area}>Giá</Text>
-                                <Text style={styles.pricetext}>200,000 VND</Text>
+                                <Text style={styles.pricetext}>{room.price} VND</Text>
                             </View>
-                            <View style={{flex:5, justifyContent:'center', alignItems:'center',}}>
-                                <TouchableOpacity style={styles.choosebutton} onPress={toggleModal}>
-                                <Text style={styles.choosetext}>{buttonText}</Text>
+                            <View style={{ flex: 5, justifyContent: 'center', alignItems: 'center' }}>    
+                                <TouchableOpacity style={styles.choosebutton} onPress={() => toggleModal(room._id)}>
+                                    <Text style={styles.choosetext}>
+                                        {selectedRoomCounts[room._id] ? `Đã chọn ${selectedRoomCounts[room._id]} phòng` : "Chọn"}
+                                    </Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
                     </View>
-                    <View style={styles.roomcontainer}>
-                        <Text style={styles.title}>Phòng cho 2 người</Text>
-
-                        <View style={styles.bedandarea} >
-                            <Image source={require('../assets/icons/bed.png')}></Image>
-                            <Text style ={styles.bed}>1 giường đôi</Text>
-                            <View style={styles.areacontainer}>
-                                <Text style={styles.area}>diện tích: </Text>
-                                <Text style={styles.area}>16m2</Text>
-                            </View>
-                        </View>
-
-                        <View style={styles.servicecontainer}>
-                            <View style = {styles.bedandarea}>
-                                <Image source={require('../assets/icons/service.png')}></Image>
-                                <Text style={styles.area}>   Dịch vụ:</Text>
-                            </View>
-
-                            <View style={styles.featureContainer}>
-                                <View style={styles.backgroundBox}>
-                                    <Image source = {require('../assets/icons/clock.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> hủy miễn phí trong 24h</Text>
-                                </View>
-
-                                <View style={styles.backgroundBox}>
-                                    <Image source = {require('../assets/icons/wifi.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> miễn phí wifi</Text>
-                                </View>
-
-                                <View style={styles.backgroundBox}>
-                                    <Image source = {require('../assets/icons/tub.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> bồn tắm</Text>
-                                </View>
-
-                                <View style={styles.backgroundBox}>
-                                    <Image source = {require('../assets/icons/airconditioner.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> điều hòa</Text>
-                                </View>
-
-                                <View style={styles.backgroundBox}>
-                                    <Image source = {require('../assets/icons/unsound.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> cách âm</Text>
-                                </View>
-                            </View>
-
-                            <View style={styles.state}>
-                                <Text style={styles.area}>Trạng thái: </Text>
-                                <Text style={styles.statetext}> 5 </Text>
-                                <Text style={styles.statetext}>phòng</Text>
-                            </View>
-                            
-                        </View>
-
-                        <View style ={styles.endcontainer}>
-                            <View style={{flex:1}}>
-                                <Text style={styles.area}>Giá</Text>
-                                <Text style={styles.pricetext}>200,000 VND</Text>
-                            </View>
-                            <View style={{flex:5, justifyContent:'center', alignItems:'center',}}>
-                                <TouchableOpacity style={styles.choosebutton} onPress={toggleModal}>
-                                <Text style={styles.choosetext}>{buttonText}</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                    </View>
-
-
-                    
+                ))}
+            </View>
+                <Modal visible={isModalVisible} animationType="slide" transparent={true}>
+                    {/* Modal Code */}
+                </Modal>
+            </View>
                     
                     
             </ScrollView>
@@ -203,18 +221,18 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
             <Modal visible={isModalVisible} animationType="slide" transparent={true}>
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
-                        <TouchableOpacity onPress={toggleModal} style={styles.closeButton}>
+                        <TouchableOpacity onPress={()=>toggleModal()} style={styles.closeButton}>
                             <Text style={styles.closeButtonText}>X</Text>
                         </TouchableOpacity>
                         <Text style={styles.modalTitle}>Chọn số lượng phòng</Text>
                         <View style={styles.modalBody}>
                             <Text style={styles.modalText}>Số lượng phòng</Text>
                             <View style={styles.counterContainer}>
-                                <TouchableOpacity onPress={decrementRoomCount} style={styles.counterButton}>
+                                <TouchableOpacity onPress={()=>decrementRoomCount(currentRoomId!)} style={styles.counterButton}>
                                     <Text style={styles.counterButtonText}>-</Text>
                                 </TouchableOpacity>
-                                <Text style={styles.counterValue}>{roomCount}</Text>
-                                <TouchableOpacity onPress={incrementRoomCount} style={styles.counterButton}>
+                                <Text style={styles.counterValue}>{selectedRoomCounts[currentRoomId!] || 0}</Text>
+                                <TouchableOpacity onPress={()=>incrementRoomCount(currentRoomId!)} style={styles.counterButton}>
                                     <Text style={styles.counterButtonText}>+</Text>
                                 </TouchableOpacity>
                             </View>
@@ -222,11 +240,16 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                         <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
                             <Text style={styles.applyButtonText}>Xác nhận</Text>
                         </TouchableOpacity>
+                        
                     </View>
                 </View>
             </Modal>
          
+
+        
         </View>
+
+        
 );
 }
 
@@ -475,9 +498,7 @@ const styles = StyleSheet.create({
         color: '#196EEE',
         fontWeight: 'bold',
         fontSize: 16,
-      },
-
-    
+      }, 
 });
 
 

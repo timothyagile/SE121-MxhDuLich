@@ -1,10 +1,37 @@
-import React from 'react'
-import {View, Text, StyleSheet, Image, TouchableOpacity, TextInput} from 'react-native'
+import React, { useEffect, useState } from 'react'
+import {View, Text, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView} from 'react-native'
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
-
+import { useUser } from '@/context/UserContext';
 
 export default function TicketScreen ({ navigation }: {navigation: NativeStackNavigatorProps})
 {
+    const { userId } = useUser();
+    const [bookings, setBookings] = useState<any[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+
+    const fetchBookings = async () => {
+        try {
+            console.log(userId);
+            const response = await fetch(`http://192.168.1.3:3000/booking/getbyuserid/${userId}`);
+            const data = await response.json();
+            if (data.isSuccess) {
+                setBookings(data.data);
+                console.log(data.data);
+            } else {
+                console.error('API error:', data.error);
+            }
+        } catch (error) {
+            console.error('Fetch error :', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        
+        fetchBookings();
+    }, [userId]);
+
     return (
         <View style = {styles.container}>
             <Image source={require('../assets/icons/logo.png')} style={styles.logo} />
@@ -23,14 +50,15 @@ export default function TicketScreen ({ navigation }: {navigation: NativeStackNa
             </View>
 
             <Text style={styles.collections }>Tất cả Booking</Text>
-
-            <View style = {styles.body}>
+            <ScrollView>
+            {bookings.map((booking) => (
+            <View key={booking._id}  style = {styles.body}>
                 <View style={{flexDirection:'row'}}>
                     <View style={styles.imageContainer}>
                         <Image source={require('../assets/images/camping-ho-coc.png')} style={styles.image} />
                     </View>
                     <View style ={styles.textContainer}>
-                        <Text style= {styles.title}>Ho Coc camping Vung Tau </Text>
+                        <Text style= {styles.title}> {booking.id} Ho Coc camping Vung Tau </Text>
                         <Text style= {styles.title2}>26/6 - 27/6 </Text>
                         <View style={styles.detailsContainer}>
                             <View style={styles.ratingBox}>
@@ -44,7 +72,8 @@ export default function TicketScreen ({ navigation }: {navigation: NativeStackNa
                     </View>
                 </View>
             </View>
-
+            ))}
+            </ScrollView>
             
         </View>
     )

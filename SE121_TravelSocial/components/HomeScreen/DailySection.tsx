@@ -10,6 +10,7 @@ const CARD_WIDTH_SPACING = CARD_WIDTH + 24;
 
 interface DailySectionProps {
     categoryId: string | undefined; // Nhận categoryId từ HomeScreen
+    navigation: any; 
 }
 
 export default function DailySection({ categoryId }: DailySectionProps) {
@@ -58,7 +59,7 @@ export default function DailySection({ categoryId }: DailySectionProps) {
             // console.log('Device IP Addresss:', ipAddresss);
             const ipAddress = await Network.getIpAddressAsync();
             console.log('Device IP Address:', ipAddress);
-            const response = await fetch(`http://192.168.1.2:3000/locationbycategory/${id}`);
+            const response = await fetch(`http://192.168.1.3:3000/locationbycategory/${id}`);
             const data = await response.json();
             if (data.isSuccess) {
                 setLocations(data.data);
@@ -67,6 +68,9 @@ export default function DailySection({ categoryId }: DailySectionProps) {
             }
         } catch (error) {
             console.error("Fetch error:", error);
+        }
+        finally {
+            setLoading(false);
         }
     };
 
