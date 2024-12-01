@@ -1,25 +1,95 @@
-import React from 'react';
-import {Image, View, StyleSheet, TouchableOpacity, Text, Dimensions} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {Image, View, StyleSheet, TouchableOpacity, Text, Dimensions, ActivityIndicator} from 'react-native';
 import locationData from '@/constants/location'
+import * as Network from 'expo-network';
 
 const {width, height} = Dimensions.get('window')
 const CARD_WIDTH =  width - 240;
 const CARD_HEIGHT = 200;
 const CARD_WIDTH_SPACING = CARD_WIDTH + 24;
 
-export default function DailySection() {
+interface DailySectionProps {
+    categoryId: string | undefined; // Nhận categoryId từ HomeScreen
+}
+
+export default function DailySection({ categoryId }: DailySectionProps) {
+
+    const [locations, setLocations] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (categoryId) {
+            fetchPopularLocations(categoryId);
+        }
+    }, [categoryId]);
+
+    // const fetchLocations = async () => {
+    //     try {
+    //         const response = await fetch('http://192.168.1.18:3000/alllocation',
+    //         {
+    //             method: 'GET',
+    //             headers: {
+    //                 'Content-Type': 'application/json', 
+    //                 'Accept': 'application/json',  
+    //             }
+    //         }); 
+    //         const result: any = await response.json();
+
+    //         if (result.isSuccess) {
+    //             setLocationData(result.data);
+    //         } else {
+    //             console.error("Lỗi: Dữ liệu không hợp lệ");
+    //         }
+    //     } catch (error) {
+    //         console.error("Đã xảy ra lỗi khi lấy dữ liệu:", error);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
+
+    // useEffect(() => {
+    //     fetchLocations();
+    // }, []);
+
+    const fetchPopularLocations = async (id: string) => {
+        try {
+            //getIPAddress();
+            // const ipAddresss = await NetworkInfo.getIPAddress();
+            // console.log('Device IP Addresss:', ipAddresss);
+            const ipAddress = await Network.getIpAddressAsync();
+            console.log('Device IP Address:', ipAddress);
+            const response = await fetch(`http://192.168.1.2:3000/locationbycategory/${id}`);
+            const data = await response.json();
+            if (data.isSuccess) {
+                setLocations(data.data);
+            } else {
+                console.error("Error fetching popular locations:", data.error);
+            }
+        } catch (error) {
+            console.error("Fetch error:", error);
+        }
+    };
+
+    // Hiển thị vòng quay khi đang tải
+    if (loading) {
+        return <ActivityIndicator size="large" color="#0000ff" />;
+    }
+
+
     return (
         <View>
-            <Text style = {styles.titleText}>Daily suggestion</Text>
+            <Text style = {styles.titleText}>Gợi ý hằng ngày</Text>
             <View style = {styles.container}>
-                {locationData.map((item, index) => {
+                {locations.map((item, index) => {
                     return (
-                    <TouchableOpacity style = {{
+                    <TouchableOpacity
+                        key={item.id}
+                         style = {{
                         marginLeft: 24,
-                        marginRight:  index === locationData.length - 1 ? 24 : 0}}>
-                        <View style={[styles.card]} key = {item.key}>
+                        marginRight:  index === locations.length - 1 ? 24 : 0}}>
+                        <View style={[styles.card]}>
                             <View style={styles.imageBox}>
-                                <Image style={styles.image} source={item.imgSource} />
+                                <Image style={styles.image} source={item.image} />
                             </View>
                             <View style={styles.footer}>
                                 <View>

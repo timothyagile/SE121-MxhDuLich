@@ -1,13 +1,25 @@
-import logo from './logo.svg';
-import '../src/styles/App.css';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import LoginScreen from './pages/LoginScreen';
+import DashBoardScreen from './pages/DashBoardScreen';
+import Layout from './pages/Layout';
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <LoginScreen/>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<LoginScreen />} />
+        <Route
+          path="/dashboard"
+          element={
+            <Layout>
+              <DashBoardScreen />
+            </Layout>
+          }
+        />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;

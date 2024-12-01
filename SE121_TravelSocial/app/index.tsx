@@ -18,126 +18,135 @@ import PaymentMethodScreen from '@/screen/PaymentMethodScreen'
 import AddNewPaymentMethodScreen from '@/screen/AddNewPaymentMethodScreen'
 import ReservationRequiredScreen from '@/screen/ReservationRequiredScreen'
 import AvailableRoomScreen from '@/screen/AvailableRoomScreen'
+import DetailScreen1 from '@/screen/HomeScreen/DetailScreen1'
 import DetailScreen from '@/screen/HomeScreen/DetailScreen'
+import { UserProvider } from '@/context/UserContext'
 
 const Stack = createNativeStackNavigator()
 
 export default function App() {
   return (
-    <NavigationContainer independent={true}>
-      <Stack.Navigator
-      initialRouteName='login'>
-        <Stack.Screen 
-        name = "welcome1" 
-        component={WelcomeScreen1}
-        options={{
-          headerShown: false,
-          headerTransparent:true,
-        }}/>
+    
+      <NavigationContainer independent={true}>
+        <UserProvider>
+          <Stack.Navigator
+          initialRouteName='login'>
+            <Stack.Screen 
+            name = "welcome1" 
+            component={WelcomeScreen1}
+            options={{
+              headerShown: false,
+              headerTransparent:true,
+            }}/>
 
-        <Stack.Screen 
-        name = "login" 
-        component={LoginScreen}
-        options={{
-          headerShown: false
-        }}/>
+            <Stack.Screen 
+            name = "login" 
+            component={LoginScreen}
+            options={{
+              headerShown: false
+            }}/>
 
-        <Stack.Screen 
-        name = "register" 
-        component={RegisterScreen}
-        options={{
-          headerShown: false
-        }}/>
+            <Stack.Screen 
+            name = "register" 
+            component={RegisterScreen}
+            options={{
+              headerShown: false
+            }}/>
 
-        <Stack.Screen 
-        name = "register2" 
-        component={RegisterScreen2}
-        options={{
-          headerShown: false
-        }}/>
+            <Stack.Screen 
+            name = "register2" 
+            component={RegisterScreen2}
+            options={{
+              headerShown: false
+            }}/>
 
-        <Stack.Screen 
-        name = "collection-screen"
-        component={CollectionScreen}
-        options={{
-          headerShown: false
-        }}/>
+            <Stack.Screen 
+            name = "collection-screen"
+            component={CollectionScreen}
+            options={{
+              headerShown: false
+            }}/>
 
-        <Stack.Screen 
-        name = "add-new-collection-screen"
-        component={AddNewCollectionScreen}
-        options={{
-          headerShown: false
-        }}/>
+            <Stack.Screen 
+            name = "add-new-collection-screen"
+            component={AddNewCollectionScreen}
+            options={{
+              headerShown: false
+            }}/>
 
-        <Stack.Screen 
-        name = "personal-information-screen"
-        component={PersonalInformationScreen}
-        options={{
-          headerShown: false
-        }}/>
+            <Stack.Screen 
+            name = "personal-information-screen"
+            component={PersonalInformationScreen}
+            options={{
+              headerShown: false
+            }}/>
 
-        <Stack.Screen 
-        name = "notifications-screen"
-        component={NotificationsScreen}
-        options={{
-          headerShown: false
-        }}/>
+            <Stack.Screen 
+            name = "notifications-screen"
+            component={NotificationsScreen}
+            options={{
+              headerShown: false
+            }}/>
 
-        <Stack.Screen 
-        name = "chat-board-screen"
-        component={ChatBoardScreen}
-        options={{
-          headerShown: false
-        }}/>
+            <Stack.Screen 
+            name = "chat-board-screen"
+            component={ChatBoardScreen}
+            options={{
+              headerShown: false
+            }}/>
 
-        <Stack.Screen 
-        name = "chat-screen"
-        component={ChatScreen}
-        options={{
-          headerShown: false
-        }}/>
+            <Stack.Screen 
+            name = "chat-screen"
+            component={ChatScreen}
+            options={{
+              headerShown: false
+            }}/>
 
-        <Stack.Screen 
-        name = "main-screen"
-        component={MainScreen}
-        options={{
-          headerShown: false
-        }}/>
+            <Stack.Screen 
+            name = "main-screen"
+            component={MainScreen}
+            options={{
+              headerShown: false
+            }}/>
 
-        <Stack.Screen 
-        name = "payment-method-screen"
-        component={PaymentMethodScreen}
-        options={{
-          headerShown: false
-        }}/>
+            <Stack.Screen 
+            name = "payment-method-screen"
+            component={PaymentMethodScreen}
+            options={{
+              headerShown: false
+            }}/>
 
-        <Stack.Screen 
-        name = "add-new-payment-method-screen"
-        component={AddNewPaymentMethodScreen}
-        options={{
-          headerShown: false
-        }}/>
+            <Stack.Screen 
+            name = "add-new-payment-method-screen"
+            component={AddNewPaymentMethodScreen}
+            options={{
+              headerShown: false
+            }}/>
 
-        <Stack.Screen 
-        name = "reservation-required-screen"
-        component={ReservationRequiredScreen}
-        options={{
-          headerShown: false
-        }}/>
+            <Stack.Screen 
+            name = "reservation-required-screen"
+            component={ReservationRequiredScreen}
+            options={{
+              headerShown: false
+            }}/>
 
-        <Stack.Screen 
-        name = "available-room-screen"
-        component={AvailableRoomScreen}
-        options={{
-          headerShown: false
-        }}/>
-        <Stack.Screen
-        name = 'detail-screen'
-        component={DetailScreen}
-        options={{
-          headerShown: false}}/>
-      </Stack.Navigator>
-    </NavigationContainer>
+            <Stack.Screen 
+            name = "available-room-screen"
+            component={AvailableRoomScreen}
+            options={{
+              headerShown: false
+            }}/>
+            <Stack.Screen
+            name = 'detail-screen'
+            component={DetailScreen}
+            options={{
+              headerShown: false}}/>
+
+
+          </Stack.Navigator>
+        </UserProvider>
+      </NavigationContainer>
+    
+   
   );
 }

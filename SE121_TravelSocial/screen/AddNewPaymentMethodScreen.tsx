@@ -78,10 +78,10 @@ export default function AddNewPaymentMethodScreen({ navigation }: {navigation: N
                 <TouchableOpacity style={styles.arrowleftbutton} onPress={() => navigation.goBack()}>
                 <Image source={require('../assets/icons/arrowleft.png')} style={styles.arrowlefticon} />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Add New Payment Method</Text>
+                <Text style={styles.headerTitle}>Thêm Phương Thức Mới</Text>
             </View>
 
-            <Text style = {{marginLeft:30, fontSize:18, fontWeight:'500',}}>Choose payment method</Text>
+            <Text style = {{marginLeft:30, fontSize:18, fontWeight:'500',}}>chọn phương thức thanh toán</Text>
             <View style={styles.imagesRow}>
 
                 <View style={{justifyContent:'center',alignItems:'center',}}>
@@ -149,7 +149,7 @@ export default function AddNewPaymentMethodScreen({ navigation }: {navigation: N
                 <View style = {{  alignItems:'center', justifyContent:'center',alignContent:'center',width:'100%'}}>
                     
                     <TouchableOpacity style={styles.addpaymentmethod2} onPress={() => navigation.navigate('payment-method-screen')} >
-                            <Text style={styles.boxText3}>Save </Text>
+                            <Text style={styles.boxText3}>Lưu</Text>
                     </TouchableOpacity>
                 </View>
             </View>

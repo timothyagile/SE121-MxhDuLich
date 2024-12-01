@@ -71,7 +71,7 @@ export default function PaymentMethodScreen({ navigation }: {navigation: NativeS
                 <TouchableOpacity style={styles.arrowleftbutton} onPress={() => navigation.goBack()}>
                 <Image source={require('../assets/icons/arrowleft.png')} style={styles.arrowlefticon} />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Payment Method</Text>
+                <Text style={styles.headerTitle}>Phương Thức Thanh Toán</Text>
             </View>
 
             <View style={{flexDirection:'row'}}>
@@ -96,7 +96,7 @@ export default function PaymentMethodScreen({ navigation }: {navigation: NativeS
 
             <View style={{marginLeft:20, marginTop:25,}}>
                 <TouchableOpacity style={styles.addpaymentmethod} onPress={() => navigation.navigate('add-new-payment-method-screen')}>
-                        <Text style={styles.boxText2}>Add payment method</Text>
+                        <Text style={styles.boxText2}>Thêm phương thức thanh toán</Text>
                 </TouchableOpacity>
             </View>
             <View style={styles.imagesRow}>
@@ -174,11 +174,11 @@ export default function PaymentMethodScreen({ navigation }: {navigation: NativeS
                 
             </View>
             <View style={{position:'absolute',bottom:20,width:'100%'}}>
-                <Text style={{marginLeft:30, fontSize:24, marginBottom:20,}}> PAY $134.00</Text>
+                <Text style={{marginLeft:30, fontSize:24, marginBottom:20,}}> Thanh toán $134.00</Text>
                 <View style = {{  alignItems:'center', justifyContent:'center',alignContent:'center',width:'100%'}}>
                     
                     <TouchableOpacity style={styles.addpaymentmethod2} onPress={applyAndPay}>
-                            <Text style={styles.boxText3}>Apply and Pay</Text>
+                            <Text style={styles.boxText3}>Xác Nhận Thanh Toán</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -214,6 +214,7 @@ const styles = StyleSheet.create({
       elevation: 20,
     },
     headerTitle: {
+      width:'120%',
       fontSize: 20,
       fontWeight: 'bold',
     },

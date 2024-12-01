@@ -1,132 +1,83 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import React from 'react';
-import {View, Text, StyleSheet, TextInput, FlatList, ScrollView, TouchableOpacity} from 'react-native'
+import {View, Text, StyleSheet, TextInput, FlatList, ScrollView, TouchableOpacity, Image} from 'react-native'
 
-import CategoryItem from "@/components/HomeScreen/CategoryItem"
+import CategoryItem from "@/components/HomeScreen/CategoryItem";
 import categoryData from '@/constants/category';
 
 import PopularSection from '@/components/HomeScreen/PopularSection';
 import RecommendedSection from '@/components/HomeScreen/RecommendedSection';
 import DailySection from '@/components/HomeScreen/DailySection';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
+import styles from '../StyleSheet/HomeScreenStyles'; 
 
 export default function HomeScreen ({navigation} : {navigation : NativeStackNavigatorProps})
 {
     
     const [findContent, setFindContent] = useState("");
     const [selectedCategory, setSelectedCategory] = useState(categoryData.at(0));
-    
+    const [locations, setLocations] = useState([]);
 
+    // useEffect(() => {
+    //     if (selectedCategory) {
+    //         fetchLocationsByCategory(selectedCategory.id);
+    //     }
+    // }, [selectedCategory]);
+
+    // const fetchLocationsByCategory = async (categoryId: string) => {
+    //     try {
+    //         const response = await fetch(`http://192.168.1.18:3000/locationbycategory/${categoryId}`);
+    //         const data = await response.json();
+    //         if (data.isSuccess) {
+    //             setLocations(data.data);
+    //         } else {
+    //             console.error("Error fetching locations:", data.error);
+    //         }
+    //     } catch (error) {
+    //         console.error("Fetch error:", error);
+    //     }
+    // };
+
+    const handleSetCategory = (category: typeof categoryData[0]) => {
+        setSelectedCategory(category); // Cập nhật danh mục được chọn
+    };
+
+    
     return (
         <View style = {styles.container}>
-            <View style = {styles.header}>
-                {/*Text header */}
-                <View style = {styles.text_container}>
-                    <View>
-                        <Text style = {styles.text1}>Explore</Text>
-                        <Text style = {styles.text2}>Aspen</Text>
-                    </View>
-                    <View>
-                        <Text style = {styles.text3}>HCM, VN</Text>
-                    </View>
+            <View style = {{alignItems:'center', width:'100%'}}>
+                <View style={styles.search}>
+                    <TouchableOpacity onPress={() => console.log('Search icon pressed')}>
+                        <Image source={require('../assets/icons/Search.png')} style={styles.icon} />
+                    </TouchableOpacity>                   
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Tìm kiếm"
+                        placeholderTextColor="#000000"
+                    />
                 </View>
-
-                {/*Search bar */}
-                <View style = {styles.textInputContainer}>
-                    <TextInput 
-                    placeholder='Find things to do'
-                    placeholderTextColor={'black'}
-                    value={findContent}
-                    onChangeText={setFindContent}
-                    style = {styles.textInput}/>
-                </View>
-
-                <View style  = {styles.categoryContainer}>
+            </View>
+            <View style  = {styles.categoryContainer}>
                     <FlatList
                     data= {categoryData}
-                    renderItem={({item}) => <CategoryItem 
+                    renderItem={({item}) => (<CategoryItem 
                         item = {item}
                         selectedCategory = {selectedCategory}
-                        setSelectedCategory = {setSelectedCategory}/>}
+                        setSelectedCategory = {setSelectedCategory}
+                        setLocations={setLocations}/>)}
 
                     horizontal
                     showsHorizontalScrollIndicator = {false}
                     style = {styles.flatList}>
                     </FlatList>
                 </View>
+           
 
-            </View>
-
-            <ScrollView style = {{borderWidth: 1, borderColor: 'red'}}>
-                    <PopularSection navigation = {navigation}/>
+            <ScrollView style = {{}}>
+                    <PopularSection categoryId={selectedCategory?.id} navigation = {navigation}/>
                     <RecommendedSection/>
-                    <DailySection/>
-            
-
+                    <DailySection categoryId={selectedCategory?.id}/>
             </ScrollView>
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-    },
-    header: {
-        borderWidth: 1,
-        height: 250
-    },
-    text_container: {
-        flexDirection: 'row',
-        //borderWidth: 1,
-        justifyContent: 'space-between',
-    },
-    text1: {
-        fontSize: 18,
-        fontFamily: '',
-        marginLeft: "12%"
-    },
-    text2: {
-        fontSize: 36,
-        fontFamily: '',
-        marginLeft: "12%",
-        fontWeight: 'medium'
-    },
-    text3: {
-        fontSize: 14,
-        fontFamily: '',
-        marginRight: "10%"
-    },
-    textInputContainer: {
-        marginTop: 20,
-        marginHorizontal: '5%',
-        ////borderWidth: 1,
-        borderRadius: 24,
-        backgroundColor: '#A8CCF0',
-        opacity: 0.2,
-        height: '25%', 
-        padding: 20
-    },
-    textInput: {
-        fontSize: 14,
-        
-    },
-    categoryContainer: {
-        //borderWidth: 1
-    },
-    flatList: {
-        marginTop: 10
-    },
-    body: {
-        flex: 1,
-        borderWidth: 1,
-        marginBottom: "0%"
-    },
-    
-    popularList: {
-
-        
-    }
-    
-})

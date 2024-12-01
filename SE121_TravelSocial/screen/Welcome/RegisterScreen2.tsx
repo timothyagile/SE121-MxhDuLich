@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {Button, Text, View,  StyleSheet, Image, TouchableOpacity, TextInput} from 'react-native';
+import {Button, Text, View,  StyleSheet, Image, TouchableOpacity, TextInput, Alert} from 'react-native';
 //import CheckBox from '@react-native-community/checkbox';
 import Checkbox from 'expo-checkbox';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
@@ -12,10 +12,40 @@ export default function RegisterScreen2 ({navigation}: {navigation: NativeStackN
     const [toggleCheckBox, setToggleCheckBox] = useState(false);
     const [secureTextEntry, setSecureTextEntry] = useState(true);
 
-    const handleSignUp = () => {
+    const handleSignUp = async () => {
+        if (!email || !password) {
+            Alert.alert('Lỗi', 'Vui lòng nhập email và mật khẩu.');
+            return;
+        }
+
         console.log('Email:', email);
         console.log('Password:', password);
-        navigation.navigate('login');
+
+        try {
+            const response = await fetch('http://192.168.1.11:3000/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userEmail: email,
+                    userPassword: password,
+                }),
+            });
+
+            const data = await response.json();
+
+            console.log('Response:', data);
+            if (response.ok) {
+                Alert.alert('Thành công', 'Tạo tài khoản thành công.');
+                //navigation.navigate('login'); // Chuyển hướng đến trang đăng nhập
+            } else {
+                Alert.alert('Lỗi', data.error || 'Có lỗi xảy ra.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Alert.alert('Lỗi', 'Không thể kết nối với máy chủ. Vui lòng thử lại.');
+        }
     };
 
     const handleCheckBox = () => {
@@ -26,9 +56,9 @@ export default function RegisterScreen2 ({navigation}: {navigation: NativeStackN
 
     return (
         <View style={styles.container}>
-            <Text style={styles.textsignup}>Sign Up</Text>
-            <Text style={styles.text1}>Please registration with email and sign up to continue using our app</Text>
-            <Text style={styles.text2}>Login with</Text>
+            <Text style={styles.textsignup}>Đăng ký</Text>
+            <Text style={styles.text1}>Đăng ký bằng email và đăng nhập để tiếp tục sử dụng ứng dụng</Text>
+            <Text style={styles.text2}>Đăng ký với</Text>
 
             <View style={styles.buttonRow}>
                 <TouchableOpacity
@@ -47,7 +77,7 @@ export default function RegisterScreen2 ({navigation}: {navigation: NativeStackN
             <View style ={styles.backgroundinput}>
                 <TextInput
                     style={styles.input}
-                    placeholder="Enter your email"
+                    placeholder="Nhập email"
                     value={email}
                     onChangeText={setEmail}
                 />
@@ -56,7 +86,7 @@ export default function RegisterScreen2 ({navigation}: {navigation: NativeStackN
             <View style ={styles.backgroundinput}>
                 <TextInput
                     style={styles.input2}
-                    placeholder="Enter your password"
+                    placeholder="Nhập mật khẩu"
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry={secureTextEntry}
@@ -82,23 +112,23 @@ export default function RegisterScreen2 ({navigation}: {navigation: NativeStackN
                     color ={toggleCheckBox?'#196EEE' : undefined}
                 />
                 <TouchableOpacity onPress={handleCheckBox}>
-                    <Text style={styles.checkboxText}>I agree with policy</Text>
+                    <Text style={styles.checkboxText}>Tôi đồng ý với chính sách</Text>
                 </TouchableOpacity>
             </View>
 
             <TouchableOpacity
                 style={styles.signupButton}
-                onPress={() => navigation.navigate('login')}
+                onPress={handleSignUp}
             >
-                <Text style={styles.signupButtonText}>Sign up</Text>
+                <Text style={styles.signupButtonText}>Đăng ký</Text>
             </TouchableOpacity>
             <View style={styles.buttonRow}>
-            <Text style={styles.text3}>You already have an account? </Text>
+            <Text style={styles.text3}>Bạn đã có tài khoản? </Text>
             <TouchableOpacity
                 style={styles.text4}
-                onPress={() => navigation.navigate('login')}
+                onPress={() => navigation.navigate('register')}
             >
-                <Text style = {{fontSize:18,fontWeight:'bold',color:'#196EEE'}}> Login</Text>
+                <Text style = {{fontSize:18,fontWeight:'bold',color:'#196EEE'}}> Đăng nhập</Text>
             </TouchableOpacity>
             
             </View>
@@ -130,9 +160,9 @@ const styles = StyleSheet.create({
     text1:{
         marginTop:5,
         textAlign:'left',
-        width: '100%', 
+        width: '90%', 
         fontSize:18,
-        left: 30,
+        marginLeft:20,
         
         fontWeight:'bold'
     },
@@ -147,7 +177,7 @@ const styles = StyleSheet.create({
         fontSize:18,
         marginTop:20,
         textAlign:'left',
-        width: '65%', 
+        width: '50%', 
         left: 30,
     },
     text4: {
@@ -156,7 +186,7 @@ const styles = StyleSheet.create({
         color: '#196EEE',
         fontWeight:'bold',
         textAlign:'left',
-        width: '35%',
+        width: '50%',
     },
 
     image: {
@@ -178,9 +208,17 @@ const styles = StyleSheet.create({
         borderRadius: 30,  
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f0f0f0', 
+        backgroundColor: 'white', 
         marginTop: 20,  
         left: 100,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5,
     },
 
     circleButtonFacebook: {
@@ -189,14 +227,22 @@ const styles = StyleSheet.create({
         borderRadius: 30,  
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f0f0f0', 
+        backgroundColor: 'white', 
         marginTop: 20,  
         right: 100,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5,
     },
 
     buttonIcon: {
-        width: 120, 
-        height: 120,  
+        width: 40, 
+        height: 40,  
     },
 
     signupButton: {

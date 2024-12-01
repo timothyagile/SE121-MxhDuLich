@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, View, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 import * as ImagePicker from 'expo-image-picker';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
@@ -19,6 +19,27 @@ export default function ProfileScreen({ navigation }: { navigation: NativeStackN
             setImage(result.assets[0].uri);
         }
     };
+
+    const logout = async () => {
+        console.log('da dang xuat')
+        try {
+            const response = await fetch('http://192.168.1.2:3000/logout', {
+                method: 'GET',
+                credentials: 'include', 
+            });
+
+            if (response.ok) {
+                
+                navigation.navigate('login');
+            } else {
+                Alert.alert("Lỗi", "Không thể đăng xuất. Vui lòng thử lại.");
+            }
+        } catch (error) {
+            console.error(error);
+            Alert.alert("Lỗi", "Đã xảy ra sự cố khi đăng xuất.");
+        }
+    };
+
 
     return (
         <View style={styles.container}>
@@ -44,39 +65,39 @@ export default function ProfileScreen({ navigation }: { navigation: NativeStackN
             </View>
             <View style = {styles.body}>
                 <View>
-                    <Text style={styles.accsetting}>Account setting</Text>
+                    <Text style={styles.accsetting}>Cài đặt tài khoản</Text>
                     <TouchableOpacity style={styles.personalInfoContainer} onPress={()=>navigation.navigate('personal-information-screen')}>
-                        <Text style={styles.personalInfoText}>Personal Information</Text>
+                        <Text style={styles.personalInfoText}>Thông tin cá nhân</Text>
                         <Image source={require('../assets/icons/arrowright.png')} style={styles.arrowIcon} />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.personalInfoContainer} onPress={()=>navigation.navigate('notifications-screen')}>
-                        <Text style={styles.personalInfoText}>Notifications</Text>
+                        <Text style={styles.personalInfoText}>Thông báo</Text>
                         <Image source={require('../assets/icons/arrowright.png')} style={styles.arrowIcon} />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.personalInfoContainer}>
-                        <Text style={styles.personalInfoText}>History of booking</Text>
+                        <Text style={styles.personalInfoText}>Lịch sử booking</Text>
                         <Image source={require('../assets/icons/arrowright.png')} style={styles.arrowIcon} />
                     </TouchableOpacity>
                 </View>
 
                 <View>
-                    <Text style={styles.accsetting}>Help & Support</Text>
+                    <Text style={styles.accsetting}>Giúp đỡ & Hỗ trợ</Text>
                     <TouchableOpacity style={styles.personalInfoContainer}>
-                        <Text style={styles.personalInfoText}>Privacy policy</Text>
+                        <Text style={styles.personalInfoText}>Chính sách bảo mật</Text>
                         <Image source={require('../assets/icons/arrowright.png')} style={styles.arrowIcon} />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.personalInfoContainer}>
-                        <Text style={styles.personalInfoText}>Terms & conditions</Text>
+                        <Text style={styles.personalInfoText}>Điều khoản và điều kiện</Text>
                         <Image source={require('../assets/icons/arrowright.png')} style={styles.arrowIcon} />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.personalInfoContainer}>
-                        <Text style={styles.personalInfoText}>FAQ & Help</Text>
+                        <Text style={styles.personalInfoText}>FAQ & Giúp đỡ</Text>
                         <Image source={require('../assets/icons/arrowright.png')} style={styles.arrowIcon} />
                     </TouchableOpacity>
                 </View>
                 <TouchableOpacity
-                    onPress={() => navigation.navigate('login')}>
-                    <Text style ={styles.textlogout}>Log out</Text>
+                    onPress={logout}>
+                    <Text style ={styles.textlogout}>Đăng xuất</Text>
                 </TouchableOpacity>
             </View>
         </View>

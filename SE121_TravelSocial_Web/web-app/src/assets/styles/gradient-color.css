@@ -1,0 +1,6 @@
+:root {
+    --gradient-blue-sidebar: linear-gradient(to bottom, rgb(82, 166, 243,0.4), rgb(48, 96, 141,0.4));
+    --gradient-blue-customer: linear-gradient(to right,rgb(82,166,243,0.24),rgb(0,133,255,0.4));
+    --gradient-gray-background: linear-gradient(to bottom,rgb(217,217,217,0.1),rgb(115,115,115,0.1));
+    --gradient-room-background: linear-gradient(to bottom,rgb(168,204,240,0.2),rgb(97,117,138,0.2));
+  }

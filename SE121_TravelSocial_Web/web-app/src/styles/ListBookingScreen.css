@@ -1,0 +1,144 @@
+@import url(../assets/styles/gradient-color.css);
+
+.containerlistbusiness {
+    background-image: var(--gradient-gray-background);
+    border-radius: 8px;
+    border: 1px solid rgb(230,230,230,0.5);
+    padding: 20px;
+}
+
+@media (min-width:1400px)  {
+
+  
+  }
+  
+  
+  @media (min-width:1200px)  {
+
+  
+  }
+  
+  @media (min-width: 978px) and (max-width: 1199px) {
+    .containerformobile {
+        width: 900px;
+    }
+    .widthlistbusiness {
+        width: 900px;
+    }
+  }
+  
+  @media (min-width: 768px) and (max-width:979px) {
+
+    
+  }
+  
+  @media (min-width: 481px) and (max-width:767px) {
+    
+  }
+
+.widthlistbusiness {
+    width: 1100px;
+    height: 800px;
+}
+
+.listbusinessbody {
+    height: 740px;
+}
+
+.icon-search {
+    width: 1rem;
+    height: auto;
+    margin-right: 2px;
+    margin-left: 6px;
+}
+
+.input-text {
+    padding:10px
+}
+
+.input-text:focus {
+    outline: none;
+    transition: all;
+    animation-duration: 200;
+}
+
+.search {
+    display: flex;
+    width: 30%;
+    
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+
+
+
+
+table {
+    width: 100%;
+    border-collapse: separate; 
+    border-spacing: 0 10px; 
+}
+
+thead th {
+    border-bottom: 2px solid #ccc;  
+    padding: 10px;  
+    color: #A2A1A8;
+    font-weight: 200;
+    font-size: 1rem;
+}
+
+tbody td {
+    padding: 10px;  
+    border-bottom: 1px solid #ddd;  
+}
+
+.namefield {
+    display: flex;
+    align-items: center;
+}
+
+.namefield p {
+    margin-bottom: 0px;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 16px;
+  }
+
+.row-container {
+    border-radius: 10px;
+    border: 1px solid  rgb(230,230,230,0.5);
+    background-color:#ffffff;
+}
+
+
+
+
+.pagination {
+    justify-content: center;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.page {
+    display: inline-block;
+    padding: 8px 12px;
+    margin: 0 5px;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    cursor: pointer;
+    background-color: white;
+}
+
+.bg-blue-important {
+    background-color: var(--blue-color) !important;
+  }
+
+.page:hover {
+    background-color: var(--blue-color);
+}

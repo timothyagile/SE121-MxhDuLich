@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
-import {Button, Text, View,  StyleSheet, Image, TouchableOpacity, TextInput, NativeSyntheticEvent, TextInputChangeEventData} from 'react-native';
+import {Button, Text, View,  StyleSheet, Image, TouchableOpacity, TextInput, NativeSyntheticEvent, TextInputChangeEventData, Alert} from 'react-native';
 //import CheckBox from '@react-native-community/checkbox';
 import Checkbox from 'expo-checkbox';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
+import { Ionicons, FontAwesome6 } from '@expo/vector-icons';
+import { useUser } from '@/context/UserContext';
 
 
 export default function LoginScreen ({navigation}: {navigation: NativeStackNavigatorProps}) {
 
     const [email, setEmail] = useState('');
-    const [emailVerify, setEmailVerify] = useState(false)
+    const [emailVerify, setEmailVerify] = useState(false);
     const [password, setPassword] = useState('');
     const [toggleCheckBox, setToggleCheckBox] = useState(false);
     const [secureTextEntry, setSecureTextEntry] = useState(true);
+
+    const { setUserId } = useUser();
 
     const handleSignUp = () => {
         console.log('Email:', email);
@@ -19,12 +23,39 @@ export default function LoginScreen ({navigation}: {navigation: NativeStackNavig
         navigation.navigate('login');
     };
 
+    const handleLogin = async () => {
+        
+        try {
+            const response = await fetch('http://192.168.1.2:3000/signin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userEmail: email, userPassword: password }),
+            });
+            
+            console.log('Response status:', response.status);
+            console.log('a', password)
+            const data = await response.json(); 
+            console.log(data);
+            if (response.ok) {
+                const userId = data.data;  // Giả sử API trả về userId trong đối tượng data
+                setUserId(userId);  // Cập nhật userId vào state hoặc context
+                console.log('User ID:', userId);
+                navigation.navigate('main-screen');
+            } else {
+                
+                Alert.alert('Login Failed', data.error || 'Please try again.');
+            }
+        } catch (error) {
+            console.error(error);
+            Alert.alert('An error occurred', 'Please check your connection and try again.');
+        }
+    };
+
     const handleCheckBox = () => {
         setToggleCheckBox(!toggleCheckBox);
     };
 
     const isValidEmail = (email: string): boolean => {
-        // Biểu thức chính quy kiểm tra định dạng email
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     };
@@ -39,9 +70,9 @@ export default function LoginScreen ({navigation}: {navigation: NativeStackNavig
 
     return (
         <View style={styles.container}>
-            <Text style={styles.textsignup}>Login Now</Text>
-            <Text style={styles.text1}>Please login to continue using our app</Text>
-            <Text style={styles.text2}>Login with</Text>
+            <Text style={styles.textsignup}>Đăng nhập ngay</Text>
+            <Text style={styles.text1}>Đăng nhập để sử dụng app của chúng tôi</Text>
+            <Text style={styles.text2}>Đăng nhập với</Text>
 
             <View style={styles.buttonRow}>
                 <TouchableOpacity
@@ -60,26 +91,16 @@ export default function LoginScreen ({navigation}: {navigation: NativeStackNavig
             <View style ={styles.backgroundinput}>
                 <TextInput
                     style={styles.input}
-                    placeholder="Enter your email"
+                    placeholder="Nhập email"
                     value={email}
                     onChange={e => handleEmail(e)}
                 />
             </View>
-
-            {/* {emailVerify ? (
-                <View>
-                    <Text>Dung</Text>
-                </View>
-            ) : (
-                <View>
-                    <Text>Sai</Text>
-                </View>
-            )} */}
             
             <View style ={styles.backgroundinput}>
                 <TextInput
                     style={styles.input2}
-                    placeholder="Enter your password"
+                    placeholder="Nhập mật khẩu"
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry={secureTextEntry}
@@ -89,32 +110,30 @@ export default function LoginScreen ({navigation}: {navigation: NativeStackNavig
                 style={styles.icon}
                 onPress={() => setSecureTextEntry(!secureTextEntry)}
                 >
-                <Image
-                    source={secureTextEntry ? require('../../assets/icons/closedeye.png'):require('../../assets/icons/openeye.png') }
-                    // style={styles.iconImage}
-                />
+                <Ionicons size={18} style={{ color: 'blue',right:0}} name = {secureTextEntry? 'eye-off' :'eye' }></Ionicons>
                 </TouchableOpacity>
             </View>
 
             <View style={styles.checkboxContainer}>
                 <TouchableOpacity onPress={handleCheckBox}>
-                    <Text style={styles.checkboxText}>forgot password?</Text>
+                    <Text style={styles.checkboxText}>quên mật khẩu?</Text>
                 </TouchableOpacity>
             </View>
 
             <TouchableOpacity
                 style={styles.signupButton}
-                onPress={() => navigation.navigate('main-screen')}
+                onPress={handleLogin}
+                //onPress={() => navigation.navigate('main-screen')}
             >
-                <Text style={styles.signupButtonText}>Login</Text>
+                <Text style={styles.signupButtonText}>Đăng nhập</Text>
             </TouchableOpacity>
             <View style={styles.buttonRow}>
-            <Text style={styles.text3}>Don't have an account </Text>
+            <Text style={styles.text3}>Chưa có tài khoản? </Text>
             <TouchableOpacity
                 style={styles.text4}
                 onPress={() => navigation.navigate('register2')}
             >
-                <Text style = {{fontSize:18,fontWeight:'bold',color:'#196EEE'}}> Sign up</Text>
+                <Text style = {{fontSize:18,fontWeight:'bold',color:'#196EEE'}}> Đăng ký</Text>
             </TouchableOpacity>
             
             </View>
@@ -163,7 +182,7 @@ const styles = StyleSheet.create({
         fontSize:18,
         marginTop:20,
         textAlign:'left',
-        width: '50%', 
+        width: '45%', 
         left: 30,
     },
     text4: {
@@ -172,7 +191,7 @@ const styles = StyleSheet.create({
         color: '#196EEE',
         fontWeight:'bold',
         textAlign:'left',
-        width: '50%',
+        width: '55%',
     },
 
     image: {
@@ -194,9 +213,17 @@ const styles = StyleSheet.create({
         borderRadius: 30,  
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f0f0f0', 
+        backgroundColor: 'white', 
         marginTop: 20,  
         left: 100,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5,
     },
 
     circleButtonFacebook: {
@@ -205,20 +232,30 @@ const styles = StyleSheet.create({
         borderRadius: 30,  
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f0f0f0', 
+        backgroundColor: 'white', 
         marginTop: 20,  
         right: 100,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5,
     },
 
     buttonIcon: {
-        width: 120, 
-        height: 120,  
+        width: 40, 
+        height: 40,  
+        
     },
 
     signupButton: {
         marginTop: 40,
         paddingVertical: 20,
-        paddingHorizontal: 140,
+        width:'90%',
+        alignItems:'center',
         backgroundColor: '#196EEE',
         borderRadius: 16,
     },
@@ -281,6 +318,7 @@ const styles = StyleSheet.create({
     checkboxText: {
         marginLeft: 10,
         fontSize: 15,
+        paddingHorizontal:10,
     },
     
 });

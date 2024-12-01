@@ -19,7 +19,7 @@ export default function MainScreen() {
         headerShown: false
       }}>
         <Tab.Screen 
-        name="Home" 
+        name="Trang chủ" 
         component={HomeScreen}
         options={{ 
           tabBarIcon: ({ focused }) => (
@@ -31,7 +31,7 @@ export default function MainScreen() {
         }}
       />
         <Tab.Screen 
-        name="Ticket" 
+        name="Booking" 
         component={TicketScreen}
         options={{ 
           tabBarIcon: ({ focused }) => (
@@ -43,7 +43,7 @@ export default function MainScreen() {
         }}
       />
         <Tab.Screen 
-        name="Collection" 
+        name="Yêu thích" 
         component={CollectionScreen}
         options={{ 
           tabBarIcon: ({ focused }) => (
@@ -57,7 +57,7 @@ export default function MainScreen() {
         }}
       />
         <Tab.Screen 
-        name="Profile" 
+        name="trang cá nhân" 
         component={ProfileScreen}
         options={{ 
           tabBarIcon: ({ focused }) => (

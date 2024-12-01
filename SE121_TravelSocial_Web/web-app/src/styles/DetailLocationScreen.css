@@ -1,0 +1,13 @@
+.mb-4 {
+    margin-bottom: 1rem;
+    margin-right: 1rem;
+}
+
+.h-of-map {
+    height: 280px;
+}
+
+.bg-room {
+    background-image: var(--gradient-room-background);
+    height: 130px;
+}
