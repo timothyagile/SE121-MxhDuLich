@@ -7,6 +7,7 @@ const businessRoute = require('./routes/businessRoute')
 const roomRoute = require('./routes/roomRoute')
 const bookingRoute = require('./routes/bookingRoute')
 const userCollectionRoute = require('./routes/userCollectionRoute')
+const uploadImageRoute = require('./routes/uploadImageRoute')
 const {requireAuth, checkUser} = require('./middleware/authMiddleware');
 const {errorHandler} = require('./middleware/errorMiddleware')
 const app = express();
@@ -43,5 +44,6 @@ app.use(bookingRoute)
 app.use(businessRoute)
 app.use(roomRoute)
 app.use(userCollectionRoute)
+app.use(uploadImageRoute)
 
 app.use(errorHandler);
