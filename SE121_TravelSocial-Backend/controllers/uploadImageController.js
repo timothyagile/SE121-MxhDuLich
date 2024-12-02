@@ -6,7 +6,6 @@ module.exports.uploadImage = async (req, res, next) => {
         const uploadImage = []
         for (let image of images) {
             const result = await cloudinary.uploader.upload(image);
-            console.log(result)
             uploadImage.push({
                 url: result.secure_url,
                 publicId: result.public_id
