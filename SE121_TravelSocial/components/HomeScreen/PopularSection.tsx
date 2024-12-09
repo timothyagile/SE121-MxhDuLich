@@ -41,32 +41,6 @@ export default function PopularSection({ categoryId, navigation }: PopularSectio
             fetchPopularLocations(categoryId);
         }
     }, [categoryId]);
-
-    // const getAllLocations = async () => {
-        
-        
-    //     try {
-    //         const response = await fetch('http://192.168.1.18:3000/alllocation');
-             
-            
-    //         const data = await response.json();
-    //         console.log(data);
-
-    //         if (data.isSuccess) {
-    //             setLocations(data.data); 
-    //         } else {
-    //             console.error(data.error);
-    //         }
-    //     } catch (error) {
-    //         console.error(error);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     getAllLocations();
-    // }, []);
     
     const getIPAddress = async () => {
         const ipAddress = await NetworkInfo.getIPAddress();
@@ -76,12 +50,9 @@ export default function PopularSection({ categoryId, navigation }: PopularSectio
 
     const fetchPopularLocations = async (id: string) => {
         try {
-            //getIPAddress();
-            // const ipAddresss = await NetworkInfo.getIPAddress();
-            // console.log('Device IP Addresss:', ipAddresss);
             const ipAddress = await Network.getIpAddressAsync();
             console.log('Device IP Address:', ipAddress);
-            const response = await fetch(`http://192.168.1.2:3000/locationbycategory/${id}`);
+            const response = await fetch(`http://192.168.1.6:3000/locationbycategory/${id}`);
             const data = await response.json();
             if (data.isSuccess) {
                 setLocations(data.data);
@@ -120,13 +91,13 @@ export default function PopularSection({ categoryId, navigation }: PopularSectio
                             </View>
                             <View style = {styles.titleBox}>
                                 <View style = {styles.textBox}>
-                                    <Text style = {[styles.textStyle, {fontSize: 20}]}>{item.name}</Text>
+                                    <Text style = {[styles.textStyle, {fontSize: 12}]}>{item.name}</Text>
                                 </View>
                                 <View>
                                     <View style = {[styles.textBox, {top: 10, width: 70}]}>
                                         <Image source={require('@/assets/icons/star.png')}
                                         style = {styles.star}></Image>
-                                        <Text style = {[styles.textStyle, {fontSize: 15}]}>{item.rating}</Text>
+                                        <Text style = {[styles.textStyle, {fontSize: 12}]}>{item.rating}</Text>
                                     </View>
                                     
                                     <TouchableOpacity onPress={()=>handlePress(item._id.toString())} style= {{left:175, bottom: 15,}}>
@@ -188,9 +159,9 @@ const styles = StyleSheet.create({
         justifyContent: 'space-evenly'
     },
     star: {
-        width: 24,
-        height: 24,
-        left: 10
+        width: 16,
+        height: 16,
+        left: 5
     },
 
     heart: {
@@ -201,7 +172,7 @@ const styles = StyleSheet.create({
     textStyle: {
         fontWeight: 'medium',
         color: 'white',
-        marginHorizontal: 20,
+        marginHorizontal: 10,
         marginVertical: 5
     }
 })

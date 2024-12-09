@@ -1,10 +1,24 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, View, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 import * as ImagePicker from 'expo-image-picker';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { RouteProp, useRoute } from '@react-navigation/native';
+import { useUser } from '@/context/UserContext';
+import { navigate } from 'expo-router/build/global-state/routing';
+
+interface User {
+    userName: string;
+    userEmail: string;
+
+}
+
 
 export default function ProfileScreen({ navigation }: { navigation: NativeStackNavigatorProps }) {
+    const { userId } = useUser();
+    const [userData, setUserData] = useState<any>(null);
+  
+
     const [image, setImage] = useState<string | null>(null);
 
     const pickImage = async () => {
@@ -40,12 +54,42 @@ export default function ProfileScreen({ navigation }: { navigation: NativeStackN
         }
     };
 
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await fetch(`http://192.168.1.2:3000/user/getbyid/${userId}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setUserData(data.data); 
+                    console.log(data.data);
+                } else {
+                    console.error('Failed to fetch user data:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+
+        if (userId) fetchUserData(); 
+    }, [userId]);
+
+    if (!userId) {
+        return (
+            <View>
+                <Text>Bạn cần đăng nhập để xem trang này.</Text>
+            </View>
+        );
+    }
 
     return (
         <View style={styles.container}>
             <View style={styles.header}>
                 <Text style={styles.profile}>Profile</Text>
-                <TouchableOpacity style={styles.bellIcon}>
+                <TouchableOpacity style={styles.bellIcon} onPress={()=> navigation.navigate('notifications-screen')}>
                     <Image source={require('../assets/icons/bell.png')}></Image>
                 </TouchableOpacity>
             </View>
@@ -59,8 +103,8 @@ export default function ProfileScreen({ navigation }: { navigation: NativeStackN
                 <TouchableOpacity style={styles.addButton}onPress={pickImage}>
                     <Image source={require('../assets/icons/changeavt.png')}></Image>
                 </TouchableOpacity>
-                <Text style = {styles.name}>To Hoang Huy</Text>
-                <Text style = {styles.email}>22520573@gm.uit.edu.vn</Text>
+                <Text style = {styles.name}>{userData?.userName}</Text>
+                <Text style = {styles.email}>{userData?.userEmail}</Text>
                  
             </View>
             <View style = {styles.body}>
@@ -74,7 +118,7 @@ export default function ProfileScreen({ navigation }: { navigation: NativeStackN
                         <Text style={styles.personalInfoText}>Thông báo</Text>
                         <Image source={require('../assets/icons/arrowright.png')} style={styles.arrowIcon} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.personalInfoContainer}>
+                    <TouchableOpacity style={styles.personalInfoContainer} onPress={()=>navigation.navigate('Booking')}>
                         <Text style={styles.personalInfoText}>Lịch sử booking</Text>
                         <Image source={require('../assets/icons/arrowright.png')} style={styles.arrowIcon} />
                     </TouchableOpacity>
