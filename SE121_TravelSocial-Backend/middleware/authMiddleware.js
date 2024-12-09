@@ -18,7 +18,7 @@ const requireAuth = (req, res, next) => {
     }
     else {
         res.redirect('/login');
-    }
+    }               
 };
 
 // check current user
