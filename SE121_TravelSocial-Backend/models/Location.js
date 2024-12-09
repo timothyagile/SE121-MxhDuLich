@@ -2,6 +2,17 @@ const mongoose = require('mongoose')
 
 const Schema = mongoose.Schema;
 
+const imageSchema = new Schema({
+    url: {
+        type: String,
+        required: true
+    },
+    publicId: {
+        type: String,
+        required: true
+    }
+})
+
 const locationSchema = new Schema({
     ownerId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -23,8 +34,8 @@ const locationSchema = new Schema({
         default: 0,
     },
     image: {
-        type: String, // Nếu bạn lưu đường dẫn hình ảnh
-        default: null,
+        type: [imageSchema],
+        default: []
     },
     address: {
         type: String,

@@ -24,42 +24,11 @@ export default function DailySection({ categoryId }: DailySectionProps) {
         }
     }, [categoryId]);
 
-    // const fetchLocations = async () => {
-    //     try {
-    //         const response = await fetch('http://192.168.1.18:3000/alllocation',
-    //         {
-    //             method: 'GET',
-    //             headers: {
-    //                 'Content-Type': 'application/json', 
-    //                 'Accept': 'application/json',  
-    //             }
-    //         }); 
-    //         const result: any = await response.json();
-
-    //         if (result.isSuccess) {
-    //             setLocationData(result.data);
-    //         } else {
-    //             console.error("Lỗi: Dữ liệu không hợp lệ");
-    //         }
-    //     } catch (error) {
-    //         console.error("Đã xảy ra lỗi khi lấy dữ liệu:", error);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     fetchLocations();
-    // }, []);
-
     const fetchPopularLocations = async (id: string) => {
         try {
-            //getIPAddress();
-            // const ipAddresss = await NetworkInfo.getIPAddress();
-            // console.log('Device IP Addresss:', ipAddresss);
             const ipAddress = await Network.getIpAddressAsync();
             console.log('Device IP Address:', ipAddress);
-            const response = await fetch(`http://192.168.1.3:3000/locationbycategory/${id}`);
+            const response = await fetch(`http://192.168.1.6:3000/locationbycategory/${id}`);
             const data = await response.json();
             if (data.isSuccess) {
                 setLocations(data.data);
@@ -75,9 +44,9 @@ export default function DailySection({ categoryId }: DailySectionProps) {
     };
 
     // Hiển thị vòng quay khi đang tải
-    if (loading) {
-        return <ActivityIndicator size="large" color="#0000ff" />;
-    }
+    // if (loading) {
+    //     return <ActivityIndicator size="large" color="#0000ff" />;
+    // }
 
 
     return (
@@ -87,7 +56,7 @@ export default function DailySection({ categoryId }: DailySectionProps) {
                 {locations.map((item, index) => {
                     return (
                     <TouchableOpacity
-                        key={item.id}
+                        key={index}
                          style = {{
                         marginLeft: 24,
                         marginRight:  index === locations.length - 1 ? 24 : 0}}>

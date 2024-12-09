@@ -18,25 +18,6 @@ export default function HomeScreen ({navigation} : {navigation : NativeStackNavi
     const [selectedCategory, setSelectedCategory] = useState(categoryData.at(0));
     const [locations, setLocations] = useState([]);
 
-    // useEffect(() => {
-    //     if (selectedCategory) {
-    //         fetchLocationsByCategory(selectedCategory.id);
-    //     }
-    // }, [selectedCategory]);
-
-    // const fetchLocationsByCategory = async (categoryId: string) => {
-    //     try {
-    //         const response = await fetch(`http://192.168.1.18:3000/locationbycategory/${categoryId}`);
-    //         const data = await response.json();
-    //         if (data.isSuccess) {
-    //             setLocations(data.data);
-    //         } else {
-    //             console.error("Error fetching locations:", data.error);
-    //         }
-    //     } catch (error) {
-    //         console.error("Fetch error:", error);
-    //     }
-    // };
 
     const handleSetCategory = (category: typeof categoryData[0]) => {
         setSelectedCategory(category); // Cập nhật danh mục được chọn

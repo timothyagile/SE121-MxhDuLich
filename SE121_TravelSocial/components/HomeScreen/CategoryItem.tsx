@@ -22,7 +22,7 @@ export default function CategoryItem({item, selectedCategory, setSelectedCategor
         setSelectedCategory(item);
         try {
             console.log(item.id);
-            const response = await fetch(`http://192.168.1.3:3000/locationbycategory/${item.id}`);
+            const response = await fetch(`http://192.168.1.6:3000/locationbycategory/${item.id}`);
             const data = await response.json();
             if (data.isSuccess) {
                 setLocations(data.data); 
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     },
     selectedItemText: {
 
-        backgroundColor: '#e6f7ff',
+        //backgroundColor: '#e6f7ff',
         color: '#196EEE',
         fontWeight: 'bold',
         borderRadius: 20,
