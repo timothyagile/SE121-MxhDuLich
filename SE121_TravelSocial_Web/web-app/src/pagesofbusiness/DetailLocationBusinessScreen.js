@@ -236,14 +236,14 @@ const DetailLocationBusinessScreen =({ mapLoaded }) => {
                                         )}
                                     </div>
                                 </div>
-                                {/* <div>
+                                <div>
                                     {address === "Địa chỉ không khả dụng" ? (
                                         <p className="text-red-500">Không tìm thấy địa chỉ cho địa điểm này.</p>
                                     ) : (
                                         <MapComponent address={address} />
                                     )}
                                    
-                                </div> */}
+                                </div>
                                 <button
                                     className="absolute bottom-2 right-3 bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center"
                                     onClick={isEditing ? handleSaveClick : handleEditClick}

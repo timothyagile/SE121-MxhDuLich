@@ -5,12 +5,12 @@ import axios from 'axios';
 import { Picker } from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
-
+import { useUser } from '@/context/UserContext';
 
 type EditFields = 'name' | 'phoneNumber' | 'email' | 'address' | 'dob' | 'nationality' | 'citizenId';
 
 export default function PersonalInformationScreen({ navigation }: {navigation: NativeStackNavigatorProps}) {
-  
+  const { userId } = useUser();
   const [isEditing, setIsEditing] = useState<{ [key in EditFields]: boolean }>({
     name: false,
     phoneNumber: false,
@@ -31,9 +31,9 @@ export default function PersonalInformationScreen({ navigation }: {navigation: N
     citizenId: 'CMND/CCCD'
   };
 
-  const [name, setName] = useState({ firstName: 'To', lastName: 'Hoang Huy' });
-  const [phoneNumber, setPhoneNumber] = useState('0386441295');
-  const [email, setEmail] = useState('22520573@gm.uit.edu.vn');
+  const [name, setName] = useState({ firstName: '', lastName: '' });
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [email, setEmail] = useState('');
   const [address, setAddress] = useState('Chưa được cung cấp');
   const [dob, setDob] = useState('Chưa được cung cấp');
   const [nationality, setNationality] = useState('Chưa được cung cấp');
@@ -47,6 +47,30 @@ export default function PersonalInformationScreen({ navigation }: {navigation: N
   const handleEditToggle = (field: EditFields) => {
       setIsEditing((prev) => ({ ...prev, [field]: !prev[field] }));
   };
+
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch(`http://192.168.1.3:3000/user/getbyid/${userId}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setName({ firstName: data.data.userName || 'Người dùng khách', lastName: data.lastName || '' });
+      setPhoneNumber(data.data.phoneNumber || 'Chưa được cung cấp');
+      setEmail(data.data.userEmail || '');
+      setAddress(data.address || 'Chưa được cung cấp');
+      setDob(data.dob || 'Chưa được cung cấp');
+      setNationality(data.nationality || 'Chưa được cung cấp');
+      setCitizenId(data.citizenId || 'Chưa được cung cấp');
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData(); // Gọi API khi màn hình load
+  }, []);
 
   const handleSave = (field: EditFields) => {
     if (field === 'name' && (name.firstName.trim() === '' || name.lastName.trim() === '')) {

@@ -10,6 +10,7 @@ const CARD_WIDTH_SPACING = CARD_WIDTH + 24;
 
 interface DailySectionProps {
     categoryId: string | undefined; // Nhận categoryId từ HomeScreen
+    navigation: any; 
 }
 
 export default function DailySection({ categoryId }: DailySectionProps) {
@@ -36,6 +37,9 @@ export default function DailySection({ categoryId }: DailySectionProps) {
             }
         } catch (error) {
             console.error("Fetch error:", error);
+        }
+        finally {
+            setLoading(false);
         }
     };
 
