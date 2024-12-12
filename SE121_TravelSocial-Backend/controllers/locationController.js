@@ -8,18 +8,21 @@ module.exports.createNewLocation = async (req, res, next) => {
         name,
         description,
         rating,
-        image,
         address,
         category,
-        dateCreated,
     } = req.body;
-        // Tạo locationData
+    // Tạo locationData
     //console.log(res.locals.user._id)
+
+    // const images = req.files.map((file) => ({
+    //     url: file.path,
+    //     publicId: file.filename
+    // }))
+
     const locationData = new Location({
         name,
         description,
         rating,
-        image,
         address,
         category,
         ownerId: res.locals.user._id

@@ -11,12 +11,12 @@ const getAllRoom = async () => {
     else
         throw new NotFoundException('Khong tim thay phong nao')
 }
-const getRoomById = async (id) => {
-    const room = await Room.findById(id)
-    if(room)
-        return room
+const getRoomById = async (roomId) => {
+    const result = await Room.findById(roomId)
+    if(result)
+        return result
     else
-        throw new NotFoundException('Khong tim thay phong nao')
+        throw new NotFoundException('Not found this business')
 }
 
 const getRoomByLocationId = async(locationId) => {

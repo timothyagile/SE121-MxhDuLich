@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
+const Location = require('./Location')
 const Schema = mongoose.Schema;
-
 
 const UCollectionSchema = new Schema({
     userId: {
@@ -8,11 +8,9 @@ const UCollectionSchema = new Schema({
         ref: 'User',
         require: true,
     },
-    locationId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Location',
-        require: true,
-    }
+    name: {type: String, required: true},
+    item: [{type: mongoose.Schema.Types.ObjectId, ref: 'Location'}]
+    
 }, {collection: 'LocationCollection'});
 
 const LocationCollection = mongoose.model('LocationCollection', UCollectionSchema);

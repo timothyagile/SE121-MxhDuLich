@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 
-const TransactionSchema = new Schema({
+const PaymentSchema = new Schema({
     paymentMethodId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'PaymentMethod',
@@ -10,14 +10,15 @@ const TransactionSchema = new Schema({
     },
     amount: {type: String, require: true},
     status:  {type: String, enum: ['pending', 'failed', 'completed'], default: 'pending'},
-    transactionId:  {type: String, require: true}, //ID tu ngan hang/vi dien tu tra ve
-    bookingId:  {
+    providerSessionId:  {type: String, require: true}, //ID tu ngan hang/vi dien tu tra ve
+    invoiceId:  {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Booking',
+        ref: 'Invoice',
         require: 'true',
-    }
-}, {collection: 'Transaction'});
+    },
 
-const Transaction = mongoose.model('Transaction', TransactionSchema);
-module.exports = Transaction
+}, {collection: 'Payment'});
+
+const Payment = mongoose.model('Payment', PaymentSchemaSchema);
+module.exports = Payment
 

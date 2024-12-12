@@ -1,5 +1,6 @@
 const Booking = require('../models/Booking')
 const {NotFoundException, ForbiddenError} = require('../errors/exception')
+const { default: mongoose } = require('mongoose')
 
 const getAllBooking = async () => {
     const result = await Booking.find()
@@ -19,6 +20,50 @@ const getBookingById = async (id) => {
 
 const getBookingByUserId = async (userId) => {
     const result = await Booking.find({userId : userId})
+    if(result.length !== 0)
+        return result
+    else
+        throw new NotFoundException('Not found')
+}
+
+//TODO: 
+const getBookingByLocationId = async (locationId) => {
+    console.log(locationId)
+    const result = await Booking.aggregate([
+        { $unwind: "$items" },
+
+        {$lookup: {
+            from: "Room",
+            localField: "items.roomId",
+            foreignField: "_id",
+            as: "BookedRoom"
+        }},
+
+        { $unwind: "$BookedRoom"},
+            // Lọc các tài liệu chỉ chứa roomId tương ứng
+        { $match: { "BookedRoom.locationId": new mongoose.Types.ObjectId(locationId) } },
+        {
+            $group: {
+                _id: "$_id", // Group theo booking ID
+                userId: { $first: "$userId" },
+                dateBooking: { $first: "$dateBooking" },
+                checkinDate: { $first: "$checkinDate" },
+                checkoutDate: { $first: "$checkoutDate" },
+                totalPrice: { $first: "$totalPrice" },
+                status: { $first: "$status" },
+                items: {
+                    $push: {
+                        roomId: "$items.roomId",
+                        quantity: "$items.quantity",
+                        roomDetails: {
+                            name: "$BookedRoom.name",
+                            pricePerNight: "$BookedRoom.pricePerNight",
+                        },
+                    },
+                },
+            },
+        },
+    ]);
     if(result.length !== 0)
         return result
     else
@@ -53,6 +98,7 @@ module.exports = {
     getAllBooking,
     getBookingById,
     getBookingByUserId,
+    getBookingByLocationId,
     createBooking,
     updateBooking,
     deleteBooking,

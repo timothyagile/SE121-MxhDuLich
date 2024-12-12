@@ -15,7 +15,7 @@ module.exports.getAllRoom = async (req, res, next) => {
     }
 }
 module.exports.getRoomById = async (req, res, next) => {
-    const {roomId} = req.params.id
+    const roomId = req.params.roomId
     try{
         const rooms = await roomSvc.getRoomById(roomId)
         res.status(201).json({
