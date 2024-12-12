@@ -36,6 +36,21 @@ module.exports.getBookingByUserId = async (req, res, next) => {
         res.status(201).json({
             isSuccess: true,
             data: result,
+            error: null 
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
+module.exports.getBookingByLocationId = async (req, res, next) => {
+    const locationId = req.params.locationId;
+    try {
+        const result = await bookingSvc.getBookingByLocationId(locationId)
+        res.status(201).json({
+            isSuccess: true,
+            data: result,
             error: null
         })
     }

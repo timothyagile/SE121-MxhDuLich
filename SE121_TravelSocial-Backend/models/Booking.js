@@ -37,6 +37,7 @@ const BookingSchema = new Schema({
         type: [ItemSchema],
         default: []
     },
+    totalPrice: {type: Number, required: true},
     status: {
         type: String,
         enum: ['pending', 'complete', 'fail'],
