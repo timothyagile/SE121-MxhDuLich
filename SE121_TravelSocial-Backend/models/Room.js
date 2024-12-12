@@ -23,11 +23,13 @@ const roomSchema = new Schema({
     name: { type: String, required: true },
     quantity: {type: String, required: true, min: 0},
     rating: { type: Number, min: 0, max: 5 },
-    price: { type: Number, required: true },
+    pricePernNight: { type: Number, required: true },
+    capacity: {type: Number, required: true},
     description: { type: String},
     facility: { type: [facilitySchema], default: [] },
     bed: {type: [bedSchema], default: []},
-    image: { type: [String], default: []}
+    image: { type: [String], default: []},
+    area: {type: Number, required: true}
     }, 
     {collection: 'Room'}
 )
