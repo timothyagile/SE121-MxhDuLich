@@ -21,8 +21,10 @@ import AvailableRoomScreen from '@/screen/AvailableRoomScreen'
 import DetailScreen1 from '@/screen/HomeScreen/DetailScreen1'
 import DetailScreen from '@/screen/HomeScreen/DetailScreen'
 import { UserProvider } from '@/context/UserContext'
+import { RootStackParamList } from '@/types/navigation'
 
-const Stack = createNativeStackNavigator()
+
+const Stack = createNativeStackNavigator<RootStackParamList>()
 
 export default function App() {
   return (

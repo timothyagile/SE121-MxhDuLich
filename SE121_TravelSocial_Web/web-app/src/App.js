@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import LoginScreen from './pages/LoginScreen';
 import DashBoardScreen from './pages/DashBoardScreen';
 import Layout from './pages/Layout';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const App = () => {
   return (
@@ -10,11 +11,13 @@ const App = () => {
       <Routes>
         <Route path="/" element={<LoginScreen />} />
         <Route
-          path="/dashboard"
+          path="/dashboard/business"
           element={
-            <Layout>
-              <DashBoardScreen />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                 <DashBoardScreen />
+              </Layout>
+            </ProtectedRoute>
           }
         />
       </Routes>

@@ -37,7 +37,7 @@ export default function ProfileScreen({ navigation }: { navigation: NativeStackN
     const logout = async () => {
         console.log('da dang xuat')
         try {
-            const response = await fetch('http://192.168.1.3:3000/logout', {
+            const response = await fetch('http://192.168.0.101:3000/logout', {
                 method: 'GET',
                 credentials: 'include', 
             });
@@ -57,7 +57,7 @@ export default function ProfileScreen({ navigation }: { navigation: NativeStackN
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await fetch(`http://192.168.1.2:3000/user/getbyid/${userId}`, {
+                const response = await fetch(`http://192.168.0.101:3000/user/getbyid/${userId}`, {
                     method: 'GET',
                     credentials: 'include',
                 });

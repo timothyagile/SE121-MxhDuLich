@@ -3,15 +3,15 @@ import React, { useEffect, useState } from 'react';
 import { Text, View, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView, Alert, Platform, Modal } from 'react-native';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 import {iconMapping} from '../constants/icon'
+import { RootStackParamList } from '@/types/navigation';
 
 
 
+// type RootStackParamList = {
+//     'room-screen': { id: string }; 
+//   };
 
-type RootStackParamList = {
-    'room-screen': { id: string }; 
-  };
-
-type DetailScreenRouteProp = RouteProp<RootStackParamList, 'room-screen'>;
+// type DetailScreenRouteProp = RouteProp<RootStackParamList, 'room-screen'>;
 
 interface Room {
     _id: string;
@@ -33,8 +33,11 @@ interface Room {
 }
 
 export default function AvailableRoomScreen({ navigation }: {navigation: NativeStackNavigatorProps}) {
-    const route = useRoute<DetailScreenRouteProp>();
-    const { id } = route.params; 
+    const route = useRoute<RouteProp<RootStackParamList, 'available-room-screen'>>();
+    const { id, checkinDate, checkoutDate } = route.params;
+    console.log('checkin ddate: ', checkinDate);
+    //const route = useRoute<DetailScreenRouteProp>();
+    //const { id } = route.params; 
     const [rooms, setRooms] = useState<Room[]>([]);
     const [services, setServices] = useState([]);
     const [isModalVisible, setModalVisible] = useState(false);
@@ -50,29 +53,86 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
     const getIcon = (iconName: string) => {
         return iconMapping[iconName] || iconMapping["default.png"];
     };
-    
-    useEffect(() => {
-        const fetchRooms = async (id: string) => {
-            try {
-                console.log('idd: ',id);
-                const response = await fetch(`http://192.168.1.3:3000/room/getbylocationid/${id}`); // Thay đổi URL theo API của bạn
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                if (Array.isArray(data.data)) {
-                    setRooms(data.data);
-                    
-                } else {
-                    console.error('Expected data to be an array, but got:', data);
-                }
-            } catch (error) {
-                console.error('Error fetching rooms:', error);
-            }
-        };
 
-        fetchRooms(id);
-    }, [id]);
+    useEffect(() => {
+        const fetchAvailableRooms = async () => {
+          try {
+            // Gọi API getbookingbylocationid để lấy danh sách các booking của địa điểm
+            const bookingResponse = await fetch(
+              `http://192.168.0.101:3000/booking/getall`
+            );
+            const bookingData = await bookingResponse.json();
+      
+            if (Array.isArray(bookingData.data)) {
+              const bookings = bookingData.data;
+              console.log(bookings);
+      
+              // Gọi API để lấy danh sách phòng
+              const roomResponse = await fetch(
+                `http://192.168.0.101:3000/room/getbylocationid/${id}`
+              );
+              const roomData = await roomResponse.json();
+      
+              if (Array.isArray(roomData.data)) {
+                const rooms = roomData.data;
+      
+                // Lọc danh sách phòng dựa trên các ngày có trong bookings
+                const availableRooms = rooms.filter((room: any) => {
+                  const isBooked = bookings.some((booking: any) => {
+                    const bookingCheckin = new Date(booking.checkInDate).getTime();
+                    const bookingCheckout = new Date(booking.checkOutDate).getTime();
+                    const userCheckin = new Date(checkinDate).getTime();
+                    const userCheckout = new Date(checkoutDate).getTime();
+                    console.log('booking checkin: ',bookingCheckin);
+                    console.log('booking checkout: ',bookingCheckout);
+                    console.log('user checkin: ',userCheckin);
+                    console.log('user checkout: ',userCheckout);
+                    
+      
+                    // Kiểm tra xem ngày người dùng chọn có nằm trong khoảng booking hay không
+                    return (
+                      room._id === booking.roomId &&
+                      ((userCheckin >= bookingCheckin && userCheckin <= bookingCheckout) ||
+                        (userCheckout >= bookingCheckin && userCheckout <= bookingCheckout))
+                    );
+                  });
+      
+                  return !isBooked; // Chỉ giữ các phòng không bị đặt
+                });
+      
+                setRooms(availableRooms); // Cập nhật danh sách phòng khả dụng
+              }
+            }
+          } catch (error) {
+            console.error('eError fetching rooms or bookings:', error);
+          }
+        };
+      
+        fetchAvailableRooms();
+      }, [id, checkinDate, checkoutDate]);
+    
+    // useEffect(() => {
+    //     const fetchRooms = async (id: string) => {
+    //         try {
+    //             console.log('idd: ',id);
+    //             const response = await fetch(`http://192.168.1.2:3000/room/getbylocationid/${id}`); // Thay đổi URL theo API của bạn
+    //             if (!response.ok) {
+    //                 throw new Error('Network response was not ok');
+    //             }
+    //             const data = await response.json();
+    //             if (Array.isArray(data.data)) {
+    //                 setRooms(data.data);
+                    
+    //             } else {
+    //                 console.error('Expected data to be an array, but got:', data);
+    //             }
+    //         } catch (error) {
+    //             console.error('Error fetching rooms:', error);
+    //         }
+    //     };
+
+    //     fetchRooms(id);
+    // }, [id]);
 
     const handleApply = () => {
         // if (roomCount > 0) {
@@ -117,6 +177,33 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
         });
     };
 
+    type SelectedRoom = {
+        roomId: string;
+        count: number;
+        roomDetails: {
+          name: string;
+          price: number;
+        };
+      };
+
+    const handleConfirm = () => {
+        const selectedRoomsData = Object.keys(selectedRoomCounts).map((roomId) => {
+            const room = rooms.find((r) => r._id === roomId);
+            return {
+              roomId,
+              count: selectedRoomCounts[roomId],
+              roomDetails: {
+                name: room?.name || '',
+                price: room?.price || 0,
+              },
+            };
+          });
+        navigation.navigate('reservation-required-screen', {
+          selectedRoomsData,
+          locationId: id,
+        });
+      };
+
     
     return (
 
@@ -132,7 +219,7 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                 </View>
                 <TouchableOpacity
                     style={styles.createButton}
-                    onPress={() => console.log('Create button pressed')}
+                    onPress={handleConfirm}
                     >
                     <Text style={styles.createButtonText}>Xác nhận</Text>
                 </TouchableOpacity>
@@ -194,11 +281,11 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                         </View>
 
                         <View style={styles.endcontainer}>
-                            <View style={{ flex: 1 }}>
-                                <Text style={styles.area}>Giá</Text>
+                            <View style={{ flex: 2 }}>
+                                <Text style={styles.area2}>Giá</Text>
                                 <Text style={styles.pricetext}>{room.price} VND</Text>
                             </View>
-                            <View style={{ flex: 5, justifyContent: 'center', alignItems: 'center' }}>    
+                            <View style={{ flex: 6, justifyContent: 'center', alignItems: 'center' }}>    
                                 <TouchableOpacity style={styles.choosebutton} onPress={() => toggleModal(room._id)}>
                                     <Text style={styles.choosetext}>
                                         {selectedRoomCounts[room._id] ? `Đã chọn ${selectedRoomCounts[room._id]} phòng` : "Chọn"}
@@ -301,6 +388,10 @@ const styles = StyleSheet.create({
         fontSize:18,
     },
 
+    area2:{
+        fontSize: 14,
+    },
+
     servicecontainer:{
 
     },
@@ -382,7 +473,7 @@ const styles = StyleSheet.create({
 
     pricetext:{
         color:'#2DD7A4',
-        fontSize: 22 ,
+        fontSize: 16 ,
         fontWeight:'600',
     },
     
