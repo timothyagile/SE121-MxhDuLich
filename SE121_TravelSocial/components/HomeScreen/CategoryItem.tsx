@@ -22,7 +22,7 @@ export default function CategoryItem({item, selectedCategory, setSelectedCategor
         setSelectedCategory(item);
         try {
             console.log(item.id);
-            const response = await fetch(`http://192.168.1.6:3000/locationbycategory/${item.id}`);
+            const response = await fetch(`http://192.168.0.101:3000/locationbycategory/${item.id}`);
             const data = await response.json();
             if (data.isSuccess) {
                 setLocations(data.data); 

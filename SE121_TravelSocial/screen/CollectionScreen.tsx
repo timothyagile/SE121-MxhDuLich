@@ -1,8 +1,8 @@
 import { CommonActions, DrawerActions, useNavigation } from '@react-navigation/native';
 import React,{ useState, useEffect } from 'react'
-import {Button, Text, View,  StyleSheet, Image, TouchableOpacity, TextInput,Modal, Dimensions} from 'react-native';
+import {Button, Text, View,  StyleSheet, Image, TouchableOpacity, TextInput,Modal, Dimensions, FlatList} from 'react-native';
 import { NativeStackNavigationProp, NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
-
+import { useUser } from '@/context/UserContext';
 
 const { height } = Dimensions.get('window');
 
@@ -18,11 +18,62 @@ type CollectionScreenNavigationProp = NativeStackNavigationProp<
 
 export default function CollectionScreen ()
 {
-  
+    const { userId } = useUser();
     const navigation = useNavigation<CollectionScreenNavigationProp>();
     const [modalVisible, setModalVisible] = useState(true);
-    useEffect(() => {
+    const [collections, setCollections] = useState<any[]>([]);
+      useEffect(() => {
         setModalVisible(true);
+      }, []);
+
+      const addNewCollection = async () => {
+        try {
+          const newCollection = {
+            name: "Collection mới",
+            imageUrl: "", 
+          };
+      
+          const response = await fetch("http://192.168.1.6:3000/collection/create", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newCollection),
+          });
+      
+          const result = await response.json();
+      
+          if (result.isSuccess) {
+            // Thêm collection vừa tạo vào danh sách
+            setCollections((prevCollections) => [...prevCollections, result.data]);
+          } else {
+            console.error("Error adding new collection:", result.error);
+          }
+        } catch (error) {
+          console.error("Error adding new collection:", error);
+        }
+      };
+
+      const fetchCollections = async () => {
+        try {
+          console.log(userId);
+          const response = await fetch(`http://192.168.1.6:3000/collection/getbyuserid/${userId}`); 
+          const result = await response.json();
+    
+          if (result.isSuccess) {
+            setCollections(result.data);
+          } else {
+            console.error('Error fetching collections:', result.error);
+          }
+        } catch (error) {
+          console.error('Error fetching collections:', error);
+        } finally {
+          
+        }
+      }
+
+      useEffect(() => {
+        fetchCollections();
       }, []);
 
     return (
@@ -42,24 +93,44 @@ export default function CollectionScreen ()
             </View>
             <Text style={styles.collections }>Bộ sưu tập</Text>
             <View style={styles.list}>
-                <View style ={{width:'50%', alignItems:'center', flexDirection:'column'}}>
-                    <TouchableOpacity 
-                        style={styles.square} 
-                        onPress={() => navigation.navigate('add-new-collection-screen')}>
-                        
-                        <Image source={require('../assets/icons/plus.png')} style={styles.iconplus} />
-                    </TouchableOpacity>
-                    <Text style={{marginTop:10, fontSize: 20,}}>Thêm mới</Text>
-                </View>
+                <FlatList
+
+                  data={[...collections, { _id: 'add-new', name: 'Thêm mới', isAddNew: true }]}
+                  keyExtractor={(item) => item._id}
+                  renderItem={({ item }) =>
+                    item.isAddNew ? (
+                      // Giao diện ô "Thêm mới"
+                      <View style={{ width: '50%', alignItems: 'center', marginVertical: 10 }}>
+                        <TouchableOpacity
+                          style={styles.square}
+                          onPress={() => navigation.navigate('add-new-collection-screen')}
+                        >
+                          <Image
+                            source={require('../assets/icons/plus.png')}
+                            style={styles.iconplus}
+                          />
+                        </TouchableOpacity>
+                        <Text style={{ marginTop: 10, fontSize: 20 }}>{item.name}</Text>
+                      </View>
+                    ) : (
+                      // Giao diện collections thông thường
+                      <View style={{ width: '50%', alignItems: 'center', marginVertical: 10 }}>
+                        <TouchableOpacity style={styles.square}>
+                          <Image
+                            source={{
+                              uri: item.imageUrl || 'https://via.placeholder.com/150',
+                            }}
+                            style={styles.iconplus}
+                          />
+                        </TouchableOpacity>
+                        <Text style={{ marginTop: 10, fontSize: 20 }}>{item.name}</Text>
+                      </View>
+                    )
+                  }
+                  numColumns={2} 
+                />
                 
-                <View style ={{width:'50%',alignItems:'center'}}>
-                    <TouchableOpacity 
-                    style={styles.square} 
-                    onPress={() => navigation.navigate('register')}>
-                        <Image source={require('../assets/icons/plus.png')} style={styles.iconplus} />
-                    </TouchableOpacity>
-                    <Text style={{marginTop:10, fontSize: 20,}}>Thêm mới</Text>
-                </View>
+
             </View>
 
             <Modal
@@ -141,7 +212,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        
+        flex: 1,
         width:'100%',
       },
     square: {

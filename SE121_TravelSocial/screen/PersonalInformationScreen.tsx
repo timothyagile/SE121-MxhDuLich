@@ -50,7 +50,7 @@ export default function PersonalInformationScreen({ navigation }: {navigation: N
 
   const fetchUserData = async () => {
     try {
-      const response = await fetch(`http://192.168.1.3:3000/user/getbyid/${userId}`);
+      const response = await fetch(`http://192.168.0.101:3000/user/getbyid/${userId}`);
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }

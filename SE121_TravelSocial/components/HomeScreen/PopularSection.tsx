@@ -52,7 +52,7 @@ export default function PopularSection({ categoryId, navigation }: PopularSectio
         try {
             const ipAddress = await Network.getIpAddressAsync();
             console.log('Device IP Address:', ipAddress);
-            const response = await fetch(`http://192.168.1.6:3000/locationbycategory/${id}`);
+            const response = await fetch(`http://192.168.0.101:3000/locationbycategory/${id}`);
             const data = await response.json();
             if (data.isSuccess) {
                 setLocations(data.data);

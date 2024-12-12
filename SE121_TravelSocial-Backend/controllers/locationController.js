@@ -67,6 +67,20 @@ module.exports.getLocationByCategory = async (req, res, next) => {
     }
 };
 
+module.exports.getLocationByUserId = async (req, res, next) => {
+    const { userId } = req.params; // Lấy categoryId từ URL
+    try {
+        const locations = await locationSvc.getLocationByUserId(userId); // Tìm theo category
+        res.status(200).json({
+            isSuccess: true,
+            data: locations,
+            error: null,
+        });
+    } catch (error) {
+        next(error)
+    }
+};
+
 //--GET LOCATION DATA BY NAME--\\
 module.exports.getLocationByName = async (req, res, next) => {
     const { name } = req.query; // Lấy tên từ query string

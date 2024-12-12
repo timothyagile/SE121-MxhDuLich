@@ -9,50 +9,69 @@ function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [userId, setUserId] = useState('');
+  
 
   //API CHECK ĐĂNG NHẬP
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    e.preventDefault(); 
+    console.log('email: ', email);
+    console.log('password: ', password);
+    try {
+      const response = await fetch('http://localhost:3000/signin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userEmail: email, userPassword: password }),
+      });
+
+      const data = await response.json();
+      console.log(data);
+      if (!response.ok) {
+        throw new Error(data.message || 'Đăng nhập thất bại');
+      }
+      
+      // Điều hướng dựa trên role
+      // if (data.userRole === 'admin') {
+      //   navigate('/dashboard/admin');
+      // } else if (data.userRole === 'location-owner') {
+      //   navigate('/dashboard/admin');
+      // }
+      if (response.ok) {
+        let user_id = data;  // Giả sử API trả về userId trong đối tượng data
+        setUserId(data.data); 
+        console.log('data: ',data.data) // Cập nhật userId vào state hoặc context
+        console.log('User ID:', userId);
+        localStorage.setItem('isAuthenticated', 'true');
+        // Sau khi login thành công, lưu id vào localStorage
+        localStorage.setItem('userId', data.data);
+        navigate('/dashboard/business');
+    } else {
+        
+        alert('Login Failed', data.error || 'Please try again.');
+    }
+    } catch (error) {
+      console.error(error);
+      alert('An error occurred', 'Please check your connection and try again.');
+    }
     // try {
-    //   const response = await fetch('http://localhost:5000/login', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({ email, password }),
-    //   });
-
-    //   const data = await response.json();
-
-    //   if (!response.ok) {
-    //     throw new Error(data.message || 'Đăng nhập thất bại');
-    //   }
-
-    //   // Điều hướng dựa trên role
-    //   if (data.role === 'admin') {
+    //   // Tạm thời sử dụng dữ liệu tĩnh thay vì gọi API thực
+    //   const mockResponse = {
+    //     email: 'admin@example.com',
+    //     role: 'business', // Thay đổi thành 'business' để test
+    //   };
+  
+    //   // Giả lập điều hướng dựa trên role
+    //   if (mockResponse.role === 'admin') {
     //     navigate('/dashboard/admin');
-    //   } else if (data.role === 'business') {
+    //   } else if (mockResponse.role === 'business') {
     //     navigate('/dashboard/business');
     //   }
     // } catch (error) {
-    //   setError(error.message);
+    //   setError('Lỗi đăng nhập tạm thời.');
     // }
-    try {
-      // Tạm thời sử dụng dữ liệu tĩnh thay vì gọi API thực
-      const mockResponse = {
-        email: 'admin@example.com',
-        role: 'business', // Thay đổi thành 'business' để test
-      };
-  
-      // Giả lập điều hướng dựa trên role
-      if (mockResponse.role === 'admin') {
-        navigate('/dashboard/admin');
-      } else if (mockResponse.role === 'business') {
-        navigate('/dashboard/business');
-      }
-    } catch (error) {
-      setError('Lỗi đăng nhập tạm thời.');
-    }
   };
   
 

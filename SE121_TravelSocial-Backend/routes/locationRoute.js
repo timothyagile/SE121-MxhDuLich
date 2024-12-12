@@ -7,6 +7,7 @@ router.post('/createlocation', checkLocationOwner, locationController.createNewL
 //read
 router.get('/alllocation', locationController.getAllLocation);
 router.get('/locationbycategory/:categoryId', locationController.getLocationByCategory);
+router.get('/locationbyuserid/:userId', locationController.getLocationByUserId);
 router.get('/locationbyname', locationController.getLocationByName);
 router.get('/locationbyid/:locationId', locationController.getLocationById);
 //update
