@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-
 import SideBar from '../components/SideBar';
 import '../styles/DashBoardScreen.css';
 import { FaAngleRight,FaBell } from 'react-icons/fa';
@@ -8,25 +7,102 @@ import pagination from '../components/Pagination';
 import PercentageIndicator from '../components/PercentageIndicator';
 import { bookings,users } from '../pages/BusinessData';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import moment from 'moment';
 
 
 const DashBoardBusinessScreen = () => {
+  const userId = localStorage.getItem('userId'); 
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(null);
   const [value, setValue] = useState(new Date());
+  const [bookings, setBookings] = useState([]);
+  const [allBookings, setAllBookings] = useState([]);
 
   const onChange = (newdate) => {
     setValue(newdate);
     setSelectedDate(newdate);
   };
 
-  const filteredUsers = selectedDate 
-    ? users.filter(user => {
-        
-        const userDate = new Date(user.time);
-        return userDate.toDateString() === selectedDate.toDateString();
-      })
-    : [];
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/booking/getbybusinessid/${userId}`);
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+
+        const allBookingsWithDetails = await Promise.all(data.data.map(async (booking) => {
+          const userResponse = await fetch(`http://localhost:3000/user/getbyid/${booking.userId}`);
+          const userData = await userResponse.json();
+          const userName = userData.data.userName;
+  
+          const roomResponse = await fetch(`http://localhost:3000/room/getbyid/${booking.roomId}`);
+          const roomData = await roomResponse.json();
+          const locationId = roomData.data.locationId;
+  
+          const locationResponse = await fetch(`http://localhost:3000/locationbyid/${locationId}`);
+          const locationData = await locationResponse.json();
+          const locationName = locationData.data.name;
+  
+          return {
+            ...booking,
+            userName,
+            locationName,
+          };
+        }));
+  
+        setBookings(allBookingsWithDetails); 
+      } catch (error) {
+        console.error("Error fetching bookings:", error);
+      }
+    };
+  
+    fetchBookings();
+  }, [userId]);
+
+  const pendingBookings = bookings.filter(booking => booking.status === 'pending');
+
+  // const filteredUsers = selectedDate 
+  //   ? users.filter(user => {
+  //       const userDate = new Date(user.time);
+  //       return userDate.toDateString() === selectedDate.toDateString();
+  //     })
+  //   : [];
+
+const [monthlyBookings, setMonthlyBookings] = useState(0); // Số booking trong tháng
+const [monthlyRevenue, setMonthlyRevenue] = useState(0);   // Doanh thu trong tháng
+
+useEffect(() => {
+  const fetchMonthlyStats = async () => {
+    try {
+      // Lấy tháng và năm hiện tại
+      const currentMonth = new Date().getMonth() + 1; // JavaScript getMonth() trả từ 0-11
+      const currentYear = new Date().getFullYear();
+
+      // Gọi API với query params
+      const response = await fetch(`http://localhost:3000/booking/revenuebymonth/${userId}?month=${currentMonth}&year=${currentYear}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch monthly stats");
+      }
+      const data = await response.json();
+
+      setMonthlyBookings(data.totalBookings); 
+      setMonthlyRevenue(data.totalRevenue);  
+    } catch (error) {
+      console.error("Error fetching monthly stats:", error);
+    }
+  };
+
+  fetchMonthlyStats();
+}, [userId]); // Chạy lại khi `userId` thay đổi
+
+  const filteredBookingsByDate = selectedDate
+    ? bookings.filter((booking) =>
+        moment(booking.dateBooking).isSame(selectedDate, 'day')
+      )
+  : bookings;  
 
   const handleRowClick =(id) => {
     navigate(`/booking/detail/${id}`);
@@ -35,7 +111,6 @@ const DashBoardBusinessScreen = () => {
   const handleBusinessDetailClick = (id) => {
     navigate(`/booking/detail/${id}`);
   };
-
 
   return (
     
@@ -61,13 +136,13 @@ const DashBoardBusinessScreen = () => {
                   </div>
                 </div>
                 <div className="card-body">
-                  <p className="number">12</p>
+                  <p className="number">{monthlyBookings}</p>
                 </div>
                 <div className="separator">
                   <div></div>
                 </div>
                 <div className="card-footer">
-                  <p>Cập nhật lần cuối: 30/7/2024</p>
+                  <p>Cập nhật lần cuối: {moment().format('DD/MM/YYYY')}</p>
                 </div>
               </div>
             </div>
@@ -82,13 +157,13 @@ const DashBoardBusinessScreen = () => {
                   </div>
                 </div>
                 <div className="card-body">
-                  <p className="number">12</p>
+                  <p className="number">{monthlyRevenue.toLocaleString()} VND</p>
                 </div>
                 <div className="separator">
                   <div></div>
                 </div>
                 <div className="card-footer">
-                  <p>Cập nhật lần cuối: 30/7/2024</p>
+                  <p>Cập nhật lần cuối: {moment().format('DD/MM/YYYY')}</p>
                 </div>
               </div>
             </div>
@@ -106,7 +181,7 @@ const DashBoardBusinessScreen = () => {
               </tr>
             </thead>
             <tbody>
-              {(bookings || []).map((booking) => (
+              {(pendingBookings || []).map((booking) => (
                 <tr
                   key={booking.id}
                   className="cursor-pointer hover:bg-blue-100"
@@ -116,12 +191,12 @@ const DashBoardBusinessScreen = () => {
                       <img src="location-icon.png" alt="Location Icon" />
                     </div>
                     </td>
-                    <td>{booking.name}</td>
-                    <td>{booking.code}</td>
-                    <td>{booking.date}</td>
+                    <td>{booking.locationName}</td>
+                    <td>{booking.userName}</td>
+                    <td>{moment(booking.dateBooking).format('DD-MM-YYYY')}</td>
                     <td>
                       <span className={booking.status === 'đã duyệt' ? 'status-label-2' : 'status-label'}>
-                        {booking.status}
+                      {booking.status === 'pending' ? 'Chờ duyệt' : booking.status}
                       </span>
                     </td>
                 </tr>
@@ -149,18 +224,18 @@ const DashBoardBusinessScreen = () => {
             <div class="scroll-container">
               <p class="new-business mb-3">Booking trong ngày</p>
               <div>
-                {filteredUsers.length > 0 ? (
-                filteredUsers.map((user) => (
+                {filteredBookingsByDate.length > 0 ? (
+                filteredBookingsByDate.map((booking) => (
                   <div
                     className="user-info"
-                    key={user.id}
-                    onClick={() => handleBusinessDetailClick(user.id)} 
+                    key={booking.id}
+                    onClick={() => handleBusinessDetailClick(booking.id)} 
                     style={{ cursor: 'pointer' }}
                   >
                     <img src="avatar.png" alt="User Avatar" className="user-avatar" />
                     <div className="user-details">
-                      <h2 className="user-name">{user.name}</h2>
-                      <p className="user-time">{user.time}</p>
+                      <h2 className="user-name">{booking.userName}</h2>
+                      <p className="user-time">{moment(booking.dateBooking).format('DD-MM-YYYY hh:mm:ss')}</p>
                     </div>
                     <div className="arrow-icon">
                       <FaAngleRight />
@@ -174,10 +249,6 @@ const DashBoardBusinessScreen = () => {
             </div>
           </div>
         </div>
-     
-      
-      
-  
   );
 };
 

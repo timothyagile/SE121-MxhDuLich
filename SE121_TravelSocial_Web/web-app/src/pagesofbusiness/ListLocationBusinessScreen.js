@@ -95,7 +95,7 @@ const ListLocationBusinessScreen = () => {
                   <tr 
                     key={location.id} 
                     className="clickable-row"
-                    onClick={() => handleRowClick(location.id)}
+                    onClick={() => handleRowClick(location._id)}
                   >
                     <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
                     <td>
