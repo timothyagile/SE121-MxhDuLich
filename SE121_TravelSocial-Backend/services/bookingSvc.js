@@ -2,6 +2,21 @@ const Booking = require('../models/Booking')
 const {NotFoundException, ForbiddenError} = require('../errors/exception')
 const { default: mongoose } = require('mongoose')
 
+
+
+const updateStatusBooking = async (bookingId, amountPayed) => {
+    const booking = await Booking.findById(bookingId);
+    console.log(amountPayed)
+    console.log(booking.totalPrice)
+    if (booking.totalPrice === amountPayed) {
+        booking.status = 'complete'
+        booking.save()
+    }
+    else {
+        throw new ForbiddenError('Cannot update status')
+    }
+}
+
 const getAllBooking = async () => {
     const result = await Booking.find()
     if(result.length !== 0)
@@ -76,8 +91,8 @@ const createBooking = async (bookingData) => {
         return result
     else
         throw new ForbiddenError('Not allow to create')
-
 }
+
 const updateBooking = async (bookingId, bookingData) => {
     const result = Booking.findByIdAndUpdate(bookingId, bookingData, {new: true, runValidators: true})
     if(result)
@@ -95,6 +110,7 @@ const deleteBooking = async (bookingId) => {
 }
 
 module.exports = {
+    updateStatusBooking,
     getAllBooking,
     getBookingById,
     getBookingByUserId,

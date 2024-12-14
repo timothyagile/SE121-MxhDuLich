@@ -1,18 +1,35 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const ItemSchema = new Schema({
+const roomSchema = new Schema({
     roomId: { 
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Room', 
         required: true 
-    }, 
+    },
+    price: {type: Number, required: true}, 
     quantity: 
     {
         type: Number,
         require: true,
         default: 1,
-    } 
+    },
+    nights: {type: Number, required: true} 
+})
+
+const serviceSchema = new Schema({
+    serviceId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Service',
+        required: true
+    },
+    price: {type: Number, required: true},
+    quantity: 
+    {
+        type: Number,
+        require: true,
+        default: 1,
+    },
 })
 
 const BookingSchema = new Schema({
@@ -34,7 +51,11 @@ const BookingSchema = new Schema({
         require: true
     },
     items: {
-        type: [ItemSchema],
+        type: [roomSchema],
+        required: true,
+    },
+    services: {
+        type: [serviceSchema],
         default: []
     },
     totalPrice: {type: Number, required: true},

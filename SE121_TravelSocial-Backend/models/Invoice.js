@@ -19,4 +19,5 @@ const invoiceSchema = new Schema({
 }, {collection: 'Invoice'})
 
 const Invoice = mongoose.model('Invoice', invoiceSchema)
-module.exports = Invoice
+const InvoiceItem = mongoose.model('ItemItem', invoiceItemSchema)
+module.exports = {Invoice, InvoiceItem}

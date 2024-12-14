@@ -10,6 +10,19 @@ const createLocation = async (locationData) => {
         throw new NotFoundException('Cannot create new location');
 }
 
+const createLocationWithImage = async (locationData) => {
+    const savedLocation = await locationData.save();
+    if(savedLocation)
+        return savedLocation;
+    else {
+        for (let image of images) {
+            await cloudinary.uploader.destroy(image.url)
+        }
+        throw new NotFoundException('Cannot create new location');
+    }
+}
+        
+
 const getAllLocation = async () => {
     const allLocation = await Location.find();
     if(allLocation.length !== 0)
@@ -64,6 +77,7 @@ const deleteLocation = async(locationId) => {
 module.exports = {
     getAllLocation, 
     createLocation,
+    createLocationWithImage,
     getLocationByCategory,
     getLocationByName,
     getLocationById,

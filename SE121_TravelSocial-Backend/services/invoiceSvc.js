@@ -1,57 +1,33 @@
 const { deteleRoom } = require('../controllers/roomController')
-const { NotFoundException } = require('../errors/exception')
+const { NotFoundException, ForbiddenError } = require('../errors/exception')
 const Invoice = require('../models/Invoice')
+const InvoiceItem = require('../models/Invoice')
 
-
-const getAllInvoice = async () => {
-    const result = null
+const createInvoice = async (invoiceData) => {
+    const result = invoiceData.save()
     if(result)
         return result
-    else throw new NotFoundException('Not found')
-}
-const getInvoiceById = async () => {
-    const result = null
-    if(result)
-        return result
-    else throw new NotFoundException('Not found')
+    else throw new ForbiddenError('Cannot create invoice')
 }
 
-const getInvoiceByLocationId = async () => {
-    const result = null
+const createInvoiceItem = async (item) => {
+    const {
+        serviceId,
+        quantity,
+        price,
+    } = item
+    const result = new InvoiceItem({
+        itemId: serviceId,
+        quantity: quantity,
+        price: price,
+        totalPrice: price * quantity
+    })
     if(result)
         return result
-    else throw new NotFoundException('Not found')
-}
-
-const getInvoiceByRangeDate = async () => {
-
-}
-
-const createInvoice = async () => {
-    const result = null
-    if(result)
-        return result
-    else throw new NotFoundException('Not found')
-}
-const updateInvoice = async () => {
-    const result = null
-    if(result)
-        return result
-    else throw new NotFoundException('Not found')
-}
- 
-const deleteInvoice = async () => {
-    const result = null
-    if(result)
-        return result
-    else throw new NotFoundException('Not found')
+    else throw new ForbiddenError('Cannot create')
 }
 
 module.exports = {
-    getAllInvoice,
-    getInvoiceById,
-    getInvoiceByLocationId,
     createInvoice,
-    updateInvoice, 
-    deleteInvoice,
+    createInvoiceItem,
 }
