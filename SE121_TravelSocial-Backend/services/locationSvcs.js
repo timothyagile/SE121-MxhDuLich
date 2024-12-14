@@ -46,7 +46,7 @@ const getLocationByName = async (name) => {
 }
 
 const getLocationById = async (locationId) => {
-    const location = await Location.findById({locationId: locationId});
+    const location = await Location.findById(locationId);
     if(location)
         return location;
     else

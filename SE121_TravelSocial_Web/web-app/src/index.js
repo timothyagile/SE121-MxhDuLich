@@ -30,6 +30,8 @@ import DetailLocationBusinessScreen from './pagesofbusiness/DetailLocationBusine
 import AddLocationScreen from './pagesofbusiness/AddLocationScreen';
 import ChatBusinessScreen from './pagesofbusiness/ChatBusinessScreen';
 import BusinessDetailBookingScreen from './pagesofbusiness/BusinessDetailBookingScreen';
+import { Provider } from 'react-redux';
+import store from './store/store';
 
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -95,7 +97,10 @@ const AppWrapper = () => {
 
 root.render(
   <React.StrictMode>
+    <Provider store={store}>
       <AppWrapper />
+    </Provider>
+      
   </React.StrictMode>
 );
 
