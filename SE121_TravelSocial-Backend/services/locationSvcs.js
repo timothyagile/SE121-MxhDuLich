@@ -39,6 +39,14 @@ const getLocationByCategory = async (categoryId) => {
         throw new NotFoundException('Not found this category location');
 }
 
+const getLocationByUserId = async (userId) => {
+    const locations = await Location.find({ownerId: userId});
+    if(locations.length != 0)
+        return locations;
+    else
+        throw new NotFoundException('Not found this user location');
+}
+
 const getLocationByName = async (name) => {
     const locations = await Location.find({ name: new RegExp(name, 'i') });
     if(locations.length != 0)
@@ -79,6 +87,7 @@ module.exports = {
     createLocation,
     createLocationWithImage,
     getLocationByCategory,
+    getLocationByUserId,
     getLocationByName,
     getLocationById,
     updateLocation,

@@ -6,11 +6,11 @@ import axios from 'axios';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useRoute,RouteProp } from '@react-navigation/native';
-
+import {API_BASE_URL} from '../../constants/config';
 
 const { width, height } = Dimensions.get('window');
 
-const GOOGLE_MAPS_API_KEY = 'AIzaSyBeCTs9sMcGjsjlIIIiML2TXrLqOZSEY6sxoacainaymoixaiduoc';
+const GOOGLE_MAPS_API_KEY = 'AIzaSyBeCTs9sMcGjsjlIIIiML2TXrLqOZSEY6s';
 const ADDRESS = 'FFXQ+X94, Bung Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam';
 
 
@@ -23,6 +23,32 @@ type DetailScreenRouteProp = RouteProp<RootStackParamList, 'detail-screen'>;
 export default function DetailScreen({navigation} : {navigation : NativeStackNavigatorProps}) {
   const route = useRoute<DetailScreenRouteProp>();
   const { id } = route.params; 
+  interface Service {
+    _id: string;
+    id: string;
+    roomId: string;
+    name: string;
+    quantity: number;
+    icon: string | null;
+    description: string;
+  }
+
+  const facilityIcons: Record<string, string> = {
+    "Wifi miễn phí": "wifi", // Wifi
+    "Máy lạnh": "snowflake-o", // Máy lạnh
+    "Tủ lạnh": "snowflake", // Tủ lạnh
+    "Hồ bơi": "swimmer", // Hồ bơi
+    "Lửa trại": "fire", // Lửa trại
+    "Bãi đỗ xe": "car", // Bãi đỗ xe
+    "Nhà hàng": "utensils", // Nhà hàng
+    "Phòng gym": "dumbbell", // Gym
+    "Spa": "spa", // Spa
+    "Bar": "glass-martini-alt", // Bar
+    "Dịch vụ khác": "ellipsis-h", // Mặc định cho dịch vụ khác
+  };
+  
+  const [services, setServices] = useState<Service[]>([]);  // Khai báo rõ ràng kiểu dữ liệu
+  
   
     const [isExpanded, setIsExpanded] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
@@ -34,6 +60,7 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
     const [selectedDate1, setSelectedDate1] = useState('');
     const [selectedDate2, setSelectedDate2] = useState('');
     const [locationDetails, setLocationDetails] = useState<any>(null);
+    //const [services, setServices] = useState<string[]>([]);
 
 
     const showDatePicker1 = () => {
@@ -100,10 +127,17 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
         }
     };
 
-    // Gọi hàm lấy tọa độ khi component được render
+    //Gọi hàm lấy tọa độ khi component được render
     // useEffect(() => {
     //     getCoordinatesFromAddress(ADDRESS);
     // }, []);
+
+    useEffect(() => {
+      console.log(locationDetails?.address)
+      if (locationDetails?.address) {
+          getCoordinatesFromAddress(locationDetails?.address);
+      }
+  }, [locationDetails]);
 
     const openMap = () => {
         if (latitude && longitude) {
@@ -120,9 +154,15 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
       }
     }, [id]);
 
+    useEffect(() => {
+      if (locationDetails?._id) {
+        fetchRoomServices(locationDetails._id); // Gọi API lấy danh sách dịch vụ
+      }
+    }, [locationDetails]);
+
     const fetchLocationDetails = async (id: string) => {
       try {
-        const response = await fetch(`http://192.168.1.2:3000/locationbyid/${id}`);
+        const response = await fetch(`${API_BASE_URL}/locationbyid/${id}`);
         const data = await response.json();
         if (data.isSuccess) {
           console.log('Location details:', data.data);
@@ -132,6 +172,30 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
         }
       } catch (error) {
         console.error('Fetch error:', error);
+      }
+    };
+
+    const fetchRoomServices = async (locationId: string) => {
+      try {
+        console.log('locationid: ',locationId);
+        const response = await fetch(`${API_BASE_URL}/room/getbylocationid/${locationId}`);
+        const result = await response.json();
+    
+        if (result.isSuccess && result.data) {
+          // Lấy danh sách dịch vụ từ tất cả các phòng
+          console.log('room',result.data);
+          const allServices = result.data.flatMap((room: any) => room.facility || []);
+          console.log('service: ',allServices);
+          const uniqueServices = Array.from(new Set(allServices.map((service: any) => service.name)))
+                                  .map((name) => {
+                                    return allServices.find((service: any) => service.name === name); // Lấy thông tin dịch vụ
+                                  }); // Loại bỏ dịch vụ trùng lặp
+          setServices(uniqueServices);
+        } else {
+          console.error('Error fetching room services:', result.error);
+        }
+      } catch (error) {
+        console.error('Error fetching room services:', error);
       }
     };
   
@@ -183,34 +247,21 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
             </TouchableOpacity>
 
         </View>
-        
-        {/* <TouchableOpacity>
-          <Text style={styles.readMore}>Read more</Text>
-        </TouchableOpacity> */}
-
         {/* Tiện ích */}
         <Text style={styles.facilityTitle}>Dịch vụ</Text>
+
+
         <View style={styles.facilityContainer}>
-          <View style={styles.facilityItem}>
-            <FontAwesome name="fire" size={24} color="#555" />
-            <Text style={styles.facilityText}>Lửa trại</Text>
-          </View>
-          <View style={styles.facilityItem}>
-            <FontAwesome name="fire" size={24} color="#555" />
-            <Text style={styles.facilityText}>Dinner</Text>
-          </View>
-          <View style={styles.facilityItem}>
-            <FontAwesome name="fire" size={24} color="#555" />
-            <Text style={styles.facilityText}>1 Tab</Text>
-          </View>
-          <View style={styles.facilityItem}>
-            <FontAwesome name="fire" size={24} color="#555" />
-            <Text style={styles.facilityText}>Pool</Text>
-          </View>
-           <View style={styles.facilityItem}>
-            <FontAwesome name="fire" size={24} color="#555" />
-            <Text style={styles.facilityText}>Pool</Text>
-          </View>
+          {services.map((service, index) => (
+            <View style={styles.facilityItem} key={index}>
+              <FontAwesome
+                name={facilityIcons[service.name] || facilityIcons["Dịch vụ khác"]}
+                size={18}
+                color="#555"
+              />
+              <Text style={styles.facilityText}>{service?.name}</Text>
+            </View>
+          ))}
         </View>
 
         <View style={styles.section}>
@@ -277,7 +328,13 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
         </View>
 
         {/* Search Button */}
-        <TouchableOpacity onPress={()=>navigation.navigate('available-room-screen')} style={styles.searchButton}>
+        <TouchableOpacity onPress={()=> {
+          console.log('Navigating with ID: ', locationDetails._id);
+          navigation.navigate('available-room-screen', {
+            id: locationDetails._id,
+            checkinDate: date1, // Gửi ngày checkin
+            checkoutDate: date2, // Gửi ngày checkout
+          });}} style={styles.searchButton}>
           <Text style={styles.searchButtonText}>Tìm kiếm</Text>
         </TouchableOpacity>
       </View>
@@ -419,7 +476,7 @@ const styles = StyleSheet.create({
     
   },
   facilityText: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#555',
     marginTop: 4,
   },

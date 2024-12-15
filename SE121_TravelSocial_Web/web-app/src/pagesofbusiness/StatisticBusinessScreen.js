@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { FaAngleRight,FaBell, FaEye } from 'react-icons/fa';
 import Chart from 'react-apexcharts';
-import '../styles/StatisticScreen.css'
+import '../styles/StatisticScreen.css';
+import { useEffect } from 'react';
 
 const StatisticBusinessScreen = () => {
+  const userId = localStorage.getItem('userId');
+  const [seriesData, setSeriesData] = useState([{ name: 'Doanh thu', data: [] }]);
 
     const chartOptions = {
         chart: {
@@ -19,10 +22,10 @@ const StatisticBusinessScreen = () => {
         }
     };
 
-    const seriesData = [{
-        name: 'Doanh thu',
-        data: [30, 40, 35, 50, 49, 60, 70, 1, 60, 45, 35, 30]
-    }];
+    // const seriesData = [{
+    //     name: 'Doanh thu',
+    //     data: [30, 40, 35, 50, 49, 60, 70, 1, 60, 45, 35, 30]
+    // }];
 
     const successRate = 60;  
     const failureRate = 100 - successRate;  
@@ -121,7 +124,33 @@ const StatisticBusinessScreen = () => {
           }],
         },
       });
-  
+
+      useEffect(() => {
+        const fetchYearlyRevenue = async () => {
+          try {
+            const year = new Date().getFullYear(); // Lấy năm hiện tại
+            const monthlyData = [];
+      
+            // Gọi API cho từng tháng (1 -> 12)
+            for (let month = 1; month <= 12; month++) {
+              const response = await fetch(`http://localhost:3000/bookings/revenue/${userId}?month=${month}&year=${year}`);
+              if (!response.ok) {
+                throw new Error(`Failed to fetch revenue for month ${month}`);
+              }
+              const result = await response.json();
+              monthlyData.push(result.data.totalRevenue || 0); // Nếu không có dữ liệu, dùng 0
+            }
+            console.log(monthlyData);
+      
+            setSeriesData([{ name: 'Doanh thu', data: monthlyData }]); // Cập nhật dữ liệu biểu đồ
+          } catch (error) {
+            console.error('Error fetching yearly revenue:', error);
+          }
+        };
+      
+        fetchYearlyRevenue();
+      }, [userId]);
+      
 
     return (
         <div class="container">

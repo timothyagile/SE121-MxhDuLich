@@ -1,166 +1,116 @@
-import React from 'react'
-import {View, Text, StyleSheet, Image, TouchableOpacity, TextInput} from 'react-native'
-import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Image, FlatList, ActivityIndicator } from 'react-native';
+import Ticket from '@/components/BookingScreen/Booking';
+import {API_BASE_URL} from '../constants/config'; // Import component Ticket
+import { useUser } from '@/context/UserContext';
 
+export default function TicketScreen() {
+  const { userId } = useUser();
+  const [tickets, setTickets] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default function TicketScreen ({ navigation }: {navigation: NativeStackNavigatorProps})
-{
-    return (
-        <View style = {styles.container}>
-            <Image source={require('../assets/icons/logo.png')} style={styles.logo} />
+  // Hàm gọi API lấy danh sách ticket
+  const fetchTickets = async () => {
+    try {
+        
+      const response = await fetch(`${API_BASE_URL}/booking/getbyuserid/${userId}`); // Thay bằng URL API của bạn
+      const result = await response.json();
 
-            <View style = {{alignItems:'center', width:'100%'}}>
-                <View style={styles.search}>
-                    <TouchableOpacity onPress={() => console.log('Search icon pressed')}>
-                        <Image source={require('../assets/icons/Search.png')} style={styles.icon} />
-                    </TouchableOpacity>                   
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Tìm kiếm"
-                        placeholderTextColor="#000000"
-                    />
-                </View>
-            </View>
+      setTickets(result.data); // Gán dữ liệu từ API
+      console.log('ticket: ',tickets)
+      if (result.isSuccess && result.data) {
+        const ticketWithNames = await Promise.all(
+          result.data.map(async (ticket: any) => {
+            // Gọi API room để lấy locationId
+            const room = await fetchRoomDetails(ticket.roomId);
 
-            <Text style={styles.collections }>Tất cả Booking</Text>
+            // Gọi API location để lấy tên địa điểm
+            const location = room && room.locationId ? await fetchLocationDetails(room.locationId) : null;
 
-            <View style = {styles.body}>
-                <View style={{flexDirection:'row'}}>
-                    <View style={styles.imageContainer}>
-                        <Image source={require('../assets/images/camping-ho-coc.png')} style={styles.image} />
-                    </View>
-                    <View style ={styles.textContainer}>
-                        <Text style= {styles.title}>Ho Coc camping Vung Tau </Text>
-                        <Text style= {styles.title2}>26/6 - 27/6 </Text>
-                        <View style={styles.detailsContainer}>
-                            <View style={styles.ratingBox}>
-                                <Text style={{color:'black', fontSize:16}}>Trạng thái: </Text>
-                                <Text style={styles.stateText}>Chờ duyệt</Text>
-                            </View>
-                            <TouchableOpacity style={styles.featureBox}>
-                                <Text style={styles.boxText}>Hủy</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
-            </View>
+            return {
+              ...ticket,
+              locationName: location ? location.name : 'Unknown Location', // Bổ sung tên địa điểm
+            };
+          })
+        );
+        setTickets(ticketWithNames);
+      } else {
+        console.error('API returned an error:', result.error);
+      }
+    } catch (error) {
+      console.error('Error fetching tickets:', error);
+    } 
+  };
 
-            
-        </View>
-    )
+  const fetchRoomDetails = async (roomId: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/room/getbyid/${roomId}`);
+      const result = await response.json();
+      if (result && result.isSuccess) {
+        return result.data; // Giả sử API trả về { data: { locationId: "xyz" } }
+      }
+      return null;
+    } catch (error) {
+      console.error(`Error fetching room details for roomId: ${roomId}`, error);
+      return null;
+    }
+  };
+  
+  const fetchLocationDetails = async (locationId: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/locationbyid/${locationId}`);
+      const result = await response.json();
+      if (result && result.isSuccess) {
+        return result.data; // Giả sử API trả về { data: { name: "Location Name" } }
+      }
+      return null;
+    } catch (error) {
+      console.error(`Error fetching location details for locationId: ${locationId}`, error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    fetchTickets();
+  }, []);
+
+  return (
+    <View style={styles.container}>
+      <Image source={require('../assets/icons/logo.png')} style={styles.logo} />
+      <Text style={styles.collections}>Tất cả Booking</Text>
+        <FlatList
+            data={tickets}
+            keyExtractor={(item) => item._id} // Sử dụng _id làm key
+            renderItem={({ item }) => (
+                <Ticket
+                title={item.locationName} // Hiển thị roomId (hoặc tuỳ chỉnh)
+                date={`${new Date(item.checkInDate).toLocaleDateString()} - ${new Date(item.checkOutDate).toLocaleDateString()}`}
+                status={item.status}
+                imageUrl={item.imageUrl || 'https://via.placeholder.com/150'}
+                onCancel={() => console.log(`Cancel ticket: ${item._id}`)}
+                />
+            )}
+        />
+      
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-    },
-
-    logo:{
-        marginTop: 20,
-        width:50,
-        height:50,
-        marginLeft: 10,
-    },
-
-    search: {
-        marginTop: 30,
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderRadius: 24,
-        paddingHorizontal: 10,
-        paddingVertical: 10,
-        backgroundColor: '#F3F8FE',
-        width: '90%',
-      },
-
-      icon: {
-        width: 20, 
-        height: 20, 
-        marginRight: 10,
-        color:'black',
-      },
-    input: {
-        flex: 1,
-        height: 40,
-        color: '#000000',
-      },
-
-    body:{
-        marginTop: 20,
-    },
-    imageContainer: {
-        marginLeft:20,
-        width: 130,
-        height: 100,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 20,
-        overflow: 'hidden',
-    },
-    image: {
-        width: '100%',
-        height: '100%',
-        resizeMode: 'cover',
-    },
-
-    collections:{
-        marginTop: 30,
-        marginLeft: 25,
-        fontSize:26,
-        fontWeight:'bold',
-      },
-
-
-    textContainer: {
-        flex: 1,
-        marginLeft: 10,
-    },
-
-    stateText:{
-        color:'#F8D675',
-        fontWeight:'600'
-    },
-    title: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        flexShrink: 1,
-        flexWrap: 'wrap',
-    },
-    title2: {
-        fontSize: 16,
-        fontWeight: '300',
-        flexShrink: 1,
-        flexWrap: 'wrap',
-    },
-
-    detailsContainer: {
-        position:'absolute',
-        flexDirection: 'row',
-        bottom: 0,
-    },
-    ratingBox: {
-        flexDirection: 'row',
-        backgroundColor: '#F1F1F1',
-        padding: 10,
-        borderRadius: 20,
-        marginRight: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    featureBox: {
-        flexDirection:'row',
-        borderRadius:20,
-        backgroundColor: '#F1F1F1',
-        padding: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-
-    boxText:{
-
-    },
-})
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  logo: {
+    marginTop: 20,
+    width: 50,
+    height: 50,
+    marginLeft: 10,
+  },
+  collections: {
+    marginTop: 30,
+    marginLeft: 25,
+    fontSize: 26,
+    fontWeight: 'bold',
+  },
+});

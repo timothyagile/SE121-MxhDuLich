@@ -2,6 +2,7 @@ import {Text, View, StyleSheet, TouchableOpacity} from 'react-native'
 import * as React from 'react'
 import { Button } from 'react-native-paper'
 import * as Network from 'expo-network';
+import {API_BASE_URL} from '../../constants/config';
 
 interface item {
     id: string,
@@ -22,7 +23,7 @@ export default function CategoryItem({item, selectedCategory, setSelectedCategor
         setSelectedCategory(item);
         try {
             console.log(item.id);
-            const response = await fetch(`http://192.168.1.2:3000/locationbycategory/${item.id}`);
+            const response = await fetch(`${API_BASE_URL}/locationbycategory/${item.id}`);
             const data = await response.json();
             if (data.isSuccess) {
                 setLocations(data.data); 
@@ -31,7 +32,7 @@ export default function CategoryItem({item, selectedCategory, setSelectedCategor
                 console.error('API error:', data.error);
             }
         } catch (error) {
-            console.error('Network error:', error);
+            console.error('Network errore:', error);
         }
     };
 
@@ -39,7 +40,7 @@ export default function CategoryItem({item, selectedCategory, setSelectedCategor
         <TouchableOpacity 
             onPress={handlePress}>
             <Button style = {[styles.text, 
-                selectedCategory?.id == item.id ? styles.selectedItemText : null
+                selectedCategory?.id == item.id ? null: null
             ]}
             labelStyle={{ 
                 color: selectedCategory?.id === item.id ? '#196EEE' : '#000' // Đổi màu chữ khi được chọn
@@ -56,7 +57,7 @@ const styles = StyleSheet.create({
     },
     selectedItemText: {
 
-        backgroundColor: '#e6f7ff',
+        //backgroundColor: '#e6f7ff',
         color: '#196EEE',
         fontWeight: 'bold',
         borderRadius: 20,

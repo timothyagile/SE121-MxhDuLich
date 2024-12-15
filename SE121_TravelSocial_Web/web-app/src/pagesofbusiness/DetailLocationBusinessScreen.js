@@ -12,12 +12,16 @@ import { faPhoneAlt, faEnvelope, faUser, faMapMarkerAlt, faMemo } from '@fortawe
 import { locations } from '../pages/BusinessData';
 import MapComponent from "../components/MapComponent";
 import MapBoxComponent from "../components/MapBoxComponent";
+import { useSelector } from 'react-redux';
+import moment from 'moment';
 
 const DetailLocationBusinessScreen =({ mapLoaded }) => {
 
+    const userData = useSelector((state) => state.user.userData);
+    console.log('userdata: ', userData);
     const [currentTab, setCurrentTab] = useState('baseinfo'); 
     const [currentTab2, setCurrentTab2] = useState('viewratingservice'); 
-
+    const { id } = useParams();
     const [latitude] = useState(10.8231);  // Thay bằng tọa độ mong muốn
     const [longitude] = useState(106.6297); // Thay bằng tọa độ mong muốn
 
@@ -41,6 +45,27 @@ const DetailLocationBusinessScreen =({ mapLoaded }) => {
     //Nơi này để chỉnh sửa dữ liệu của base-ìno//
     const [locationInfo, setLocationInfo] = useState(locations);
     const [isEditing, setIsEditing] = useState(false);
+
+    useEffect(() => {
+        const fetchLocationInfo = async () => {
+          try {
+            const response = await fetch(`http://localhost:3000/locationbyid/${id}`);
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            setLocationInfo(data.data);
+            console.log('id: ', id);
+            console.log('location infor: ',locationInfo);
+          } catch (error) {
+            console.error('Lỗi khi gọi API:', error);
+          } 
+        };
+    
+        if (id) {
+          fetchLocationInfo();
+        }
+    }, [id]);
 
     const handleEditClick = () => {
         setIsEditing(!isEditing);
@@ -88,12 +113,12 @@ const DetailLocationBusinessScreen =({ mapLoaded }) => {
 
     const navigate = useNavigate ();
 
-    const { id } = useParams();
+   
     const [address, setAddress] = useState("FFXQ+X94, Bung Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam");
 
     useEffect(() => {
         // Đây là nơi bạn cập nhật địa chỉ mới khi cần
-        setAddress("FFXQ+X94, Bung Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam");
+        setAddress(locationInfo.address);
     }, [id]);
 
 
@@ -108,18 +133,18 @@ const DetailLocationBusinessScreen =({ mapLoaded }) => {
                             <img alt="Profile picture of a person" class="w-20 h-20 rounded-full mr-4" height="80" src="https://storage.googleapis.com/a1aa/image/0FPVWfLJ1m0nJS9YfULFrbvezZsDHus5bXhqxVDA6tO9UMKnA.jpg" width="80"/>
                             <div>
                                 <h1 class="text-xl font-bold">
-                                    Du lịch Hồ Cốc - Vũng Tàu
+                                    {userData.userName}
                                 </h1>
                                 <div class="flex items-center text-gray-600 mt-2">
                                     <FontAwesomeIcon icon={faPhoneAlt} className="mr-2" />
                                     <span>
-                                        0987654321
+                                        {userData?.phoneNumber || '0123456789'}
                                     </span>
                                 </div>
                                 <div class="flex items-center text-gray-600 mt-1">
                                     <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
                                     <span>
-                                        hc.vt@example.com
+                                        {userData?.userEmail || 'abc@example.com'}
                                     </span>
                                 </div>
                             </div>
@@ -162,7 +187,7 @@ const DetailLocationBusinessScreen =({ mapLoaded }) => {
                                             className="border p-2 rounded"
                                             />
                                         ) : (
-                                        <p class="font-semibold">124335111</p>
+                                        <p class="font-semibold">{locationInfo?._id || 122345679876543}</p>
                                         )}
                                     </div>
                                     <div>
@@ -176,7 +201,7 @@ const DetailLocationBusinessScreen =({ mapLoaded }) => {
                                             className="border p-2 rounded"
                                             />
                                         ) : (
-                                        <p class="font-semibold">Du lịch Hồ Cốc - Vũng Tàu</p>
+                                        <p class="font-semibold">{locationInfo?.name || 'Hồ Cốc du lịch Vũng TàuTàu'}</p>
                                         )}
                                     </div>
                                     <div>
@@ -190,7 +215,7 @@ const DetailLocationBusinessScreen =({ mapLoaded }) => {
                                             className="border p-2 rounded"
                                             />
                                         ) : (
-                                        <p class="font-semibold">Du lịch Hồ Cốc - Vũng Tàu</p>
+                                        <p class="font-semibold">{userData?.userName || 'Nguyễn Văn AA'}</p>
                                         )}
                                     </div>
                                     <div>
@@ -204,7 +229,7 @@ const DetailLocationBusinessScreen =({ mapLoaded }) => {
                                             className="border p-2 rounded"
                                             />
                                         ) : (
-                                        <p class="font-semibold">FFXQ+X94, Bung Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam</p>
+                                        <p class="font-semibold">{locationInfo?.address || ''}</p>
                                         )}
                                     </div>
                                     <div>
@@ -213,12 +238,12 @@ const DetailLocationBusinessScreen =({ mapLoaded }) => {
                                             <input
                                             type="text"
                                             name="tenDiaDiem"
-                                            value={locationInfo.tenDiaDiem}
+                                            value={locationInfo.category.name}
                                             onChange={handleInputChange}
                                             className="border p-2 rounded"
                                             />
                                         ) : (
-                                        <p class="font-semibold">camping</p>
+                                        <p class="font-semibold">{locationInfo?.category.name || 'Khách sạn'}</p>
                                         )}
                                     </div>
                                     <div>
@@ -232,18 +257,19 @@ const DetailLocationBusinessScreen =({ mapLoaded }) => {
                                             className="border p-2 rounded"
                                             />
                                         ) : (
-                                        <p class="font-semibold"> 12/10/2023 </p>
+                                        <p class="font-semibold"> {moment(locationInfo.dateCreated).format('DD-MM-YYYY hh:mm:ss')} </p>
                                         )}
                                     </div>
                                 </div>
-                                {/* <div>
+                                <div>
                                     {address === "Địa chỉ không khả dụng" ? (
                                         <p className="text-red-500">Không tìm thấy địa chỉ cho địa điểm này.</p>
                                     ) : (
-                                        <MapComponent address={address} />
+                                        <></>
+                                        //<MapComponent address={address} />
                                     )}
                                    
-                                </div> */}
+                                </div>
                                 <button
                                     className="absolute bottom-2 right-3 bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center"
                                     onClick={isEditing ? handleSaveClick : handleEditClick}

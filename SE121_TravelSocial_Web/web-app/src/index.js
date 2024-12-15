@@ -30,8 +30,11 @@ import DetailLocationBusinessScreen from './pagesofbusiness/DetailLocationBusine
 import AddLocationScreen from './pagesofbusiness/AddLocationScreen';
 import ChatBusinessScreen from './pagesofbusiness/ChatBusinessScreen';
 import BusinessDetailBookingScreen from './pagesofbusiness/BusinessDetailBookingScreen';
+import { Provider } from 'react-redux';
+import store from './store/store';
 
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const link = document.createElement('link');
 link.href = 'https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css';
@@ -59,9 +62,10 @@ const AppWrapper = () => {
 
         {/* Layout chính cho các trang có sidebar */}
         <Route element={<Layout />}>
+
           {/* Dashboard */}
-          <Route path="/dashboard/admin" element={<DashBoardScreen />} />
-          <Route path="/dashboard/business" element={<DashBoardBusinessScreen />} />
+          <Route path="/dashboard/admin" element={<ProtectedRoute><DashBoardScreen /></ProtectedRoute>} />
+          <Route path="/dashboard/business" element={<ProtectedRoute><DashBoardBusinessScreen /></ProtectedRoute>} />
 
           {/* Doanh nghiệp */}
           <Route path="/business/list" element={<ListBusinessScreen />} />
@@ -93,7 +97,10 @@ const AppWrapper = () => {
 
 root.render(
   <React.StrictMode>
+    <Provider store={store}>
       <AppWrapper />
+    </Provider>
+      
   </React.StrictMode>
 );
 

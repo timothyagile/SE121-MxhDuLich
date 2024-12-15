@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const User = require('./models/User')
 const bcrypt = require('bcryptjs');
 
-
+app.use(cors());
 app.use(express.json());
 
 const mongoURL = "mongodb+srv://thinhnguyenphuc:6RUfHulVdn6qLyO8@thinhnguyenphuc.dxqeq.mongodb.net/TravelSocial?retryWrites=true&w=majority&appName=thinhnguyenphuc";

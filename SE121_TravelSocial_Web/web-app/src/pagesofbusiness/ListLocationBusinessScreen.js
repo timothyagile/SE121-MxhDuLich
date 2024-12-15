@@ -11,6 +11,28 @@ const ListLocationBusinessScreen = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [locations, setLocations] = useState([]); 
+  const [loading, setLoading] = useState(true);
+
+  const userId = localStorage.getItem('userId');
+
+  useEffect(() => {
+    const fetchLocations = async () => {
+       // Hiển thị trạng thái loading
+      try {
+        const response = await fetch(`http://localhost:3000/locationbyuserid/${userId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch locations');
+        }
+        const data = await response.json();
+        setLocations(data.data || []); 
+      } catch (error) {
+        console.error('Error fetching locations:', error);
+      } 
+    };
+
+    fetchLocations();
+  }, [userId]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -63,7 +85,7 @@ const ListLocationBusinessScreen = () => {
                         <th>STT</th>
                         <th>Tên nhà kinh doanh</th>
                         <th>Loại</th>
-                        <th>Số điện thoại</th>
+                        <th>địa chỉ</th>
                         <th></th>
                     </tr> 
                 </thead>
@@ -73,20 +95,20 @@ const ListLocationBusinessScreen = () => {
                   <tr 
                     key={location.id} 
                     className="clickable-row"
-                    onClick={() => handleRowClick(location.id)}
+                    onClick={() => handleRowClick(location._id)}
                   >
                     <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
                     <td>
                       <div className="namefield">
                         <img 
-                          src={require(`../assets/images/${location.avatar}`)} 
+                          src={location.avatar ? require(`../assets/images/${location.avatar}`) : require('../assets/images/avt.png')} 
                           alt="User Avatar" 
                           className="user-avatar" 
                         />
                         <p>{location.name}</p>
                       </div>
                     </td>
-                    <td>{location.type}</td>
+                    <td>{location.category.name}</td>
                     <td>{location.address}</td>
                     <td>
                       <button 

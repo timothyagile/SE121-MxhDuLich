@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {Image, View, StyleSheet, TouchableOpacity, Text, Dimensions, ActivityIndicator} from 'react-native';
 import locationData from '@/constants/location'
 import * as Network from 'expo-network';
+import {API_BASE_URL} from '../../constants/config';
 
 const {width, height} = Dimensions.get('window')
 const CARD_WIDTH =  width - 240;
@@ -10,6 +11,7 @@ const CARD_WIDTH_SPACING = CARD_WIDTH + 24;
 
 interface DailySectionProps {
     categoryId: string | undefined; // Nhận categoryId từ HomeScreen
+    navigation: any; 
 }
 
 export default function DailySection({ categoryId }: DailySectionProps) {
@@ -23,42 +25,11 @@ export default function DailySection({ categoryId }: DailySectionProps) {
         }
     }, [categoryId]);
 
-    // const fetchLocations = async () => {
-    //     try {
-    //         const response = await fetch('http://192.168.1.18:3000/alllocation',
-    //         {
-    //             method: 'GET',
-    //             headers: {
-    //                 'Content-Type': 'application/json', 
-    //                 'Accept': 'application/json',  
-    //             }
-    //         }); 
-    //         const result: any = await response.json();
-
-    //         if (result.isSuccess) {
-    //             setLocationData(result.data);
-    //         } else {
-    //             console.error("Lỗi: Dữ liệu không hợp lệ");
-    //         }
-    //     } catch (error) {
-    //         console.error("Đã xảy ra lỗi khi lấy dữ liệu:", error);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     fetchLocations();
-    // }, []);
-
     const fetchPopularLocations = async (id: string) => {
         try {
-            //getIPAddress();
-            // const ipAddresss = await NetworkInfo.getIPAddress();
-            // console.log('Device IP Addresss:', ipAddresss);
             const ipAddress = await Network.getIpAddressAsync();
             console.log('Device IP Address:', ipAddress);
-            const response = await fetch(`http://192.168.1.2:3000/locationbycategory/${id}`);
+            const response = await fetch(`${API_BASE_URL}/locationbycategory/${id}`);
             const data = await response.json();
             if (data.isSuccess) {
                 setLocations(data.data);
@@ -68,12 +39,15 @@ export default function DailySection({ categoryId }: DailySectionProps) {
         } catch (error) {
             console.error("Fetch error:", error);
         }
+        finally {
+            setLoading(false);
+        }
     };
 
     // Hiển thị vòng quay khi đang tải
-    if (loading) {
-        return <ActivityIndicator size="large" color="#0000ff" />;
-    }
+    // if (loading) {
+    //     return <ActivityIndicator size="large" color="#0000ff" />;
+    // }
 
 
     return (
@@ -83,7 +57,7 @@ export default function DailySection({ categoryId }: DailySectionProps) {
                 {locations.map((item, index) => {
                     return (
                     <TouchableOpacity
-                        key={item.id}
+                        key={index}
                          style = {{
                         marginLeft: 24,
                         marginRight:  index === locations.length - 1 ? 24 : 0}}>

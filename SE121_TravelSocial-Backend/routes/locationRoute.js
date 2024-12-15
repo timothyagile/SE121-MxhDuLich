@@ -10,7 +10,10 @@ router.post('/createlocation', checkLocationOwner, upload.array('images', 10), l
 //read
 router.get('/alllocation', locationController.getAllLocation);
 router.get('/locationbycategory/:categoryId', locationController.getLocationByCategory);
-router.get('/locationbyname',locationController.getLocationByName);
+
+router.get('/locationbyuserid/:userId', locationController.getLocationByUserId);
+router.get('/locationbyname', locationController.getLocationByName);
+
 router.get('/locationbyid/:locationId', locationController.getLocationById);
 //update
 router.put('/updatelocation/:locationId', checkLocationOwner, locationController.updateLocation);

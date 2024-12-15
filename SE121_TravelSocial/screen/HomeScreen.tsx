@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import React from 'react';
-import {View, Text, StyleSheet, TextInput, FlatList, ScrollView, TouchableOpacity, Image} from 'react-native'
+import {View, Text, StyleSheet, TextInput, FlatList, ScrollView, TouchableOpacity, Image, ImageBackground} from 'react-native'
 
 import CategoryItem from "@/components/HomeScreen/CategoryItem";
 import categoryData from '@/constants/category';
@@ -18,32 +18,18 @@ export default function HomeScreen ({navigation} : {navigation : NativeStackNavi
     const [selectedCategory, setSelectedCategory] = useState(categoryData.at(0));
     const [locations, setLocations] = useState([]);
 
-    // useEffect(() => {
-    //     if (selectedCategory) {
-    //         fetchLocationsByCategory(selectedCategory.id);
-    //     }
-    // }, [selectedCategory]);
-
-    // const fetchLocationsByCategory = async (categoryId: string) => {
-    //     try {
-    //         const response = await fetch(`http://192.168.1.18:3000/locationbycategory/${categoryId}`);
-    //         const data = await response.json();
-    //         if (data.isSuccess) {
-    //             setLocations(data.data);
-    //         } else {
-    //             console.error("Error fetching locations:", data.error);
-    //         }
-    //     } catch (error) {
-    //         console.error("Fetch error:", error);
-    //     }
-    // };
 
     const handleSetCategory = (category: typeof categoryData[0]) => {
-        setSelectedCategory(category); // Cập nhật danh mục được chọn
+        setSelectedCategory(category); 
     };
 
     
     return (
+    <ImageBackground
+      source={require('../assets/icons/logo.png')} // Đường dẫn đến ảnh logo
+      style={styles.backgroundImage} // Định nghĩa kiểu dáng cho nền
+      // Đảm bảo ảnh bao phủ toàn bộ màn hình
+    >
         <View style = {styles.container}>
             <View style = {{alignItems:'center', width:'100%'}}>
                 <View style={styles.search}>
@@ -55,11 +41,13 @@ export default function HomeScreen ({navigation} : {navigation : NativeStackNavi
                         placeholder="Tìm kiếm"
                         placeholderTextColor="#000000"
                     />
+                        <Image source={require('../assets/icons/logoblue.png')} style={styles.logo}/>
                 </View>
             </View>
             <View style  = {styles.categoryContainer}>
                     <FlatList
                     data= {categoryData}
+                    keyExtractor={(item) => item.id.toString()}
                     renderItem={({item}) => (<CategoryItem 
                         item = {item}
                         selectedCategory = {selectedCategory}
@@ -76,8 +64,9 @@ export default function HomeScreen ({navigation} : {navigation : NativeStackNavi
             <ScrollView style = {{}}>
                     <PopularSection categoryId={selectedCategory?.id} navigation = {navigation}/>
                     <RecommendedSection/>
-                    <DailySection categoryId={selectedCategory?.id}/>
+                    <DailySection categoryId={selectedCategory?.id} navigation={undefined}/>
             </ScrollView>
         </View>
+    </ImageBackground>
     )
 }

@@ -66,6 +66,27 @@ const BookingSchema = new Schema({
     }
 }, {collection: 'Booking'});
 
+const MonthlyStatisticsSchema = new Schema({
+    month: {
+        type: Number, // Tháng (1-12)
+        required: true,
+    },
+    year: {
+        type: Number, // Năm
+        required: true,
+    },
+    totalRevenue: {
+        type: Number, // Tổng doanh thu của tháng
+        required: true,
+        default: 0,
+    },
+    totalBookings: {
+        type: Number, // Tổng số lượng booking trong tháng
+        required: true,
+        default: 0,
+    },
+});
+
 const Booking = mongoose.model('Booking', BookingSchema);
 module.exports = Booking
 

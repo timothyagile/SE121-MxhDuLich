@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Text, View, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView, Alert, Platform, Linking, ActivityIndicator } from 'react-native';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
+import { RootStackParamList } from '@/types/navigation';
+import { RouteProp, useRoute } from '@react-navigation/native';
+import {API_BASE_URL} from '../constants/config';
 
-
-
+type ReservationRouteProp = RouteProp<RootStackParamList, 'payment-method-screen'>;
 interface Bank {
     
     appId: string;
@@ -16,34 +18,56 @@ interface Bank {
 
 
 export default function PaymentMethodScreen({ navigation }: {navigation: NativeStackNavigatorProps}) {
-
+    const route = useRoute<ReservationRouteProp>();
+    const { locationId, totalPrice } = route.params;
     const [selectedButton, setSelectedButton] = useState<string | null>(null);
-    
-
-    const handlePress = (button: string) => {
-        setSelectedButton(button);
-    };
-
-   
+    const [locationDetails, setLocationDetails] = useState<any>(null);
     const [banks, setBanks] = useState<Bank[]>([]);
     const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetch('https://api.vietqr.io/v2/android-app-deeplinks')
-            .then(response => response.json())
-            .then(data => {
-                setBanks(data.data);
-                setLoading(false);
-            })
-            .catch(error => {
-                Alert.alert('Error', 'Không thể tải danh sách ngân hàng.');
-                setLoading(false);
-            });
-    }, []);
+    const handlePress = (button: string) => {
+        setSelectedButton(button);
+        if (button === 'bank') {
+            fetchBanks();
+        }
+        handleMomoPayment();
+    };
 
+    const handleMomoPayment = async () => {
+        const partnerCode = "MOMOXXXX"; 
+        const totalPrice = 50000; 
+        const orderId = "order12345"; 
+        const description = "Thanh toán TravelSocial";
+    
+        const deeplink = `momo://?action=payWithApp&amount=${totalPrice}&orderId=${orderId}&description=${description}`;
+        try {
+            await Linking.openURL(deeplink);
+        } catch (error) {
+            Alert.alert('Lỗi', 'Không thể mở ứng dụng MoMo.');
+        }
+    };
+    
+
+    const fetchBanks = async () => {
+        
+        try {
+            const response = await fetch('https://api.vietqr.io/v2/android-app-deeplinks');
+            const data = await response.json();
+            if (data && data.apps && Array.isArray(data.apps)) {
+                setBanks(data.apps);
+                setLoading(false);
+            } else {
+                Alert.alert('Lỗi', 'Dữ liệu ngân hàng không hợp lệ.');
+                setLoading(false);
+            }
+        } catch (error) {
+            Alert.alert('Lỗi', 'Không thể tải danh sách ngân hàng.');
+        } 
+    };
     const handlePress1 = (bank: Bank) => {
         setSelectedBank(bank);
+
     };
 
     const applyAndPay = () => {
@@ -56,13 +80,26 @@ export default function PaymentMethodScreen({ navigation }: {navigation: NativeS
         }
     };
 
-    if (loading) {
-        return (
-            <View style={styles.loader}>
-                <ActivityIndicator size="large" color="#0000ff" />
-            </View>
-        );
-    }
+    const fetchLocationDetails = async (id: string) => {
+        try {
+          console.log('locationid in payment: ',locationId);
+          const response = await fetch(`${API_BASE_URL}/locationbyid/${locationId}`);
+          const data = await response.json();
+          if (data.isSuccess) {
+            console.log('Location details:', data.data);
+            setLocationDetails(data.data);
+          } else {
+            console.error('API error:', data.error);
+          }
+        } catch (error) {
+          console.error('Fetch error:', error);
+        }
+    };
+    useEffect(() => {
+        if (locationId) {
+          fetchLocationDetails(locationId); 
+        }
+    }, [locationId]);
 
     return (
 
@@ -79,12 +116,12 @@ export default function PaymentMethodScreen({ navigation }: {navigation: NativeS
                     <Image source={require('../assets/images/camping-ho-coc.png')} style={styles.image} />
                 </View>
                 <View style ={styles.textContainer}>
-                    <Text style= {styles.title}>Ho Coc camping Vung Tau </Text>
+                    <Text style= {styles.title}>{locationDetails?.name || 'Tên địa điểm'}</Text>
 
                     <View style={styles.detailsContainer}>
                         <View style={styles.ratingBox}>
                             <Image source = {require('../assets/icons/star.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                            <Text style={styles.boxText}>4.1</Text>
+                            <Text style={styles.boxText}>{locationDetails?.rating || 0}</Text>
                         </View>
                         <View style={styles.featureBox}>
                             <Image source={require('../assets/icons/clock.png')} style ={{marginRight:3,}}></Image>
@@ -94,11 +131,11 @@ export default function PaymentMethodScreen({ navigation }: {navigation: NativeS
                 </View>
             </View>
 
-            <View style={{marginLeft:20, marginTop:25,}}>
+            {/* <View style={{marginLeft:20, marginTop:25,}}>
                 <TouchableOpacity style={styles.addpaymentmethod} onPress={() => navigation.navigate('add-new-payment-method-screen')}>
                         <Text style={styles.boxText2}>Thêm phương thức thanh toán</Text>
                 </TouchableOpacity>
-            </View>
+            </View> */}
             <View style={styles.imagesRow}>
 
                 <View style={{justifyContent:'center',alignItems:'center',}}>
@@ -142,11 +179,33 @@ export default function PaymentMethodScreen({ navigation }: {navigation: NativeS
                 
             </View>
 
-            <View style={{width:'100%', alignItems:'center',}}>
+            <ScrollView style = {{marginTop:20, marginBottom: 130,}}>
+            {selectedButton === 'bank' && ( // Kiểm tra trạng thái selectedButton
+                loading ? ( // Hiển thị trạng thái loading khi đang tải danh sách ngân hàng
+                <ActivityIndicator size="large" color="#0000ff" />
+                ) : (
+                    <View style={styles.bankList}>
+                        {banks.map((bank) => (
+                            <TouchableOpacity
+                                key={bank.appId} 
+                                style={styles.bankItem}
+                                onPress={() => handlePress1(bank)}
+                            >
+                                <Image source={{ uri: bank.appLogo }} style={styles.bankLogo} />
+                                <View>
+                                    <Text style={styles.bankName}>{bank.bankName}</Text>
+                                </View>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                ))}
+                </ScrollView>
+
+            {/* <View style={{width:'100%', alignItems:'center',}}>
                 <View style={styles.squareContainer2}>
                     <TouchableOpacity 
                     style={styles.bank} 
-                    onPress={() => handlePress1({appId: 'vcb', appLogo: 'https://play-lh.googleusercontent.com/SD4lUzWCqLq6nqURm8abnazm8sC0h_hkikryHyODrVpI0g3xMjeuaVs379jUCKrd0vk', appName: 'BIDV SmartBanking', bankName: 'Ngân hàng TMCP Đầu tư và Phát triển Việt Nam', deeplink: 'https://dl.vietqr.io/pay?app=vcb'})}
+                    onPress={() => handlePress1({appId: 'vcb', appLogo: 'https://play-lh.googleusercontent.com/SD4lUzWCqLq6nqURm8abnazm8sC0h_hkikryHyODrVpI0g3xMjeuaVs379jUCKrd0vk', appName: 'BIDV SmartBanking', bankName: 'Ngân hàng TMCP Đầu tư và Phát triển Việt Nam', deeplink: 'https://dl.vietqr.io/pay?app=vcb&ba=122555743434234@ocb'})}
                     >
                         <Image source={require('../assets/icons/VCB.png')} style={{width:40, height:40,}}></Image>
                         <View>
@@ -172,9 +231,9 @@ export default function PaymentMethodScreen({ navigation }: {navigation: NativeS
                 </View>
 
                 
-            </View>
+            </View> */}
             <View style={{position:'absolute',bottom:20,width:'100%'}}>
-                <Text style={{marginLeft:30, fontSize:24, marginBottom:20,}}> Thanh toán $134.00</Text>
+                <Text style={{marginLeft:30, fontSize:24, marginBottom:20,}}> Thanh toán {totalPrice} VND</Text>
                 <View style = {{  alignItems:'center', justifyContent:'center',alignContent:'center',width:'100%'}}>
                     
                     <TouchableOpacity style={styles.addpaymentmethod2} onPress={applyAndPay}>
@@ -444,4 +503,31 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
   
+    bankList: {
+        width: '100%',
+        alignItems: 'center',
+        marginTop: 20,
+    },
+    bankItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: 10,
+        paddingHorizontal: 10,
+        paddingVertical: 15,
+        borderRadius: 10,
+        backgroundColor: '#f0f0f0',
+        width: '90%',
+    },
+    bankLogo: {
+        width: 40,
+        height: 40,
+        marginRight: 10,
+    },
+    bankName: {
+        paddingRight:45,
+        flexShrink: 1,
+        flexWrap: 'wrap',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
 });

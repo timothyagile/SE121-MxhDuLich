@@ -2,9 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { Text, View, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView, Alert, Platform, Linking, ActivityIndicator } from 'react-native';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 import { RadioButton } from 'react-native-paper';
+import { useRoute } from '@react-navigation/native';
+import { RouteProp } from '@react-navigation/native';
+import { RouteParams } from 'expo-router';
+import { RootStackParamList } from '@/types/navigation';
+import {API_BASE_URL} from '../constants/config';
 
+type ReservationRouteProp = RouteProp<RootStackParamList, 'reservation-required-screen'>;
 
 export default function ReservationRequiredScreen({ navigation }: {navigation: NativeStackNavigatorProps}) {
+    const route = useRoute<ReservationRouteProp>();
+    const { selectedRoomsData, locationId } = route.params;
+    console.log('location id: ',locationId);
 
     const [isEditing, setIsEditing] = useState<string | null>(null);
     const [name, setName] = useState({ firstName: '', lastName: '' });
@@ -13,11 +22,58 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
     const [displayPhoneNumber, setDisplayPhoneNumber] = useState('');
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [checked, setChecked] = useState('first');
+    const [locationDetails, setLocationDetails] = useState<any>(null);
+   
 
-    const handleSelect = (option: string) => {
-      setSelectedOption(option);
-    };
 
+    const totalRooms = selectedRoomsData.reduce((sum, room) => sum + room.count, 0);
+
+    const roomPrice = selectedRoomsData.reduce(
+        (sum, room) => sum + room.roomDetails.price * room.count,
+        0
+      );
+
+      const cleaningFee = 15000.0;
+      const serviceFee = roomPrice * 0.01;
+      const tax = roomPrice * 0.04;
+      const totalPrice = roomPrice + cleaningFee + serviceFee + tax;
+
+      const [displayedTotalPrice, setDisplayedTotalPrice] = useState(totalPrice);
+    
+      const fetchLocationDetails = async (id: string) => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/locationbyid/${locationId}`);
+          const data = await response.json();
+          if (data.isSuccess) {
+            console.log('Location details:', data.data);
+            setLocationDetails(data.data);
+          } else {
+            console.error('API error:', data.error);
+          }
+        } catch (error) {
+          console.error('Fetch error:', error);
+        }
+      };
+    
+      useEffect(() => {
+        if (locationId) {
+          fetchLocationDetails(locationId);
+        }
+      }, [locationId]);
+
+    useEffect(() => {
+        console.log('Received Rooms:', selectedRoomsData);
+      }, [selectedRoomsData]);
+
+      const handleSelect = (option: string) => {
+        setSelectedOption(option);
+        setChecked(option);
+        if (option === 'first') {
+          setDisplayedTotalPrice(totalPrice); // Trả toàn bộ
+        } else if (option === 'second') {
+          setDisplayedTotalPrice(totalPrice / 2); // Trả một nửa
+        }
+      };
 
     const handleSave = (field: string) => {
         if (field === 'name') {
@@ -77,27 +133,29 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
         }
     };
 
+   
+
     return (
 
-        <ScrollView style={styles.container}>
+        <View style={styles.container}>
             <View style={styles.header}>
                 <TouchableOpacity style={styles.arrowleftbutton} onPress={() => navigation.goBack()}>
                 <Image source={require('../assets/icons/arrowleft.png')} style={styles.arrowlefticon} />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Yêu Cầu Đặt Chỗ</Text>
             </View>
-
+            <ScrollView>
             <View style={{flexDirection:'row'}}>
                 <View style={styles.imageContainer}>
                     <Image source={require('../assets/images/camping-ho-coc.png')} style={styles.image} />
                 </View>
                 <View style ={styles.textContainer}>
-                    <Text style= {styles.title}>Ho Coc camping Vung Tau </Text>
+                    <Text style= {styles.title}>{locationDetails?.name || 'Tên địa điểm'}</Text>
 
                     <View style={styles.detailsContainer}>
                         <View style={styles.ratingBox}>
                             <Image source = {require('../assets/icons/star.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                            <Text style={styles.boxText}>4.1</Text>
+                            <Text style={styles.boxText}>{locationDetails?.rating || 0}</Text>
                         </View>
                         <View style={styles.featureBox}>
                             <Image source={require('../assets/icons/clock.png')} style ={{marginRight:3,}}></Image>
@@ -113,41 +171,49 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                     <Text style={styles.firsttext}>Ngày</Text>
                     <Text style={styles.secondtext}>26/6 - 27/6</Text>
                 </View>
-                <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
+                {/* <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>Số người</Text>
                     <Text style={styles.secondtext}>4</Text>
-                </View>
+                </View> */}
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>Số phòng</Text>
-                    <Text style={styles.secondtext}>2</Text>
+                    <Text style={styles.secondtext}>{totalRooms}</Text>
                 </View>
+                {selectedRoomsData.map((room, index) => (
+                <View key={index} style={{flexDirection:'row', marginTop: 10 }}>
+                    <Text style={styles.firsttext}>         {room.roomDetails.name}</Text>
+                    <Text style={styles.secondtext}>{room.count}   phòng</Text>
+                </View>
+                ))}
             </View>
 
             <View style ={{width:'100%', height:10, backgroundColor:'#E0DCDC', marginVertical:10, }}></View>
             <View style={styles.bookingcontainer}>
                 <Text style={styles.yourbooking}>Chi tiết giá</Text>
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
-                    <Text style={styles.firsttext}>$50 x 2</Text>
-                    <Text style={styles.secondtext1}>$100.00</Text>
+                    {/* <Text style={styles.firsttext}>$50 x 2</Text>
+                    <Text style={styles.secondtext1}>$100.00</Text> */}
+                    <Text style={styles.firsttext}>Phòng ({totalRooms} phòng)</Text>
+                    <Text style={styles.secondtext1}>{roomPrice.toFixed(0)} VND</Text>
                 </View>
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>Phí dọn dẹp</Text>
-                    <Text style={styles.secondtext1}>$6.00</Text>
+                    <Text style={styles.secondtext1}>{cleaningFee.toFixed(0)} VND</Text>
                 </View>
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>Phí dịch vụ</Text>
-                    <Text style={styles.secondtext1}>$20.00</Text>
+                    <Text style={styles.secondtext1}>{serviceFee.toFixed(0)} VND</Text>
                 </View>
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>Thuế</Text>
-                    <Text style={styles.secondtext1}>$8.00</Text>
+                    <Text style={styles.secondtext1}>{tax.toFixed(0)} VND</Text>
                 </View>
 
                 <View style ={{width:'100%', height:1, backgroundColor:'#E0DCDC', marginVertical:10, }}></View>
                 
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>Tổng cộng</Text>
-                    <Text style={styles.secondtext1}>$134.00</Text>
+                    <Text style={styles.secondtext1}>{totalPrice.toFixed(0)} VND</Text>
                 </View>
 
             </View>
@@ -160,29 +226,29 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                 </View>
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>Trả hết</Text>
-                    <Text style={styles.secondtext}>$134.00</Text>
+                    <Text style={styles.secondtext}>({totalPrice.toFixed(0)} VND)</Text>
                     <View style={{position:'absolute', right:0,}}>
                         <RadioButton
                         value="first"
                         status={checked === 'first' ? 'checked' : 'unchecked'}
-                        onPress={() => setChecked('first')}
+                        onPress={() => handleSelect('first')}
                         />
                     </View>
                     
                 </View>
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>Trả một nửa</Text>
-                    <Text style={styles.secondtext}>$67.00</Text>
+                    <Text style={styles.secondtext}>{(totalPrice / 2).toFixed(0)} VND</Text>
                     <View style={{position:'absolute', right:0,}}>
                         <RadioButton
                         value="second"
                         status={checked === 'second' ? 'checked' : 'unchecked'}
-                        onPress={() => setChecked('second')}
+                        onPress={() => handleSelect('second')}
                         />
                     </View>
                     
                 </View>
-                <Text style={{width:'60%',}}>Cần trả $67.00 hôm nay và $67.00 vào ngày 25</Text>
+                <Text style={{width:'60%',}}>Cần trả {(totalPrice / 2).toFixed(0)} VND hôm nay và còn lại vào ngày 25</Text>
                 
             </View>
 
@@ -192,7 +258,6 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                 <View style={{flexDirection:'row'}}>
                     <Text style={styles.yourbooking}>Thông tin liên lạc</Text>
                     <Text style={{color:'red', fontSize:20, marginLeft:5}}>*</Text>
-                    
                 </View>
                 <TouchableOpacity 
                 style={styles.rowwithicon}         
@@ -234,15 +299,20 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
             <View style={{width:'100%', marginVertical:20,}}>
                 <View style = {{  alignItems:'center', justifyContent:'center',alignContent:'center',width:'100%'}}>
                     
-                    <TouchableOpacity style={styles.addpaymentmethod2} onPress={()=> navigation.navigate('payment-method-screen')} >
-                            <Text style={styles.boxText3}>Tiếp tục để thanh toán</Text>
+                    <TouchableOpacity style={styles.addpaymentmethod2} onPress={()=> navigation.navigate('payment-method-screen',{
+                        locationId: locationId,
+                        totalPrice: displayedTotalPrice,
+                        })} >
+                        <Text style={styles.boxText3}>Tiếp tục để thanh toán</Text>
                     </TouchableOpacity>
                 </View>
             </View>
 
+            </ScrollView>
             
             
-        </ScrollView>
+            
+        </View>
 
         
 );

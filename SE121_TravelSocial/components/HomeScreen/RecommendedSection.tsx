@@ -2,6 +2,7 @@ import {Text, View, FlatList, Dimensions, TouchableOpacity, StyleSheet, Image, A
 import locationData from '@/constants/location';
 import React, { useEffect, useState } from 'react';
 import * as Network from 'expo-network';
+import {API_BASE_URL} from '../../constants/config';
 
 const {width, height} = Dimensions.get('window')
 const CARD_WIDTH =  width - 190;
@@ -28,7 +29,7 @@ export default function RecommendedSection() {
         try {
             const ipAddress = await Network.getIpAddressAsync();
             console.log('Device IP Address:', ipAddress);
-            const response = await fetch('http://192.168.1.2:3000/alllocation'); 
+            const response = await fetch(`${API_BASE_URL}/alllocation`); 
             
             const data = await response.json();
 
@@ -54,7 +55,7 @@ export default function RecommendedSection() {
 
     return (
 
-        <View>
+        <View style={{height:CARD_HEIGHT+50}}>
             <Text style = {styles.titleText}>Đề xuất</Text>
             <FlatList
             data={locations}
@@ -65,9 +66,11 @@ export default function RecommendedSection() {
             keyExtractor={item => item._id}
             renderItem={({item, index}) => {
                 return (
-                    <TouchableOpacity style = {{
+                    <TouchableOpacity style = {[
+                        styles.cardContainer,
+                        {
                         marginLeft: 24,
-                        marginRight:  index === locationData.length - 1 ? 24 : 0}}>
+                        marginRight:  index === locationData.length - 1 ? 24 : 0}]}>
                         <View>
                             <View style = {[styles.imageBox, ]}>
                                 <Image source={require('@/assets/images/bai-truoc-20.jpg')}
@@ -90,7 +93,7 @@ export default function RecommendedSection() {
                             </View>
                             <View style = {styles.footer}>
                                 <View>
-                                    <Text style = {[styles.textStyle, {fontSize: 20}]}>{item.name}</Text>
+                                    <Text style = {[styles.textStyle, {fontSize: 14}]}>{item.name}</Text>
                                 </View>
                                 <View style = {[styles.textBox,{borderWidth:3, borderColor:'white'}]}>
                                     <Text style = {[styles.textStyle2, {marginHorizontal: 5, color: 'white'}]}>hot deal</Text>
@@ -106,6 +109,22 @@ export default function RecommendedSection() {
 }
 
 const styles = StyleSheet.create({
+
+    cardContainer: {
+        borderWidth: 2, // Viền trắng
+        borderColor: 'white',
+        borderRadius: 24, // Bo góc
+        shadowColor: '#000', // Màu bóng
+        shadowOffset: {
+          width: 0,
+          height: 10, // Đổ bóng theo chiều dọc
+        },
+        shadowOpacity: 0.1, // Độ mờ của bóng
+        shadowRadius: 10, // Bán kính bóng
+        elevation: 5, // Đổ bóng trên Android
+        backgroundColor: 'white', // Nền trắng
+        height: CARD_HEIGHT-20,
+      },
     
     titleText: {
         fontSize: 24,
@@ -115,7 +134,7 @@ const styles = StyleSheet.create({
     },
     card: {
         width: CARD_WIDTH,
-        height: CARD_HEIGHT,
+        height: CARD_HEIGHT-70,
         marginVertical: 10,
     },
     imageBox: {

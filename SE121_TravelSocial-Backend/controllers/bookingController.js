@@ -59,6 +59,21 @@ module.exports.getBookingByLocationId = async (req, res, next) => {
     }
 }
 
+module.exports.getBookingByBusinessId = async (req, res, next) => {
+    const {businessId} = req.params;
+    try {
+        const result = await bookingSvc.getBookingByBusinessId(businessId)
+        res.status(201).json({
+            isSuccess: true,
+            data: result,
+            error: null
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
 module.exports.createBooking = async (req, res, next) => {
     const {
         dateBooking,
@@ -119,3 +134,46 @@ module.exports.deleteBooking = async (req, res, next) => {
         next(error)
     }
 }
+
+module.exports.getRevenueByMonth = async (req, res, next) => {
+    const { month, year } = req.query; // Lấy month, year từ query params
+    try {
+        if (!month || !year) {
+            throw new Error('Month and year are required.');
+        }
+
+        const result = await bookingSvc.getRevenueByMonth(parseInt(month), parseInt(year));
+        res.status(200).json({
+            isSuccess: true,
+            data: result,
+            error: null,
+        });
+    } catch (error) {
+        next(error); // Xử lý lỗi thông qua middleware
+    }
+};
+
+module.exports.getBookingRevenue = async (req, res, next) => {
+    const { businessId } = req.params;
+    try {
+        
+        if (!businessId) {
+            return res.status(400).json({ isSuccess: false, error: 'Business ID is required', data: null });
+        }
+        const { month, year } = req.query;
+
+        const result = await bookingSvc.getBookingRevenueByMonthForBusiness(
+            businessId,
+            parseInt(month),
+            parseInt(year)
+        );
+
+        res.status(200).json({
+            isSuccess: true,
+            data: result,
+            error: null,
+        });
+    } catch (error) {
+        next(error);
+    }
+};

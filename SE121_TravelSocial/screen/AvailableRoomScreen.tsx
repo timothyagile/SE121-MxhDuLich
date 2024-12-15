@@ -1,46 +1,211 @@
+import { RouteProp, useRoute } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { Text, View, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView, Alert, Platform, Modal } from 'react-native';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
+import {iconMapping} from '../constants/icon'
+import { RootStackParamList } from '@/types/navigation';
+import {API_BASE_URL} from '../constants/config';
+
+
+
+// type RootStackParamList = {
+//     'room-screen': { id: string }; 
+//   };
+
+// type DetailScreenRouteProp = RouteProp<RootStackParamList, 'room-screen'>;
+
+interface Room {
+    _id: string;
+    name: string;
+    bedType: string;
+    area: number; 
+    quantity: number; 
+    price: number; 
+    facility: {
+        name: string; 
+        description?: string; 
+        icon: string;
+    }[];
+    bed: {
+        category: string;
+        icon: string;
+        quantity: number;
+    }[];
+}
 
 export default function AvailableRoomScreen({ navigation }: {navigation: NativeStackNavigatorProps}) {
-
+    const route = useRoute<RouteProp<RootStackParamList, 'available-room-screen'>>();
+    const { id, checkinDate, checkoutDate } = route.params;
+    console.log('checkin ddate: ', checkinDate);
+    //const route = useRoute<DetailScreenRouteProp>();
+    //const { id } = route.params; 
+    const [rooms, setRooms] = useState<Room[]>([]);
+    const [services, setServices] = useState([]);
     const [isModalVisible, setModalVisible] = useState(false);
     const [roomCount, setRoomCount] = useState(0);
     const [selectedRooms, setSelectedRooms] = useState(0);
+    const [selectedRoomCounts, setSelectedRoomCounts] = useState<Record<string, number>>({});
+    const [currentRoomId, setCurrentRoomId] = useState<string | null>(null);
     const [buttonText, setButtonText] = useState("Chọn");
+    // const baseUrl = "http://localhost:3000/"; // URL trỏ đến thư mục assets
+    // const fullUrl = `${baseUrl}${icon}`;
     
 
+    const getIcon = (iconName: string) => {
+        return iconMapping[iconName] || iconMapping["default.png"];
+    };
+
+    useEffect(() => {
+        const fetchAvailableRooms = async () => {
+          try {
+            // Gọi API getbookingbylocationid để lấy danh sách các booking của địa điểm
+            const bookingResponse = await fetch(
+              `${API_BASE_URL}/booking/getall`
+            );
+            const bookingData = await bookingResponse.json();
+      
+            if (Array.isArray(bookingData.data)) {
+              const bookings = bookingData.data;
+              console.log(bookings);
+      
+              // Gọi API để lấy danh sách phòng
+              const roomResponse = await fetch(
+                `${API_BASE_URL}/room/getbylocationid/${id}`
+              );
+              const roomData = await roomResponse.json();
+      
+              if (Array.isArray(roomData.data)) {
+                const rooms = roomData.data;
+      
+                // Lọc danh sách phòng dựa trên các ngày có trong bookings
+                const availableRooms = rooms.filter((room: any) => {
+                  const isBooked = bookings.some((booking: any) => {
+                    const bookingCheckin = new Date(booking.checkInDate).getTime();
+                    const bookingCheckout = new Date(booking.checkOutDate).getTime();
+                    const userCheckin = new Date(checkinDate).getTime();
+                    const userCheckout = new Date(checkoutDate).getTime();
+                    console.log('booking checkin: ',bookingCheckin);
+                    console.log('booking checkout: ',bookingCheckout);
+                    console.log('user checkin: ',userCheckin);
+                    console.log('user checkout: ',userCheckout);
+                    
+      
+                    // Kiểm tra xem ngày người dùng chọn có nằm trong khoảng booking hay không
+                    return (
+                      room._id === booking.roomId &&
+                      ((userCheckin >= bookingCheckin && userCheckin <= bookingCheckout) ||
+                        (userCheckout >= bookingCheckin && userCheckout <= bookingCheckout))
+                    );
+                  });
+      
+                  return !isBooked; // Chỉ giữ các phòng không bị đặt
+                });
+      
+                setRooms(availableRooms); // Cập nhật danh sách phòng khả dụng
+              }
+            }
+          } catch (error) {
+            console.error('eError fetching rooms or bookings:', error);
+          }
+        };
+      
+        fetchAvailableRooms();
+      }, [id, checkinDate, checkoutDate]);
+    
+    // useEffect(() => {
+    //     const fetchRooms = async (id: string) => {
+    //         try {
+    //             console.log('idd: ',id);
+    //             const response = await fetch(`http://192.168.1.2:3000/room/getbylocationid/${id}`); // Thay đổi URL theo API của bạn
+    //             if (!response.ok) {
+    //                 throw new Error('Network response was not ok');
+    //             }
+    //             const data = await response.json();
+    //             if (Array.isArray(data.data)) {
+    //                 setRooms(data.data);
+                    
+    //             } else {
+    //                 console.error('Expected data to be an array, but got:', data);
+    //             }
+    //         } catch (error) {
+    //             console.error('Error fetching rooms:', error);
+    //         }
+    //     };
+
+    //     fetchRooms(id);
+    // }, [id]);
+
     const handleApply = () => {
-        if (roomCount > 0) {
-            setSelectedRooms(roomCount); 
-            setButtonText(`Đã chọn ${roomCount} phòng `);
-        }
+        // if (roomCount > 0) {
+        //     setSelectedRooms(roomCount); 
+        //     setButtonText(`Đã chọn ${roomCount} phòng `);
+        // }
+        {selectedRoomCounts[currentRoomId!] ? `Đã chọn ${selectedRoomCounts[currentRoomId!]} phòng` : "Chọn"}
 
 
-        if(roomCount===0){
-            setSelectedRooms(roomCount); 
-            setButtonText('Chọn');
-        }
+        // if(roomCount===0){
+        //     setSelectedRooms(roomCount); 
+        //     setButtonText('Chọn');
+        // }
         setModalVisible(false);
     };
     
 
-    const toggleModal = () => {
+    
+    const toggleModal = (roomId?: string) => {
+        setCurrentRoomId(roomId || null);
         setModalVisible(!isModalVisible);
     };
 
-    const incrementRoomCount = () => {
-        setRoomCount(prevCount => prevCount + 1);
-       
+
+    const incrementRoomCount = (roomId: string) => {
+        setSelectedRoomCounts(prevCounts => ({
+            ...prevCounts,
+            [roomId]: (prevCounts[roomId] || 0) + 1, // Tăng số lượng phòng đã chọn cho roomId
+        }));
     };
 
-    const decrementRoomCount = () => {
-        if (roomCount > 0) {
-            setRoomCount(prevCount => prevCount - 1);
-            
-        }
+    const decrementRoomCount = (roomId: string) => {
+        setSelectedRoomCounts(prevCounts => {
+            const currentCount = prevCounts[roomId] || 0;
+            if (currentCount > 0) {
+                return {
+                    ...prevCounts,
+                    [roomId]: currentCount - 1, // Giảm số lượng phòng đã chọn cho roomId
+                };
+            }
+            return prevCounts;
+        });
     };
 
+    type SelectedRoom = {
+        roomId: string;
+        count: number;
+        roomDetails: {
+          name: string;
+          price: number;
+        };
+      };
+
+    const handleConfirm = () => {
+        const selectedRoomsData = Object.keys(selectedRoomCounts).map((roomId) => {
+            const room = rooms.find((r) => r._id === roomId);
+            return {
+              roomId,
+              count: selectedRoomCounts[roomId],
+              roomDetails: {
+                name: room?.name || '',
+                price: room?.price || 0,
+              },
+            };
+          });
+        navigation.navigate('reservation-required-screen', {
+          selectedRoomsData,
+          locationId: id,
+        });
+      };
+
+    
     return (
 
         <View style={styles.container}>
@@ -55,146 +220,87 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                 </View>
                 <TouchableOpacity
                     style={styles.createButton}
-                    onPress={() => console.log('Create button pressed')}
+                    onPress={handleConfirm}
                     >
                     <Text style={styles.createButtonText}>Xác nhận</Text>
                 </TouchableOpacity>
             </View>
 
             <ScrollView style={styles.body}>
-                    <View style={styles.roomcontainer}>
-                        <Text style={styles.title}>Phòng cho 2 người</Text>
 
-                        <View style={styles.bedandarea} >
-                            <Image source={require('../assets/icons/bed.png')}></Image>
-                            <Text style ={styles.bed}>1 giường đôi</Text>
+
+                <View style={styles.container}>
+            
+
+            <View style={styles.body}>
+                {rooms.map((room, index) => (
+                    <View key={index} style={styles.roomcontainer}>
+                        <Text style={styles.title}>{room?.name || ''}</Text>
+                        <View style={styles.bedandarea}>
+                            
+                            {room.bed.map((bed, index) => (
+                                <View key={index} style={styles.backgroundBox}>
+                                    
+                                        <Image source={getIcon(bed.icon)}/>
+                                        <Text style={styles.bed}>{bed.category} : {bed.quantity} </Text>
+                                    
+                                </View>
+                            ))}
+                            
                             <View style={styles.areacontainer}>
-                                <Text style={styles.area}>diện tích: </Text>
-                                <Text style={styles.area}>16m2</Text>
+                                <Text style={styles.area}>Diện tích: </Text>
+                                <Text style={styles.area}>{room.area} m²</Text>
                             </View>
+                        </View>
+
+                        <View style = {styles.bedandarea}>
+                            <Image source={require('../assets/icons/service.png')}></Image>
+                            <Text style={styles.area}>   Dịch vụ:</Text>
+                        </View>
+
+                        <View style={styles.featureContainer}>
+                        
+                            {room.facility.map((facility, index) => (
+                                
+                                <View key={index} style={styles.backgroundBox}>
+                                    <Image
+                                        
+                                        source={getIcon(facility.icon)}
+                                        style={{height:20, width:20, marginRight:3,}}
+                                    />
+                                    <Text style={styles.area}>{facility.name}</Text>
+                                </View>
+                            ))}
                         </View>
 
                         <View style={styles.servicecontainer}>
-                            <View style = {styles.bedandarea}>
-                                <Image source={require('../assets/icons/service.png')}></Image>
-                                <Text style={styles.area}>   Dịch vụ:</Text>
-                            </View>
-
-                            <View style={styles.featureContainer}>
-                                <View style={styles.backgroundBox}>
-                                    <Image source = {require('../assets/icons/clock.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> hủy miễn phí trong 24h</Text>
-                                </View>
-
-                                <View style={styles.backgroundBox}>
-                                    <Image source = {require('../assets/icons/wifi.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> miễn phí wifi</Text>
-                                </View>
-
-                                <View style={styles.backgroundBox}>
-                                    <Image source = {require('../assets/icons/tub.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> bồn tắm</Text>
-                                </View>
-
-                                <View style={styles.backgroundBox}>
-                                    <Image source = {require('../assets/icons/airconditioner.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> điều hòa</Text>
-                                </View>
-
-                                <View style={styles.backgroundBox}>
-                                    <Image source = {require('../assets/icons/unsound.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> cách âm</Text>
-                                </View>
-                            </View>
-
                             <View style={styles.state}>
                                 <Text style={styles.area}>Trạng thái: </Text>
-                                <Text style={styles.statetext}> 5 </Text>
-                                <Text style={styles.statetext}>phòng</Text>
+                                <Text style={styles.statetext}>{room.quantity}</Text>
+                                <Text style={styles.statetext}> phòng</Text>
                             </View>
-                            
                         </View>
 
-                        <View style ={styles.endcontainer}>
-                            <View style={{flex:1}}>
-                                <Text style={styles.area}>Giá</Text>
-                                <Text style={styles.pricetext}>200,000 VND</Text>
+                        <View style={styles.endcontainer}>
+                            <View style={{ flex: 2 }}>
+                                <Text style={styles.area2}>Giá</Text>
+                                <Text style={styles.pricetext}>{room.price} VND</Text>
                             </View>
-                            <View style={{flex:5, justifyContent:'center', alignItems:'center',}}>
-                                <TouchableOpacity style={styles.choosebutton} onPress={toggleModal}>
-                                <Text style={styles.choosetext}>{buttonText}</Text>
+                            <View style={{ flex: 6, justifyContent: 'center', alignItems: 'center' }}>    
+                                <TouchableOpacity style={styles.choosebutton} onPress={() => toggleModal(room._id)}>
+                                    <Text style={styles.choosetext}>
+                                        {selectedRoomCounts[room._id] ? `Đã chọn ${selectedRoomCounts[room._id]} phòng` : "Chọn"}
+                                    </Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
                     </View>
-                    <View style={styles.roomcontainer}>
-                        <Text style={styles.title}>Phòng cho 2 người</Text>
-
-                        <View style={styles.bedandarea} >
-                            <Image source={require('../assets/icons/bed.png')}></Image>
-                            <Text style ={styles.bed}>1 giường đôi</Text>
-                            <View style={styles.areacontainer}>
-                                <Text style={styles.area}>diện tích: </Text>
-                                <Text style={styles.area}>16m2</Text>
-                            </View>
-                        </View>
-
-                        <View style={styles.servicecontainer}>
-                            <View style = {styles.bedandarea}>
-                                <Image source={require('../assets/icons/service.png')}></Image>
-                                <Text style={styles.area}>   Dịch vụ:</Text>
-                            </View>
-
-                            <View style={styles.featureContainer}>
-                                <View style={styles.backgroundBox}>
-                                    <Image source = {require('../assets/icons/clock.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> hủy miễn phí trong 24h</Text>
-                                </View>
-
-                                <View style={styles.backgroundBox}>
-                                    <Image source = {require('../assets/icons/wifi.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> miễn phí wifi</Text>
-                                </View>
-
-                                <View style={styles.backgroundBox}>
-                                    <Image source = {require('../assets/icons/tub.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> bồn tắm</Text>
-                                </View>
-
-                                <View style={styles.backgroundBox}>
-                                    <Image source = {require('../assets/icons/airconditioner.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> điều hòa</Text>
-                                </View>
-
-                                <View style={styles.backgroundBox}>
-                                    <Image source = {require('../assets/icons/unsound.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                                    <Text style={styles.boxText}> cách âm</Text>
-                                </View>
-                            </View>
-
-                            <View style={styles.state}>
-                                <Text style={styles.area}>Trạng thái: </Text>
-                                <Text style={styles.statetext}> 5 </Text>
-                                <Text style={styles.statetext}>phòng</Text>
-                            </View>
-                            
-                        </View>
-
-                        <View style ={styles.endcontainer}>
-                            <View style={{flex:1}}>
-                                <Text style={styles.area}>Giá</Text>
-                                <Text style={styles.pricetext}>200,000 VND</Text>
-                            </View>
-                            <View style={{flex:5, justifyContent:'center', alignItems:'center',}}>
-                                <TouchableOpacity style={styles.choosebutton} onPress={toggleModal}>
-                                <Text style={styles.choosetext}>{buttonText}</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                    </View>
-
-
-                    
+                ))}
+            </View>
+                <Modal visible={isModalVisible} animationType="slide" transparent={true}>
+                    {/* Modal Code */}
+                </Modal>
+            </View>
                     
                     
             </ScrollView>
@@ -203,18 +309,18 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
             <Modal visible={isModalVisible} animationType="slide" transparent={true}>
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
-                        <TouchableOpacity onPress={toggleModal} style={styles.closeButton}>
+                        <TouchableOpacity onPress={()=>toggleModal()} style={styles.closeButton}>
                             <Text style={styles.closeButtonText}>X</Text>
                         </TouchableOpacity>
                         <Text style={styles.modalTitle}>Chọn số lượng phòng</Text>
                         <View style={styles.modalBody}>
                             <Text style={styles.modalText}>Số lượng phòng</Text>
                             <View style={styles.counterContainer}>
-                                <TouchableOpacity onPress={decrementRoomCount} style={styles.counterButton}>
+                                <TouchableOpacity onPress={()=>decrementRoomCount(currentRoomId!)} style={styles.counterButton}>
                                     <Text style={styles.counterButtonText}>-</Text>
                                 </TouchableOpacity>
-                                <Text style={styles.counterValue}>{roomCount}</Text>
-                                <TouchableOpacity onPress={incrementRoomCount} style={styles.counterButton}>
+                                <Text style={styles.counterValue}>{selectedRoomCounts[currentRoomId!] || 0}</Text>
+                                <TouchableOpacity onPress={()=>incrementRoomCount(currentRoomId!)} style={styles.counterButton}>
                                     <Text style={styles.counterButtonText}>+</Text>
                                 </TouchableOpacity>
                             </View>
@@ -222,11 +328,16 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                         <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
                             <Text style={styles.applyButtonText}>Xác nhận</Text>
                         </TouchableOpacity>
+                        
                     </View>
                 </View>
             </Modal>
          
+
+        
         </View>
+
+        
 );
 }
 
@@ -276,6 +387,10 @@ const styles = StyleSheet.create({
 
     area:{
         fontSize:18,
+    },
+
+    area2:{
+        fontSize: 14,
     },
 
     servicecontainer:{
@@ -359,7 +474,7 @@ const styles = StyleSheet.create({
 
     pricetext:{
         color:'#2DD7A4',
-        fontSize: 22 ,
+        fontSize: 16 ,
         fontWeight:'600',
     },
     
@@ -475,9 +590,7 @@ const styles = StyleSheet.create({
         color: '#196EEE',
         fontWeight: 'bold',
         fontSize: 16,
-      },
-
-    
+      }, 
 });
 
 
