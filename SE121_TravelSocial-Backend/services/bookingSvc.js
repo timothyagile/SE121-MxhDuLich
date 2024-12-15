@@ -6,14 +6,11 @@ const { default: mongoose } = require('mongoose')
 
 const updateStatusBooking = async (bookingId, amountPayed) => {
     const booking = await Booking.findById(bookingId);
-    console.log(amountPayed)
-    console.log(booking.totalPrice)
+    //console.log(amountPayed)
+    //console.log(booking.totalPrice)
     if (booking.totalPrice === amountPayed) {
         booking.status = 'complete'
         booking.save()
-    }
-    else {
-        throw new ForbiddenError('Cannot update status')
     }
 }
 
@@ -27,6 +24,14 @@ const getAllBooking = async () => {
 }
 const getBookingById = async (id) => {
     const result = await Booking.findById(id)
+    .populate({
+        path: 'items.roomId',
+        select: 'name'
+    })
+    .populate({
+        path: 'services.serviceId',
+        select: 'name'
+    }) 
     if(result)
         return result
     else

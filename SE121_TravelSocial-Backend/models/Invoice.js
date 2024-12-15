@@ -3,9 +3,9 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema;
 
 const invoiceItemSchema = new Schema({
-    itemId: {type: mongoose.Schema.Types.ObjectId, ref: 'Service', required: true},
-    description: {type: String},
+    itemName: {type: String, required: true},
     quantity: {type: Number, default: 1},
+    price: {type: Number, required: true},
     totalPrice: {type: Number, required: true}
 })
 
