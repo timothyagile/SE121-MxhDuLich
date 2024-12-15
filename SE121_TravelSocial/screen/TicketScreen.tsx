@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, FlatList, ActivityIndicator } from 'react-native';
 import Ticket from '@/components/BookingScreen/Booking';
 import {API_BASE_URL} from '../constants/config'; // Import component Ticket
+import { useUser } from '@/context/UserContext';
 
 export default function TicketScreen() {
+  const { userId } = useUser();
   const [tickets, setTickets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -11,7 +13,7 @@ export default function TicketScreen() {
   const fetchTickets = async () => {
     try {
         
-      const response = await fetch(`${API_BASE_URL}/booking/getall`); // Thay bằng URL API của bạn
+      const response = await fetch(`${API_BASE_URL}/booking/getbyuserid/${userId}`); // Thay bằng URL API của bạn
       const result = await response.json();
 
       setTickets(result.data); // Gán dữ liệu từ API
@@ -68,7 +70,6 @@ export default function TicketScreen() {
     }
   };
 
-  // Gọi API khi component được render
   useEffect(() => {
     fetchTickets();
   }, []);
@@ -82,10 +83,10 @@ export default function TicketScreen() {
             keyExtractor={(item) => item._id} // Sử dụng _id làm key
             renderItem={({ item }) => (
                 <Ticket
-                title={`Room ID: `} // Hiển thị roomId (hoặc tuỳ chỉnh)
+                title={item.locationName} // Hiển thị roomId (hoặc tuỳ chỉnh)
                 date={`${new Date(item.checkInDate).toLocaleDateString()} - ${new Date(item.checkOutDate).toLocaleDateString()}`}
                 status={item.status}
-                imageUrl={item.imageUrl || 'https://via.placeholder.com/150'} // Dùng ảnh mặc định nếu thiếu
+                imageUrl={item.imageUrl || 'https://via.placeholder.com/150'}
                 onCancel={() => console.log(`Cancel ticket: ${item._id}`)}
                 />
             )}

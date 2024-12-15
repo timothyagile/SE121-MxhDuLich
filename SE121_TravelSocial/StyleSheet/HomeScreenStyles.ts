@@ -6,10 +6,16 @@ export default StyleSheet.create({
         backgroundColor: '#fff',
     },
 
+    backgroundImage: {
+        flex: 1,
+        width: '100%',
+        height: '100%',
+      },
+
     logo:{
-        marginTop: 20,
-        width:50,
-        height:50,
+        marginTop: 0,
+        width:35,
+        height:35,
         marginLeft: 10,
     },
 
