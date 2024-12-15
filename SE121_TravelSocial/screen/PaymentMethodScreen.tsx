@@ -3,6 +3,7 @@ import { Text, View, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView,
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 import { RootStackParamList } from '@/types/navigation';
 import { RouteProp, useRoute } from '@react-navigation/native';
+import {API_BASE_URL} from '../constants/config';
 
 type ReservationRouteProp = RouteProp<RootStackParamList, 'payment-method-screen'>;
 interface Bank {
@@ -30,7 +31,23 @@ export default function PaymentMethodScreen({ navigation }: {navigation: NativeS
         if (button === 'bank') {
             fetchBanks();
         }
+        handleMomoPayment();
     };
+
+    const handleMomoPayment = async () => {
+        const partnerCode = "MOMOXXXX"; 
+        const totalPrice = 50000; 
+        const orderId = "order12345"; 
+        const description = "Thanh toán TravelSocial";
+    
+        const deeplink = `momo://?action=payWithApp&amount=${totalPrice}&orderId=${orderId}&description=${description}`;
+        try {
+            await Linking.openURL(deeplink);
+        } catch (error) {
+            Alert.alert('Lỗi', 'Không thể mở ứng dụng MoMo.');
+        }
+    };
+    
 
     const fetchBanks = async () => {
         
@@ -65,7 +82,8 @@ export default function PaymentMethodScreen({ navigation }: {navigation: NativeS
 
     const fetchLocationDetails = async (id: string) => {
         try {
-          const response = await fetch(`http://192.168.0.101:3000/locationbyid/${locationId}`);
+          console.log('locationid in payment: ',locationId);
+          const response = await fetch(`${API_BASE_URL}/locationbyid/${locationId}`);
           const data = await response.json();
           if (data.isSuccess) {
             console.log('Location details:', data.data);

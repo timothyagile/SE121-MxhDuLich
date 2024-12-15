@@ -6,6 +6,7 @@ import { Picker } from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useUser } from '@/context/UserContext';
+import {API_BASE_URL} from '../constants/config';
 
 type EditFields = 'name' | 'phoneNumber' | 'email' | 'address' | 'dob' | 'nationality' | 'citizenId';
 
@@ -50,7 +51,7 @@ export default function PersonalInformationScreen({ navigation }: {navigation: N
 
   const fetchUserData = async () => {
     try {
-      const response = await fetch(`http://192.168.0.101:3000/user/getbyid/${userId}`);
+      const response = await fetch(`${API_BASE_URL}/user/getbyid/${userId}`);
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }

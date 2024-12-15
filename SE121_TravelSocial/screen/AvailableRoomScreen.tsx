@@ -4,6 +4,7 @@ import { Text, View, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView,
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 import {iconMapping} from '../constants/icon'
 import { RootStackParamList } from '@/types/navigation';
+import {API_BASE_URL} from '../constants/config';
 
 
 
@@ -59,7 +60,7 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
           try {
             // Gọi API getbookingbylocationid để lấy danh sách các booking của địa điểm
             const bookingResponse = await fetch(
-              `http://192.168.0.101:3000/booking/getall`
+              `${API_BASE_URL}/booking/getall`
             );
             const bookingData = await bookingResponse.json();
       
@@ -69,7 +70,7 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
       
               // Gọi API để lấy danh sách phòng
               const roomResponse = await fetch(
-                `http://192.168.0.101:3000/room/getbylocationid/${id}`
+                `${API_BASE_URL}/room/getbylocationid/${id}`
               );
               const roomData = await roomResponse.json();
       

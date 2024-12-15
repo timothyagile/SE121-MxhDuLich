@@ -6,7 +6,7 @@ import axios from 'axios';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useRoute,RouteProp } from '@react-navigation/native';
-
+import {API_BASE_URL} from '../../constants/config';
 
 const { width, height } = Dimensions.get('window');
 
@@ -162,7 +162,7 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
 
     const fetchLocationDetails = async (id: string) => {
       try {
-        const response = await fetch(`http://192.168.0.101:3000/locationbyid/${id}`);
+        const response = await fetch(`${API_BASE_URL}/locationbyid/${id}`);
         const data = await response.json();
         if (data.isSuccess) {
           console.log('Location details:', data.data);
@@ -178,7 +178,7 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
     const fetchRoomServices = async (locationId: string) => {
       try {
         console.log('locationid: ',locationId);
-        const response = await fetch(`http://192.168.1.2:3000/room/getbylocationid/${locationId}`);
+        const response = await fetch(`${API_BASE_URL}/room/getbylocationid/${locationId}`);
         const result = await response.json();
     
         if (result.isSuccess && result.data) {

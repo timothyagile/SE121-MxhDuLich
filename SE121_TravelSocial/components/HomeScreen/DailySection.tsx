@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {Image, View, StyleSheet, TouchableOpacity, Text, Dimensions, ActivityIndicator} from 'react-native';
 import locationData from '@/constants/location'
 import * as Network from 'expo-network';
+import {API_BASE_URL} from '../../constants/config';
 
 const {width, height} = Dimensions.get('window')
 const CARD_WIDTH =  width - 240;
@@ -28,7 +29,7 @@ export default function DailySection({ categoryId }: DailySectionProps) {
         try {
             const ipAddress = await Network.getIpAddressAsync();
             console.log('Device IP Address:', ipAddress);
-            const response = await fetch(`http://192.168.0.101:3000/locationbycategory/${id}`);
+            const response = await fetch(`${API_BASE_URL}/locationbycategory/${id}`);
             const data = await response.json();
             if (data.isSuccess) {
                 setLocations(data.data);
