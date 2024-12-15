@@ -6,6 +6,7 @@ import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/n
 import CustomModal from '../CollectionScreen/AddIntoCollection';
 import * as Network from 'expo-network';
 import { NetworkInfo } from 'react-native-network-info';
+import {API_BASE_URL} from '../../constants/config';
 
 const {width, height} = Dimensions.get('window')
 const CARD_WIDTH = 240;
@@ -52,7 +53,7 @@ export default function PopularSection({ categoryId, navigation }: PopularSectio
         try {
             const ipAddress = await Network.getIpAddressAsync();
             console.log('Device IP Address:', ipAddress);
-            const response = await fetch(`http://192.168.0.101:3000/locationbycategory/${id}`);
+            const response = await fetch(`${API_BASE_URL}/locationbycategory/${id}`);
             const data = await response.json();
             if (data.isSuccess) {
                 setLocations(data.data);

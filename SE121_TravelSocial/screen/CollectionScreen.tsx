@@ -3,6 +3,7 @@ import React,{ useState, useEffect } from 'react'
 import {Button, Text, View,  StyleSheet, Image, TouchableOpacity, TextInput,Modal, Dimensions, FlatList} from 'react-native';
 import { NativeStackNavigationProp, NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 import { useUser } from '@/context/UserContext';
+import {API_BASE_URL} from '../constants/config';
 
 const { height } = Dimensions.get('window');
 
@@ -33,7 +34,7 @@ export default function CollectionScreen ()
             imageUrl: "", 
           };
       
-          const response = await fetch("http://192.168.1.6:3000/collection/create", {
+          const response = await fetch(`${API_BASE_URL}/collection/create`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -57,7 +58,7 @@ export default function CollectionScreen ()
       const fetchCollections = async () => {
         try {
           console.log(userId);
-          const response = await fetch(`http://192.168.1.6:3000/collection/getbyuserid/${userId}`); 
+          const response = await fetch(`${API_BASE_URL}/collection/getbyuserid/${userId}`); 
           const result = await response.json();
     
           if (result.isSuccess) {

@@ -3,7 +3,7 @@ import {Button, Text, View,  StyleSheet, Image, TouchableOpacity, TextInput, Ale
 //import CheckBox from '@react-native-community/checkbox';
 import Checkbox from 'expo-checkbox';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
-
+import {API_BASE_URL} from '../../constants/config';
 
 export default function RegisterScreen2 ({navigation}: {navigation: NativeStackNavigatorProps}) {
 
@@ -22,7 +22,7 @@ export default function RegisterScreen2 ({navigation}: {navigation: NativeStackN
         console.log('Password:', password);
 
         try {
-            const response = await fetch('http://192.168.1.11:3000/signup', {
+            const response = await fetch(`${API_BASE_URL}/signup`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

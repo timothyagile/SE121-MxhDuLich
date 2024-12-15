@@ -118,7 +118,7 @@ const DetailLocationBusinessScreen =({ mapLoaded }) => {
 
     useEffect(() => {
         // Đây là nơi bạn cập nhật địa chỉ mới khi cần
-        setAddress("FFXQ+X94, Bung Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam");
+        setAddress(locationInfo.address);
     }, [id]);
 
 

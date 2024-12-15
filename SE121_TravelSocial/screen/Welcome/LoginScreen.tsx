@@ -5,6 +5,7 @@ import Checkbox from 'expo-checkbox';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 import { Ionicons, FontAwesome6 } from '@expo/vector-icons';
 import { useUser } from '@/context/UserContext';
+import {API_BASE_URL} from '../../constants/config';
 
 
 export default function LoginScreen ({navigation}: {navigation: NativeStackNavigatorProps}) {
@@ -24,9 +25,9 @@ export default function LoginScreen ({navigation}: {navigation: NativeStackNavig
     };
 
     const handleLogin = async () => {
-        
+        console.log('url:', API_BASE_URL);
         try {
-            const response = await fetch('http://192.168.0.101:3000/signin', {
+            const response = await fetch(`${API_BASE_URL}/signin`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userEmail: email, userPassword: password }),

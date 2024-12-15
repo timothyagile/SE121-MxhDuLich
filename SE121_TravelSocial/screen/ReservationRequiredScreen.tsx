@@ -6,6 +6,7 @@ import { useRoute } from '@react-navigation/native';
 import { RouteProp } from '@react-navigation/native';
 import { RouteParams } from 'expo-router';
 import { RootStackParamList } from '@/types/navigation';
+import {API_BASE_URL} from '../constants/config';
 
 type ReservationRouteProp = RouteProp<RootStackParamList, 'reservation-required-screen'>;
 
@@ -41,7 +42,7 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
     
       const fetchLocationDetails = async (id: string) => {
         try {
-          const response = await fetch(`http://192.168.0.101:3000/locationbyid/${locationId}`);
+          const response = await fetch(`${API_BASE_URL}/locationbyid/${locationId}`);
           const data = await response.json();
           if (data.isSuccess) {
             console.log('Location details:', data.data);

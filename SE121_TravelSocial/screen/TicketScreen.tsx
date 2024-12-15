@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, FlatList, ActivityIndicator } from 'react-native';
-import Ticket from '@/components/BookingScreen/Booking'; // Import component Ticket
+import Ticket from '@/components/BookingScreen/Booking';
+import {API_BASE_URL} from '../constants/config'; // Import component Ticket
 
 export default function TicketScreen() {
   const [tickets, setTickets] = useState<any[]>([]);
@@ -10,7 +11,7 @@ export default function TicketScreen() {
   const fetchTickets = async () => {
     try {
         
-      const response = await fetch('http://192.168.1.6:3000/booking/getall'); // Thay bằng URL API của bạn
+      const response = await fetch(`${API_BASE_URL}/booking/getall`); // Thay bằng URL API của bạn
       const result = await response.json();
 
       setTickets(result.data); // Gán dữ liệu từ API
@@ -41,7 +42,7 @@ export default function TicketScreen() {
 
   const fetchRoomDetails = async (roomId: string) => {
     try {
-      const response = await fetch(`http://192.168.1.6:3000/room/getbyid/${roomId}`);
+      const response = await fetch(`${API_BASE_URL}/room/getbyid/${roomId}`);
       const result = await response.json();
       if (result && result.isSuccess) {
         return result.data; // Giả sử API trả về { data: { locationId: "xyz" } }
@@ -55,7 +56,7 @@ export default function TicketScreen() {
   
   const fetchLocationDetails = async (locationId: string) => {
     try {
-      const response = await fetch(`http://192.168.1.6:3000/locationbyid/${locationId}`);
+      const response = await fetch(`${API_BASE_URL}/locationbyid/${locationId}`);
       const result = await response.json();
       if (result && result.isSuccess) {
         return result.data; // Giả sử API trả về { data: { name: "Location Name" } }
