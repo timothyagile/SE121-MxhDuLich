@@ -11,6 +11,8 @@ const createInvoice = async (invoiceData) => {
 }
 
 const createInvoiceItem = async (items, services) => {
+    
+    
     const invoiceItems = [];
     
     // Xử lý danh sách các phòng đã đặt (items)
@@ -43,7 +45,7 @@ const createInvoiceItem = async (items, services) => {
             }
 
             const invoiceItem = new InvoiceItem({
-                itemId: serviceId.name,
+                itemName: serviceId.name,
                 quantity: quantity,
                 price: price,
                 totalPrice: price * quantity,

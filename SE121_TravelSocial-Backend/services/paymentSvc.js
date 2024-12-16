@@ -1,6 +1,7 @@
 const { default: mongoose } = require('mongoose')
 const { ForbiddenError } = require('../errors/exception')
 const Payment = require('../models/Payment')
+const Booking = require('../models/Booking').Booking
 
 
 
@@ -14,6 +15,9 @@ const getAllPayment = async (paymentData) => {
 
 const createPayment = async (paymentData) => {
     const result = await paymentData.save()
+    const booking = await Booking.findById(paymentData.bookingId)
+    booking.amountPaid += paymentData.amount
+    await booking.save()
     if(result)
         return result
     else

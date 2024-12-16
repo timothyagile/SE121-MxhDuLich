@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const serviceSchema = new Schema({
+    locationId: {type: mongoose.Schema.Types.ObjectId, Ref: 'Location', required: true},
     name: {type: String, required: true},
     description: {type: String},
     price: {type: Number, required: true},

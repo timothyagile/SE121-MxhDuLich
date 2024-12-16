@@ -1,19 +1,17 @@
-const Booking = require('../models/Booking')
+const Booking = require('../models/Booking').Booking
+const ServiceBooked = require('../models/Booking').ServiceBooked
 const Location = require('../models/Location')
+const Service = require('../models/Service')
 const Room = require('../models/Room')
 const {NotFoundException, ForbiddenError} = require('../errors/exception')
 const { default: mongoose } = require('mongoose')
 
-
-
 const updateStatusBooking = async (bookingId, amountPayed) => {
     const booking = await Booking.findById(bookingId);
-    //console.log(amountPayed)
-    //console.log(booking.totalPrice)
-    if (booking.totalPrice === amountPayed) {
-        booking.status = 'complete'
-        booking.save()
-    }
+    if(!booking)
+        throw new NotFoundException('Cannot found booking to calculate')
+    booking.amountPaid = amountPayed
+    await booking.save()
 }
 
 const getAllBooking = async () => {
@@ -50,7 +48,6 @@ const getBookingByUserId = async (userId) => {
 
 //TODO: 
 const getBookingByLocationId = async (locationId) => {
-    console.log(locationId)
     const result = await Booking.aggregate([
         { $unwind: "$items" },
 
@@ -106,8 +103,27 @@ const updateBooking = async (bookingId, bookingData) => {
         return result
     else
         throw new NotFoundException('Not allow to update')
-
 }
+
+const addServices = async (bookingId, serviceId) => {
+    const booking = await Booking.findById(bookingId)
+    if(!booking)
+        throw new NotFoundException('Not found booking to add service')
+    const service = await Service.findById(serviceId)
+    if(!service)
+        throw new NotFoundException('Not found service')
+    const newService = new ServiceBooked({
+        serviceId: service.id,
+        price: service.price
+    })
+    booking.services.push(newService)
+    const result = await booking.save()
+    if(result)
+        return result
+    else
+        throw new ForbiddenError('Cannot add service')
+}
+
 const deleteBooking = async (bookingId) => {
     const result = Booking.findByIdAndDelete(bookingId)
     if(result)
@@ -230,6 +246,7 @@ module.exports = {
     getBookingByBusinessId,
     createBooking,
     updateBooking,
+    addServices,
     deleteBooking,
     getRevenueByMonth,
     getBookingRevenueByMonthForBusiness,

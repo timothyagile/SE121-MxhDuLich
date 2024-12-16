@@ -15,6 +15,7 @@ const invoiceSchema = new Schema({
     tax: {type: Number, required: true},
     invoiceItem: {type: [invoiceItemSchema], required: true},
     totalPrice: {type: Number, required: true},
+    totalPriceAfterTax: {type: Number, required: true},
     status: {type: String, enum: ['pending', 'failed', 'completed'], default: 'pending'}
 }, {collection: 'Invoice'})
 

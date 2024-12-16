@@ -12,7 +12,7 @@ module.exports.createPayment = async (req, res, next) => {
     try {
         const result = await paymentSvc.createPayment(paymentData)
         const amountPayed = await paymentSvc.caculatePayed(bookingId)
-        const updateStatusBooking = await bookingSvc.updateStatusBooking(bookingId, amountPayed)
+        //const updateStatusBooking = await bookingSvc.updateStatusBooking(bookingId, amountPayed)
         res.status(200).json({
             isSuccess: true,
             data: result,
