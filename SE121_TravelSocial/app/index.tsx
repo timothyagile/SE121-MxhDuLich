@@ -2,6 +2,9 @@ import {View, Text} from 'react-native'
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
+(Text as any).defaultProps = (Text as any).defaultProps || {};
+(Text as any).defaultProps.style = { fontFamily: 'UTMTimesBold'};
+
 import WelcomeScreen1 from '@/screen/Welcome/WelcomeScreen1'
 import LoginScreen from '@/screen/Welcome/LoginScreen'
 import RegisterScreen from '@/screen/Welcome/RegisterScreen'

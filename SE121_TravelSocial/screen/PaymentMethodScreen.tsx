@@ -4,6 +4,11 @@ import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/n
 import { RootStackParamList } from '@/types/navigation';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import {API_BASE_URL} from '../constants/config';
+import axios from 'axios';
+import * as FileSystem from 'expo-file-system';
+import * as MediaLibrary from 'expo-media-library';
+import { Icon, IconButton } from 'react-native-paper';
+
 
 type ReservationRouteProp = RouteProp<RootStackParamList, 'payment-method-screen'>;
 interface Bank {
@@ -25,6 +30,8 @@ export default function PaymentMethodScreen({ navigation }: {navigation: NativeS
     const [banks, setBanks] = useState<Bank[]>([]);
     const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
     const [loading, setLoading] = useState(true);
+    const [qrImage, setQrImage] = useState<string | null>(null)
+    
 
     const handlePress = (button: string) => {
         setSelectedButton(button);
@@ -35,20 +42,89 @@ export default function PaymentMethodScreen({ navigation }: {navigation: NativeS
     };
 
     const handleMomoPayment = async () => {
-        const partnerCode = "MOMOXXXX"; 
-        const totalPrice = 50000; 
-        const orderId = "order12345"; 
-        const description = "Thanh toán TravelSocial";
+        // const partnerCode = "MOMOXXXX"; 
+        // const totalPrice = 50000; 
+        // const orderId = "order12345"; 
+        // const description = "Thanh toán TravelSocial";
     
-        const deeplink = `momo://?action=payWithApp&amount=${totalPrice}&orderId=${orderId}&description=${description}`;
-        try {
-            await Linking.openURL(deeplink);
-        } catch (error) {
-            Alert.alert('Lỗi', 'Không thể mở ứng dụng MoMo.');
-        }
+        // const deeplink = `momo://?action=payWithApp&amount=${totalPrice}&orderId=${orderId}&description=${description}`;
+        // try {
+        //     await Linking.openURL(deeplink);
+        // } catch (error) {
+        //     Alert.alert('Lỗi', 'Không thể mở ứng dụng MoMo.');
+        // }
     };
-    
 
+
+const generateVietQR = async () => {
+    try {
+        const response = await axios.post(
+            'https://api.vietqr.io/v2/generate',
+            {
+                accountNo: "9386441295",
+                accountName: "TO HOANG HUY",
+                acqId: "970436",
+                addInfo: "chuyen tien dat cho",
+                amount: "2000",
+                template: "compact",
+            },
+            {
+                headers: {
+                    'x-client-id': 'f905c745-0625-48e1-8468-e9d47ebb861c',
+                    'x-api-key': '527eee5f-326f-4dd4-91ab-df80ba43329e',
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+
+        setQrImage(response.data.qrDataURL);
+        return response.data;
+    } catch (error:any) {
+        console.error('Error generating VietQR:', error.response?.data || error.message);
+    }
+};
+
+useEffect(() => {
+    if (qrImage) {
+    }
+}, [qrImage]); 
+
+useEffect(()=>{
+    handleGenerateQR();
+},[])
+
+
+const handleGenerateQR = async () => {
+    const qrData = await generateVietQR();
+    setQrImage(qrData.data.qrDataURL); 
+};
+
+const saveQRImageToGallery = async () => {
+    try {
+        if (!qrImage) {
+            Alert.alert('QR Code không có dữ liệu!');
+            return;
+        }
+        const base64Data = qrImage.split(',')[1];
+        const fileUri = FileSystem.documentDirectory + 'vietqr.png';
+        await FileSystem.writeAsStringAsync(fileUri, base64Data, {
+            encoding: FileSystem.EncodingType.Base64,
+        });
+        const permission = await MediaLibrary.requestPermissionsAsync();
+
+        if (permission.granted) {
+            const asset = await MediaLibrary.createAssetAsync(fileUri);
+            await MediaLibrary.createAlbumAsync('QR Codes', asset, false); 
+            Alert.alert('Thành công!', 'Ảnh QR đã được lưu vào thư viện ảnh.');
+        } else {
+            Alert.alert('Không có quyền', 'Ứng dụng cần quyền truy cập vào thư viện ảnh.');
+        }
+    } catch (error) {
+        console.error('Error saving QR Image to gallery:', error);
+        Alert.alert('Lỗi', 'Không thể lưu ảnh QR vào thư viện ảnh.');
+    }
+};
+    
     const fetchBanks = async () => {
         
         try {
@@ -111,140 +187,132 @@ export default function PaymentMethodScreen({ navigation }: {navigation: NativeS
                 <Text style={styles.headerTitle}>Phương Thức Thanh Toán</Text>
             </View>
 
-            <View style={{flexDirection:'row'}}>
-                <View style={styles.imageContainer}>
-                    <Image source={require('../assets/images/camping-ho-coc.png')} style={styles.image} />
-                </View>
-                <View style ={styles.textContainer}>
-                    <Text style= {styles.title}>{locationDetails?.name || 'Tên địa điểm'}</Text>
+            <ScrollView>
+                <View style={{flexDirection:'row'}}>
+                    <View style={styles.imageContainer}>
+                        <Image source={require('../assets/images/camping-ho-coc.png')} style={styles.image} />
+                    </View>
+                    <View style ={styles.textContainer}>
+                        <Text style= {styles.title}>{locationDetails?.name || 'Tên địa điểm'}</Text>
 
-                    <View style={styles.detailsContainer}>
-                        <View style={styles.ratingBox}>
-                            <Image source = {require('../assets/icons/star.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                            <Text style={styles.boxText}>{locationDetails?.rating || 0}</Text>
-                        </View>
-                        <View style={styles.featureBox}>
-                            <Image source={require('../assets/icons/clock.png')} style ={{marginRight:3,}}></Image>
-                            <Text style={styles.boxText}>free cancel in 24h</Text>
+                        <View style={styles.detailsContainer}>
+                            <View style={styles.ratingBox}>
+                                <Image source = {require('../assets/icons/star.png')} style={{height:20, width:20, marginRight:3,}}></Image>
+                                <Text style={styles.boxText}>{locationDetails?.rating || 0}</Text>
+                            </View>
+                            <View style={styles.featureBox}>
+                                <Image source={require('../assets/icons/clock.png')} style ={{marginRight:3,}}></Image>
+                                <Text style={styles.boxText}>free cancel in 24h</Text>
+                            </View>
                         </View>
                     </View>
                 </View>
-            </View>
 
-            {/* <View style={{marginLeft:20, marginTop:25,}}>
-                <TouchableOpacity style={styles.addpaymentmethod} onPress={() => navigation.navigate('add-new-payment-method-screen')}>
-                        <Text style={styles.boxText2}>Thêm phương thức thanh toán</Text>
-                </TouchableOpacity>
-            </View> */}
-            <View style={styles.imagesRow}>
-
-                <View style={{justifyContent:'center',alignItems:'center',}}>
-                    <TouchableOpacity
-                        style={[
-                            styles.squareContainer,
-                            selectedButton === 'bank' && styles.selectedSquareContainer
-                        ]}
-                        onPress={() => handlePress('bank')}
-                    >
-                        <Image source={require('../assets/images/bank.png')} style={styles.smallImage} />
+                <View style={styles.container}>
+                    <TouchableOpacity onPress={handleGenerateQR}>
+                        
                     </TouchableOpacity>
-                    <Text style={{marginTop:10,}}>Bank</Text>
-                </View>
-
-                <View style={{justifyContent:'center',alignItems:'center',}}>
-                    <TouchableOpacity
-                        style={[
-                            styles.squareContainer,
-                            selectedButton === 'momo' && styles.selectedSquareContainer
-                        ]}
-                        onPress={() => handlePress('momo')}
-                    >
-                        <Image source={require('../assets/images/momo.png')} style={styles.smallImage} />
-                    </TouchableOpacity>
-                    <Text style={{marginTop:10,}}>Momo</Text>
-                </View>
-
-                <View style={{justifyContent:'center',alignItems:'center',}}>
-                    <TouchableOpacity
-                        style={[
-                            styles.squareContainer,
-                            selectedButton === 'credit-card' && styles.selectedSquareContainer
-                        ]}
-                        onPress={() => handlePress('credit-card')}
-                    >
-                        <Image source={require('../assets/images/credit-card.png')} style={styles.smallImage} />
-                    </TouchableOpacity>
-                    <Text style={{marginTop:10,}}>Credit-card</Text>
-                </View>
-                
-            </View>
-
-            <ScrollView style = {{marginTop:20, marginBottom: 130,}}>
-            {selectedButton === 'bank' && ( // Kiểm tra trạng thái selectedButton
-                loading ? ( // Hiển thị trạng thái loading khi đang tải danh sách ngân hàng
-                <ActivityIndicator size="large" color="#0000ff" />
-                ) : (
-                    <View style={styles.bankList}>
-                        {banks.map((bank) => (
-                            <TouchableOpacity
-                                key={bank.appId} 
-                                style={styles.bankItem}
-                                onPress={() => handlePress1(bank)}
-                            >
-                                <Image source={{ uri: bank.appLogo }} style={styles.bankLogo} />
-                                <View>
-                                    <Text style={styles.bankName}>{bank.bankName}</Text>
-                                </View>
-                            </TouchableOpacity>
-                        ))}
+                    {qrImage && (
+                        <Image
+                            source={{ uri: qrImage }}
+                            style={styles.qrImage}
+                            resizeMode="contain"
+                        />
+                    )}
+                    <View style={{width:'100%', justifyContent:'center',alignItems:'center', marginTop: 5}}>
+                        <TouchableOpacity style={{width:60, flexDirection: 'row', height:20, left: 20, justifyContent:'center'}} onPress={saveQRImageToGallery}>
+                            <Text style ={{width:'100%',height:20, justifyContent:'center', alignItems:'center', fontSize:14, fontWeight:'700',}}>Lưu ảnh</Text>
+                            <IconButton 
+                                icon="download" 
+                                size={20}
+                                style={{ bottom: 15, right: 20}} 
+                            />                        
+                        </TouchableOpacity>
                     </View>
-                ))}
-                </ScrollView>
-
-            {/* <View style={{width:'100%', alignItems:'center',}}>
-                <View style={styles.squareContainer2}>
-                    <TouchableOpacity 
-                    style={styles.bank} 
-                    onPress={() => handlePress1({appId: 'vcb', appLogo: 'https://play-lh.googleusercontent.com/SD4lUzWCqLq6nqURm8abnazm8sC0h_hkikryHyODrVpI0g3xMjeuaVs379jUCKrd0vk', appName: 'BIDV SmartBanking', bankName: 'Ngân hàng TMCP Đầu tư và Phát triển Việt Nam', deeplink: 'https://dl.vietqr.io/pay?app=vcb&ba=122555743434234@ocb'})}
-                    >
-                        <Image source={require('../assets/icons/VCB.png')} style={{width:40, height:40,}}></Image>
-                        <View>
-                            <Text style={styles.boxTextbank}>Vietcomabank</Text>
-                            <Text style={styles.account}>To Hoang Huy - 9386441295</Text>
-                        </View>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity 
-                    style={styles.bank2}
-                    onPress={() => handlePress1({appId: 'bidv', appLogo: 'https://play-lh.googleusercontent.com/SD4lUzWCqLq6nqURm8abnazm8sC0h_hkikryHyODrVpI0g3xMjeuaVs379jUCKrd0vk', appName: 'BIDV SmartBanking', bankName: 'Ngân hàng TMCP Đầu tư và Phát triển Việt Nam', deeplink: 'https://dl.vietqr.io/pay?app=bidv'})}
-                    >
-                        <Image source={require('../assets/icons/VCB.png')} style={{width:40, height:40,}}></Image>
-                        <View>
-                            <Text style={styles.boxTextbank}>BIDV</Text>
-                            <Text style={styles.account}>To Hoang Huy - 9386441295</Text>
-                        </View>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={styles.blankbank} onPress={() => navigation.navigate('add-new-payment-method-screen')}>
-                        <Image style={{width:40, height:40,}}  source ={require('../assets/icons/plus-black.png')}></Image>
-                    </TouchableOpacity>
-                </View>
-
-                
-            </View> */}
-            <View style={{position:'absolute',bottom:20,width:'100%'}}>
-                <Text style={{marginLeft:30, fontSize:24, marginBottom:20,}}> Thanh toán {totalPrice} VND</Text>
-                <View style = {{  alignItems:'center', justifyContent:'center',alignContent:'center',width:'100%'}}>
                     
-                    <TouchableOpacity style={styles.addpaymentmethod2} onPress={applyAndPay}>
-                            <Text style={styles.boxText3}>Xác Nhận Thanh Toán</Text>
-                    </TouchableOpacity>
                 </View>
-            </View>
-            
-            
+
+                {/* <View style={{marginLeft:20, marginTop:25,}}>
+                    <TouchableOpacity style={styles.addpaymentmethod} onPress={() => navigation.navigate('add-new-payment-method-screen')}>
+                            <Text style={styles.boxText2}>Thêm phương thức thanh toán</Text>
+                    </TouchableOpacity>
+                </View> */}
+                <View style={styles.imagesRow}>
+
+                    <View style={{justifyContent:'center',alignItems:'center',}}>
+                        <TouchableOpacity
+                            style={[
+                                styles.squareContainer,
+                                selectedButton === 'bank' && styles.selectedSquareContainer
+                            ]}
+                            onPress={() => handlePress('bank')}
+                        >
+                            <Image source={require('../assets/images/bank.png')} style={styles.smallImage} />
+                        </TouchableOpacity>
+                        <Text style={{marginTop:10,}}>Bank</Text>
+                    </View>
+
+                    <View style={{justifyContent:'center',alignItems:'center',}}>
+                        <TouchableOpacity
+                            style={[
+                                styles.squareContainer,
+                                selectedButton === 'momo' && styles.selectedSquareContainer
+                            ]}
+                            onPress={() => handlePress('momo')}
+                        >
+                            <Image source={require('../assets/images/momo.png')} style={styles.smallImage} />
+                        </TouchableOpacity>
+                        <Text style={{marginTop:10,}}>Momo</Text>
+                    </View>
+
+                    <View style={{justifyContent:'center',alignItems:'center',}}>
+                        <TouchableOpacity
+                            style={[
+                                styles.squareContainer,
+                                selectedButton === 'credit-card' && styles.selectedSquareContainer
+                            ]}
+                            onPress={() => handlePress('credit-card')}
+                        >
+                            <Image source={require('../assets/images/credit-card.png')} style={styles.smallImage} />
+                        </TouchableOpacity>
+                        <Text style={{marginTop:10,}}>Credit-card</Text>
+                    </View>
+                    
+                </View>
+
+                <ScrollView style = {{marginTop:20, marginBottom: 130, height: 300}}>
+                {selectedButton === 'bank' && ( 
+                    loading ? ( 
+                    <ActivityIndicator size="large" color="#0000ff" />
+                    ) : (
+                        <View style={styles.bankList}>
+                            {banks.map((bank) => (
+                                <TouchableOpacity
+                                    key={bank.appId} 
+                                    style={styles.bankItem}
+                                    onPress={() => handlePress1(bank)}
+                                >
+                                    <Image source={{ uri: bank.appLogo }} style={styles.bankLogo} />
+                                    <View>
+                                        <Text style={styles.bankName}>{bank.bankName}</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    ))}
+                    </ScrollView>
+                <View style={{position:'absolute',bottom:20,width:'100%'}}>
+                    <Text style={{marginLeft:30, fontSize:24, marginBottom:20,}}> Thanh toán {totalPrice} VND</Text>
+                    <View style = {{  alignItems:'center', justifyContent:'center',alignContent:'center',width:'100%'}}>
+                        
+                        <TouchableOpacity style={styles.addpaymentmethod2} onPress={applyAndPay}>
+                                <Text style={styles.boxText3}>Xác Nhận Thanh Toán</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </ScrollView>
         </View>
-);
+    );
 }
 
 const styles = StyleSheet.create({
@@ -252,6 +320,13 @@ const styles = StyleSheet.create({
       flex: 1,
       backgroundColor: '#ffffff',
     },
+
+    qrImage: {
+        marginTop: 20,
+        width: '100%',
+        height: 200,
+    },
+
     header: {
       
       flexDirection: 'row',
