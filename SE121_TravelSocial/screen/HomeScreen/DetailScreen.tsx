@@ -7,6 +7,9 @@ import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/n
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useRoute,RouteProp } from '@react-navigation/native';
 import {API_BASE_URL} from '../../constants/config';
+import { Icon } from 'react-native-paper';
+import {iconMapping} from '../../constants/icon';
+
 
 const { width, height } = Dimensions.get('window');
 
@@ -29,23 +32,32 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
     roomId: string;
     name: string;
     quantity: number;
-    icon: string | null;
+    icon: string;
     description: string;
   }
 
-  const facilityIcons: Record<string, string> = {
-    "Wifi miễn phí": "wifi", // Wifi
-    "Máy lạnh": "snowflake-o", // Máy lạnh
-    "Tủ lạnh": "snowflake", // Tủ lạnh
-    "Hồ bơi": "swimmer", // Hồ bơi
-    "Lửa trại": "fire", // Lửa trại
-    "Bãi đỗ xe": "car", // Bãi đỗ xe
-    "Nhà hàng": "utensils", // Nhà hàng
-    "Phòng gym": "dumbbell", // Gym
-    "Spa": "spa", // Spa
-    "Bar": "glass-martini-alt", // Bar
-    "Dịch vụ khác": "ellipsis-h", // Mặc định cho dịch vụ khác
+  type FacilityIcons = {
+    [key: string]: string; // Cho phép dùng các khóa kiểu string
+};
+
+  const getIcon = (iconName: string) => {
+    return iconMapping[iconName] || iconMapping["default.png"];
   };
+
+
+const facilityIcons: FacilityIcons = {
+    "Wifi miễn phí": require('../../assets/icons/wifi.png'),
+    "Máy lạnh": "ac-unit",
+    "Kitchen": "Kitchen", 
+    "Hồ bơi": "pool",
+    "Lửa trái": "fire",
+    "Bãi đỗ xe": "local-parking",
+    "Nhà hàng": "restaurant",
+    "Phòng gym": "fitness-center",
+    "Spa": "spa",
+    "Bar": "local-bar",
+    "Dịch vụ khác": "help",
+};
   
   const [services, setServices] = useState<Service[]>([]);  // Khai báo rõ ràng kiểu dữ liệu
   
@@ -254,11 +266,7 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
         <View style={styles.facilityContainer}>
           {services.map((service, index) => (
             <View style={styles.facilityItem} key={index}>
-              <FontAwesome
-                name={facilityIcons[service.name] || facilityIcons["Dịch vụ khác"]}
-                size={18}
-                color="#555"
-              />
+                <Image source={getIcon(service?.icon)}/>
               <Text style={styles.facilityText}>{service?.name}</Text>
             </View>
           ))}

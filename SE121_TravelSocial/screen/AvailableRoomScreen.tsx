@@ -1,18 +1,14 @@
 import { RouteProp, useRoute } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView, Alert, Platform, Modal } from 'react-native';
+import { Text, View, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView, Alert, Platform, Modal, FlatList, Dimensions } from 'react-native';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
-import {iconMapping} from '../constants/icon'
+import {iconMapping} from '../constants/icon';
 import { RootStackParamList } from '@/types/navigation';
 import {API_BASE_URL} from '../constants/config';
+import axios from 'axios';
 
+const { width } = Dimensions.get('window');
 
-
-// type RootStackParamList = {
-//     'room-screen': { id: string }; 
-//   };
-
-// type DetailScreenRouteProp = RouteProp<RootStackParamList, 'room-screen'>;
 
 interface Room {
     _id: string;
@@ -20,7 +16,9 @@ interface Room {
     bedType: string;
     area: number; 
     quantity: number; 
-    price: number; 
+    price: number;
+    image: string[]; 
+    description: string;
     facility: {
         name: string; 
         description?: string; 
@@ -37,8 +35,6 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
     const route = useRoute<RouteProp<RootStackParamList, 'available-room-screen'>>();
     const { id, checkinDate, checkoutDate } = route.params;
     console.log('checkin ddate: ', checkinDate);
-    //const route = useRoute<DetailScreenRouteProp>();
-    //const { id } = route.params; 
     const [rooms, setRooms] = useState<Room[]>([]);
     const [services, setServices] = useState([]);
     const [isModalVisible, setModalVisible] = useState(false);
@@ -47,9 +43,19 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
     const [selectedRoomCounts, setSelectedRoomCounts] = useState<Record<string, number>>({});
     const [currentRoomId, setCurrentRoomId] = useState<string | null>(null);
     const [buttonText, setButtonText] = useState("Chọn");
-    // const baseUrl = "http://localhost:3000/"; // URL trỏ đến thư mục assets
-    // const fullUrl = `${baseUrl}${icon}`;
-    
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    const onScrollEnd = (e: any) => {
+      const contentOffsetX = e.nativeEvent.contentOffset.x;
+      const index = Math.round(contentOffsetX / width);
+      setCurrentIndex(index);
+    };
+
+    const images = [
+        require('../assets/images/room.jpg'),
+        require('../assets/images/room.jpg'),
+        require('../assets/images/room.jpg'),
+    ];
 
     const getIcon = (iconName: string) => {
         return iconMapping[iconName] || iconMapping["default.png"];
@@ -58,7 +64,6 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
     useEffect(() => {
         const fetchAvailableRooms = async () => {
           try {
-            // Gọi API getbookingbylocationid để lấy danh sách các booking của địa điểm
             const bookingResponse = await fetch(
               `${API_BASE_URL}/booking/getall`
             );
@@ -67,8 +72,7 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
             if (Array.isArray(bookingData.data)) {
               const bookings = bookingData.data;
               console.log(bookings);
-      
-              // Gọi API để lấy danh sách phòng
+
               const roomResponse = await fetch(
                 `${API_BASE_URL}/room/getbylocationid/${id}`
               );
@@ -76,8 +80,7 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
       
               if (Array.isArray(roomData.data)) {
                 const rooms = roomData.data;
-      
-                // Lọc danh sách phòng dựa trên các ngày có trong bookings
+
                 const availableRooms = rooms.filter((room: any) => {
                   const isBooked = bookings.some((booking: any) => {
                     const bookingCheckin = new Date(booking.checkInDate).getTime();
@@ -89,8 +92,6 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                     console.log('user checkin: ',userCheckin);
                     console.log('user checkout: ',userCheckout);
                     
-      
-                    // Kiểm tra xem ngày người dùng chọn có nằm trong khoảng booking hay không
                     return (
                       room._id === booking.roomId &&
                       ((userCheckin >= bookingCheckin && userCheckin <= bookingCheckout) ||
@@ -98,10 +99,10 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                     );
                   });
       
-                  return !isBooked; // Chỉ giữ các phòng không bị đặt
+                  return !isBooked; 
                 });
       
-                setRooms(availableRooms); // Cập nhật danh sách phòng khả dụng
+                setRooms(availableRooms); 
               }
             }
           } catch (error) {
@@ -111,58 +112,34 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
       
         fetchAvailableRooms();
       }, [id, checkinDate, checkoutDate]);
-    
-    // useEffect(() => {
-    //     const fetchRooms = async (id: string) => {
-    //         try {
-    //             console.log('idd: ',id);
-    //             const response = await fetch(`http://192.168.1.2:3000/room/getbylocationid/${id}`); // Thay đổi URL theo API của bạn
-    //             if (!response.ok) {
-    //                 throw new Error('Network response was not ok');
-    //             }
-    //             const data = await response.json();
-    //             if (Array.isArray(data.data)) {
-    //                 setRooms(data.data);
-                    
-    //             } else {
-    //                 console.error('Expected data to be an array, but got:', data);
-    //             }
-    //         } catch (error) {
-    //             console.error('Error fetching rooms:', error);
-    //         }
-    //     };
-
-    //     fetchRooms(id);
-    // }, [id]);
 
     const handleApply = () => {
-        // if (roomCount > 0) {
-        //     setSelectedRooms(roomCount); 
-        //     setButtonText(`Đã chọn ${roomCount} phòng `);
-        // }
         {selectedRoomCounts[currentRoomId!] ? `Đã chọn ${selectedRoomCounts[currentRoomId!]} phòng` : "Chọn"}
-
-
-        // if(roomCount===0){
-        //     setSelectedRooms(roomCount); 
-        //     setButtonText('Chọn');
-        // }
         setModalVisible(false);
     };
-    
-
     
     const toggleModal = (roomId?: string) => {
         setCurrentRoomId(roomId || null);
         setModalVisible(!isModalVisible);
     };
 
-
     const incrementRoomCount = (roomId: string) => {
-        setSelectedRoomCounts(prevCounts => ({
-            ...prevCounts,
-            [roomId]: (prevCounts[roomId] || 0) + 1, // Tăng số lượng phòng đã chọn cho roomId
-        }));
+        const room = rooms.find((r) => r._id === roomId); // Tìm thông tin phòng
+        if (room) {
+            const maxCount = room.quantity; // Lấy số lượng phòng có sẵn
+            setSelectedRoomCounts((prevCounts) => {
+                const currentCount = prevCounts[roomId] || 0;
+                if (currentCount < maxCount) {
+                    return {
+                        ...prevCounts,
+                        [roomId]: currentCount + 1,
+                    };
+                } else {
+                    Alert.alert("Thông báo", `Chỉ còn ${maxCount} phòng khả dụng.`);
+                    return prevCounts; // Không tăng nếu đã đạt giới hạn
+                }
+            });
+        }
     };
 
     const decrementRoomCount = (roomId: string) => {
@@ -171,7 +148,7 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
             if (currentCount > 0) {
                 return {
                     ...prevCounts,
-                    [roomId]: currentCount - 1, // Giảm số lượng phòng đã chọn cho roomId
+                    [roomId]: currentCount - 1, 
                 };
             }
             return prevCounts;
@@ -227,21 +204,47 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
             </View>
 
             <ScrollView style={styles.body}>
-
-
                 <View style={styles.container}>
-            
-
-            <View style={styles.body}>
+                <View style={styles.body}>
                 {rooms.map((room, index) => (
                     <View key={index} style={styles.roomcontainer}>
+                        <View style={styles.imageCarousel}>
+                            <FlatList
+                                data={images}
+                                horizontal={true}
+                                pagingEnabled
+                                showsHorizontalScrollIndicator={false}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={({ item }) => (
+                                <Image
+                                    source={ item }
+                                    style={styles.roomImage}
+                                />
+                                )}
+                                onMomentumScrollEnd={onScrollEnd}
+                            />
+                            <View style={styles.pagination}>
+                                {images.map((_, index) => (
+                                <View
+                                    key={index}
+                                    style={[
+                                    styles.dot,
+                                    index === currentIndex ? styles.activeDot : styles.inactiveDot,
+                                    ]}
+                                />
+                                ))}
+                            </View>
+                        </View>
                         <Text style={styles.title}>{room?.name || ''}</Text>
+                        <Text style={styles.roomDescription}>
+                            {room?.description || 'Mô tả phòng hiện chưa có'}
+                        </Text>
                         <View style={styles.bedandarea}>
                             
                             {room.bed.map((bed, index) => (
                                 <View key={index} style={styles.backgroundBox}>
                                     
-                                        <Image source={getIcon(bed.icon)}/>
+                                        <Image style={{width:17, height:17}}  source={getIcon(bed.icon)}/>
                                         <Text style={styles.bed}>{bed.category} : {bed.quantity} </Text>
                                     
                                 </View>
@@ -254,7 +257,7 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                         </View>
 
                         <View style = {styles.bedandarea}>
-                            <Image source={require('../assets/icons/service.png')}></Image>
+                            <Image style={{width:17, height:17}} source={require('../assets/icons/service.png')}></Image>
                             <Text style={styles.area}>   Dịch vụ:</Text>
                         </View>
 
@@ -266,7 +269,7 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                                     <Image
                                         
                                         source={getIcon(facility.icon)}
-                                        style={{height:20, width:20, marginRight:3,}}
+                                        style={{height:17, width:17, marginRight:3,}}
                                     />
                                     <Text style={styles.area}>{facility.name}</Text>
                                 </View>
@@ -282,7 +285,7 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                         </View>
 
                         <View style={styles.endcontainer}>
-                            <View style={{ flex: 2 }}>
+                            <View style={{ flex: 4 }}>
                                 <Text style={styles.area2}>Giá</Text>
                                 <Text style={styles.pricetext}>{room.price} VND</Text>
                             </View>
@@ -296,15 +299,11 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                         </View>
                     </View>
                 ))}
-            </View>
-                <Modal visible={isModalVisible} animationType="slide" transparent={true}>
-                    {/* Modal Code */}
-                </Modal>
-            </View>
-                    
-                    
-            </ScrollView>
 
+                </View>
+                </View>  
+                
+            </ScrollView>
 
             <Modal visible={isModalVisible} animationType="slide" transparent={true}>
                 <View style={styles.modalOverlay}>
@@ -332,13 +331,8 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                     </View>
                 </View>
             </Modal>
-         
-
-        
         </View>
-
-        
-);
+    );
 }
 
 const styles = StyleSheet.create({
@@ -348,8 +342,38 @@ const styles = StyleSheet.create({
     },
 
     body:{
-        
+    },
 
+    pagination: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginTop: 10,
+      },
+      dot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        marginHorizontal: 5,
+      },
+      activeDot: {
+        backgroundColor: 'blue',
+      },
+      inactiveDot: {
+        backgroundColor: 'gray',
+      },
+
+    imageCarousel: {
+        width: '100%',
+        height: 220,
+        marginBottom: 16, 
+      },
+    roomImage: {
+        marginStart:0,
+        marginTop: 10,
+        width: 394, 
+        height: 190,
+        borderRadius: 10,
+        marginRight: 0, 
     },
 
     roomcontainer:{
@@ -366,6 +390,15 @@ const styles = StyleSheet.create({
         fontWeight:'bold',
         marginLeft:20,
         marginTop:10,
+        position:'absolute',
+    },
+
+    roomDescription: {
+        fontSize: 14,
+        color: '#666',
+        marginBottom: 16,
+        lineHeight: 20,
+        marginLeft: 20,
     },
 
     bedandarea:{
@@ -375,7 +408,7 @@ const styles = StyleSheet.create({
     },
 
     bed:{
-        fontSize:18,
+        fontSize:14,
         marginLeft:10,
     },
 
@@ -386,7 +419,8 @@ const styles = StyleSheet.create({
     },
 
     area:{
-        fontSize:18,
+        fontSize:14,
+        color: '#666',
     },
 
     area2:{
@@ -436,7 +470,7 @@ const styles = StyleSheet.create({
     },
 
     statetext:{
-        fontSize:18,
+        fontSize:14,
         color:'#196EEE',
         shadowColor: '#196EEE',
         shadowOffset: {
@@ -462,7 +496,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         alignContent:'center',
-        width:250,
+        width:200,
         height:50,
     },
 
@@ -523,11 +557,22 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     modalContent: {
-        width: '80%',
+        // width: '80%',
+        // backgroundColor: 'white',
+        // borderRadius: 10,
+        // padding: 20,
+        // alignItems: 'center',
+        width: '90%',
         backgroundColor: 'white',
         borderRadius: 10,
         padding: 20,
         alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 5, // Đổ bóng trên Android
+        shadowColor: '#000', // Đổ bóng trên iOS
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
     },
     closeButton: {
         alignSelf: 'flex-end',
