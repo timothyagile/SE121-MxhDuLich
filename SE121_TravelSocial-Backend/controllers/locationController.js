@@ -12,6 +12,7 @@ module.exports.createNewLocation = async (req, res, next) => {
         address,
         category,
     } = req.body;
+    const imageFiles = req.files
     // Tạo locationData
     //console.log(res.locals.user._id)
 
@@ -26,10 +27,11 @@ module.exports.createNewLocation = async (req, res, next) => {
         rating,
         address,
         category,
+        image: null,
         ownerId: res.locals.user._id
     });
     try {
-        const savedLocation = await locationSvc.createLocation(locationData); // Lưu địa điểm mới vào cơ sở dữ liệu
+        const savedLocation = await locationSvc.createLocation(locationData, imageFiles); // Lưu địa điểm mới vào cơ sở dữ liệu
         res.status(201).json({
             isSuccess: true,
             data: savedLocation,
@@ -53,6 +55,7 @@ module.exports.createLocation = async (req, res, next) => {
         url: file.path,
         publicId: file.filename
     }))
+    console.log(images)
     try {
         const locationData = new Location({
             name,
@@ -66,7 +69,7 @@ module.exports.createLocation = async (req, res, next) => {
         const savedLocation = await locationSvc.createLocationWithImage(locationData); // Lưu địa điểm mới vào cơ sở dữ liệu
         res.status(201).json({
             isSuccess: true,
-            data: savedLocation,
+            data: 'success',
             error: null,
         });
     } catch (error) {

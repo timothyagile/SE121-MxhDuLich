@@ -11,6 +11,7 @@ const uploadImageRoute = require('./routes/uploadImageRoute')
 const invoiceRoute = require('./routes/invoiceRoute')
 const paymentRoute = require('./routes/paymentRoute')
 const serviceRoute = require('./routes/serviceRoute')
+const messageRoute = require('./routes/messageRoute')
 const {requireAuth, checkUser} = require('./middleware/authMiddleware');
 const {errorHandler} = require('./middleware/errorMiddleware')
 const app = express();
@@ -58,5 +59,6 @@ app.use(uploadImageRoute)
 app.use(paymentRoute)
 app.use(invoiceRoute)
 app.use(serviceRoute)
+app.use(messageRoute)
 
 app.use(errorHandler);
