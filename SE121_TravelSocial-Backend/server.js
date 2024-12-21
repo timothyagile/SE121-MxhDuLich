@@ -6,6 +6,7 @@ const locationRoute = require('./routes/locationRoute')
 const businessRoute = require('./routes/businessRoute')
 const roomRoute = require('./routes/roomRoute')
 const bookingRoute = require('./routes/bookingRoute')
+const recommendationRoute = require('./routes/recommendationRoute')
 const userCollectionRoute = require('./routes/userCollectionRoute')
 const uploadImageRoute = require('./routes/uploadImageRoute')
 const {requireAuth, checkUser} = require('./middleware/authMiddleware');
@@ -52,5 +53,6 @@ app.use(businessRoute)
 app.use(roomRoute)
 app.use(userCollectionRoute)
 app.use(uploadImageRoute)
+app.use(recommendationRoute)
 
 app.use(errorHandler);

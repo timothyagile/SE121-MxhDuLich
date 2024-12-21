@@ -26,5 +26,6 @@ export type SelectedRoom = {
     'reservation-required-screen': { selectedRoomsData: SelectedRoom[] ,locationId: string};
     'available-room-screen': { id: string; checkinDate: string; checkoutDate: string };
     'detail-screen': { id: string };
+    'detail-booking-screen': {bookingId: string};
   };
   

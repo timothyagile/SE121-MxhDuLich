@@ -1,3 +1,6 @@
+import { RootStackParamList } from '@/types/navigation';
+import { NavigationProp } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 
@@ -7,30 +10,40 @@ interface TicketProps {
   status: string;
   onCancel: () => void;
   imageUrl: string;
+  bookingId: string;
+  
 }
 
-const Ticket: React.FC<TicketProps> = ({ title, date, status, onCancel, imageUrl }) => {
+const Ticket: React.FC<TicketProps> = ({ title, date, status, onCancel, imageUrl, bookingId }) => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
+  const handleNavigate = () => {
+    navigation.navigate('detail-booking-screen', {bookingId}); // Truyền bookingId
+  };
   return (
-    <View style={styles.body}>
-      <View style={{ flexDirection: 'row' }}>
-        <View style={styles.imageContainer}>
-          <Image source={{ uri: imageUrl }} style={styles.image} />
-        </View>
-        <View style={styles.textContainer}>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.title2}>{date}</Text>
-          <View style={styles.detailsContainer}>
-            <View style={styles.ratingBox}>
-              <Text style={{ color: 'black', fontSize: 16 }}>Trạng thái: </Text>
-              <Text style={styles.stateText}>{status}</Text>
+    <TouchableOpacity onPress={handleNavigate}>
+      <View style={styles.body}>
+        <View style={{ flexDirection: 'row' }}>
+          <View style={styles.imageContainer}>
+            <Image source={{ uri: imageUrl }} style={styles.image} />
+          </View>
+          <View style={styles.textContainer}>
+            <Text style={styles.title}>{title}</Text>
+            <Text style={styles.title2}>{date}</Text>
+            <View style={styles.detailsContainer}>
+              <View style={styles.ratingBox}>
+                <Text style={{ color: '#666', fontSize: 14 }}>Trạng thái: </Text>
+                <Text style={styles.stateText}>{status}</Text>
+              </View>
+              <TouchableOpacity style={styles.featureBox} onPress={onCancel}>
+                <Text style={styles.boxText}>Hủy</Text>
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.featureBox} onPress={onCancel}>
-              <Text style={styles.boxText}>Hủy</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
+    
   );
 };
 
@@ -69,10 +82,12 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   title2: {
-    fontSize: 16,
+    marginTop: 5,
+    fontSize: 13,
     fontWeight: '300',
     flexShrink: 1,
     flexWrap: 'wrap',
+    marginLeft: 2,
   },
   detailsContainer: {
     position: 'absolute',
