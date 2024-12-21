@@ -25,6 +25,7 @@ import DetailScreen1 from '@/screen/HomeScreen/DetailScreen1'
 import DetailScreen from '@/screen/HomeScreen/DetailScreen'
 import { UserProvider } from '@/context/UserContext'
 import { RootStackParamList } from '@/types/navigation'
+import DetailBookingScreen from '@/screen/DetailBookingScreen';
 
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -147,6 +148,11 @@ export default function App() {
             options={{
               headerShown: false}}/>
 
+            <Stack.Screen
+            name = "detail-booking-screen"
+            component={DetailBookingScreen}
+            options={{
+              headerShown: false}}/>
 
           </Stack.Navigator>
         </UserProvider>

@@ -73,6 +73,8 @@ const facilityIcons: FacilityIcons = {
     const [selectedDate2, setSelectedDate2] = useState('');
     const [locationDetails, setLocationDetails] = useState<any>(null);
     //const [services, setServices] = useState<string[]>([]);
+    const [minPrice, setMinPrice] = useState(0);
+    const [roomsStatus, setRoomsStatus] = useState('');
 
 
     const showDatePicker1 = () => {
@@ -194,6 +196,7 @@ const facilityIcons: FacilityIcons = {
         const result = await response.json();
     
         if (result.isSuccess && result.data) {
+          
           // Lấy danh sách dịch vụ từ tất cả các phòng
           console.log('room',result.data);
           const allServices = result.data.flatMap((room: any) => room.facility || []);
@@ -204,14 +207,31 @@ const facilityIcons: FacilityIcons = {
                                   }); // Loại bỏ dịch vụ trùng lặp
           setServices(uniqueServices);
         } else {
-          console.error('Error fetching room services:', result.error);
+          //console.error('Error fetching room services:', result.error);
         }
+
+        const allPrices = result.data?.map((room:any) => room.price);
+        const minPrice =Math.min(...allPrices);
+        setMinPrice(minPrice);
+
+        if (result.isSuccess && Array.isArray(result.data)){
+          const availableRooms = result.data?.filter((room: any) => room?.quantity > 0);
+        
+          if (availableRooms.length > 0){
+            setRoomsStatus('Còn phòng');
+          } else {
+            setRoomsStatus('Hết phòng');
+          }
+        } else {
+          setRoomsStatus('Hết phòng');
+        }
+
+
+
       } catch (error) {
         console.error('Error fetching room services:', error);
       }
     };
-  
-  
   
   return (
     <ScrollView style={styles.container}>
@@ -318,7 +338,7 @@ const facilityIcons: FacilityIcons = {
           </View>
         </View>
 
-        {/* Number of People Input */}
+        {/* Number of People  */}
         <View style={styles.inputContainer}>
           <FontAwesome name="user" size={20} color="gray" style={styles.iconLeft} />
           <TextInput
@@ -332,7 +352,7 @@ const facilityIcons: FacilityIcons = {
         {/* Availability State */}
         <View style={styles.stateContainer}>
           <Text style={styles.stateText}>Trang thái:</Text>
-          <Text style={styles.stateBadge}>Có sẵn</Text>
+          <Text style={styles.stateBadge}>{roomsStatus}</Text>
         </View>
 
         {/* Search Button */}
@@ -362,17 +382,21 @@ const facilityIcons: FacilityIcons = {
 
         <Text style={styles.feedbackText}>
           “The location was perfect. The staff was friendly. Our bed was comfy. The pool was fresh with a great view. The breakfast was delicious! We had a hot tub on our balcony which was awesome.”
-        </Text>
+        </Text>   
       </View>
 
         {/* Giá và nút đặt */}
         <View style={styles.bookingSection}>
             <View>
                 <Text style={styles.priceLabel}>Giá chỉ từ</Text>
-                <Text style={styles.price}>500.000 VND</Text>
+                <Text style={styles.price}>{minPrice} VND</Text>
             </View>
           
-          <TouchableOpacity onPress={()=> navigation.navigate('reservation-required-screen')} style={styles.bookNowButton}>
+          <TouchableOpacity onPress={()=> navigation.navigate('available-room-screen', {
+            id: locationDetails._id,
+            checkinDate: date1, // Gửi ngày checkin
+            checkoutDate: date2, // Gửi ngày checkout
+          })} style={styles.bookNowButton}>
             <Text style={styles.bookNowText}>Đặt ngay</Text>
             <FontAwesome size={20} name='arrow-right' style={styles.iconBookNow}></FontAwesome>
           </TouchableOpacity>
