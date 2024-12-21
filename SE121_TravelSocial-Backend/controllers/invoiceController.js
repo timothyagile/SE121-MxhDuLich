@@ -1,73 +1,24 @@
 const invoiceSvc = require('../services/invoiceSvc')
+const bookingSvc = require('../services/bookingSvc')
+const Invoice = require('../models/Invoice').Invoice
+const Service = require('../models/Service')
 
-module.exports.getAllInvoice = async (req, res, next) => {
-    try {
-        const result = null
-        res.status(201).json({
-            isSuccess: true,
-            data: result,
-            error: null
-        })
-    }
-    catch (error) {
-        next(error)
-    }
-}
-module.exports.getInvoiceById = async (req, res, next) => {
-    try {
-        const result = await invoiceSvc.getAllBooking()
-        res.status(201).json({
-            isSuccess: true,
-            data: result,
-            error: null
-        })
-    }
-    catch (error) {
-        next(error)
-    }
-}
-module.exports.getInvoiceByLocationId = async (req, res, next) => {
-    try {
-        const result = await invoiceSvc.getAllBooking()
-        res.status(201).json({
-            isSuccess: true,
-            data: result,
-            error: null
-        })
-    }
-    catch (error) {
-        next(error)
-    }
-}
 module.exports.createInvoice = async (req, res, next) => {
+    const {bookingId} = req.body
     try {
-        const result = await invoiceSvc.getAllBooking()
-        res.status(201).json({
-            isSuccess: true,
-            data: result,
-            error: null
+        const booking = await bookingSvc.getBookingById(bookingId)
+        const items = booking.items
+        const services = booking.services
+        const invoiceItem = await invoiceSvc.createInvoiceItem(items, services)
+        const invoiceData = new Invoice({
+            bookingId,
+            invoiceDate: Date.now(),
+            invoiceItem: invoiceItem,
+            tax: booking.totalPrice * 0.08,
+            totalPrice: booking.totalPrice,
+            invoiceItem
         })
-    }
-    catch (error) {
-        next(error)
-    }
-}
-module.exports.updateInvoice = async (req, res, next) => {
-    try {
-        const result = await invoiceSvc.getAllBooking()
-        res.status(201).json({
-            isSuccess: true,
-            data: result,
-            error: null
-        })
-    }
-    catch (error) {
-        next(error)
-    }
-}
-module.exports.deleteInvoice = async (req, res, next) => {
-    try {
-        const result = await invoiceSvc.getAllBooking()
+        const result = await invoiceSvc.createInvoice(invoiceData)
         res.status(201).json({
             isSuccess: true,
             data: result,

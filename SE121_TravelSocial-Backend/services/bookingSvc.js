@@ -4,6 +4,18 @@ const Room = require('../models/Room')
 const {NotFoundException, ForbiddenError} = require('../errors/exception')
 const { default: mongoose } = require('mongoose')
 
+
+
+const updateStatusBooking = async (bookingId, amountPayed) => {
+    const booking = await Booking.findById(bookingId);
+    //console.log(amountPayed)
+    //console.log(booking.totalPrice)
+    if (booking.totalPrice === amountPayed) {
+        booking.status = 'complete'
+        booking.save()
+    }
+}
+
 const getAllBooking = async () => {
     const result = await Booking.find()
     if(result.length !== 0)
@@ -14,6 +26,14 @@ const getAllBooking = async () => {
 }
 const getBookingById = async (id) => {
     const result = await Booking.findById(id)
+    .populate({
+        path: 'items.roomId',
+        select: 'name'
+    })
+    .populate({
+        path: 'services.serviceId',
+        select: 'name'
+    }) 
     if(result)
         return result
     else
@@ -78,8 +98,8 @@ const createBooking = async (bookingData) => {
         return result
     else
         throw new ForbiddenError('Not allow to create')
-
 }
+
 const updateBooking = async (bookingId, bookingData) => {
     const result = Booking.findByIdAndUpdate(bookingId, bookingData, {new: true, runValidators: true})
     if(result)
@@ -202,6 +222,7 @@ const getBookingRevenueByMonthForBusiness = async (businessId, month, year) => {
   };
   
 module.exports = {
+    updateStatusBooking,
     getAllBooking,
     getBookingById,
     getBookingByUserId,
