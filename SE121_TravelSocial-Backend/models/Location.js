@@ -44,11 +44,11 @@ const locationSchema = new Schema({
     category: {
         id: {
             type: String,
-            required: true,
+            //required: true,
         },
         cateName: {
             type: String,
-            required: true,
+            //required: true,
         },
     },
     dateCreated: {

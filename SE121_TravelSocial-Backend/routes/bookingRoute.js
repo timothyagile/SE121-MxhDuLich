@@ -10,6 +10,7 @@ router.get('/booking/getbylocationid/:locationId', bookingController.getBookingB
 router.get('/booking/getbybusinessid/:businessId', bookingController.getBookingByBusinessId)
 router.post('/booking/createbooking', bookingController.createBooking)
 router.put('/booking/update/:id', bookingController.updateBooking)
+router.put('/booking/addservice/:id', bookingController.addServices)
 router.delete('/booking/delete/:id', bookingController.deleteBooking)
 router.get('/bookings/revenue', bookingController.getRevenueByMonth)
 router.get('/bookings/revenue/:businessId', bookingController.getBookingRevenue)

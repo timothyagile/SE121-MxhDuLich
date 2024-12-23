@@ -1,4 +1,4 @@
-const Booking = require('../models/Booking')
+const Booking = require('../models/Booking').Booking
 const bookingSvc = require('../services/bookingSvc')
 
 module.exports.getAllBooking = async (req, res, next) => {
@@ -82,6 +82,7 @@ module.exports.createBooking = async (req, res, next) => {
         items,
         services,
         status,
+        totalPrice
     } = req.body
     
     try {
