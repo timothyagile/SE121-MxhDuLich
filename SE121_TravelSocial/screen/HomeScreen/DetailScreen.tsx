@@ -7,6 +7,9 @@ import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/n
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useRoute,RouteProp } from '@react-navigation/native';
 import {API_BASE_URL} from '../../constants/config';
+import { Icon } from 'react-native-paper';
+import {iconMapping} from '../../constants/icon';
+
 
 const { width, height } = Dimensions.get('window');
 
@@ -29,23 +32,32 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
     roomId: string;
     name: string;
     quantity: number;
-    icon: string | null;
+    icon: string;
     description: string;
   }
 
-  const facilityIcons: Record<string, string> = {
-    "Wifi miễn phí": "wifi", // Wifi
-    "Máy lạnh": "snowflake-o", // Máy lạnh
-    "Tủ lạnh": "snowflake", // Tủ lạnh
-    "Hồ bơi": "swimmer", // Hồ bơi
-    "Lửa trại": "fire", // Lửa trại
-    "Bãi đỗ xe": "car", // Bãi đỗ xe
-    "Nhà hàng": "utensils", // Nhà hàng
-    "Phòng gym": "dumbbell", // Gym
-    "Spa": "spa", // Spa
-    "Bar": "glass-martini-alt", // Bar
-    "Dịch vụ khác": "ellipsis-h", // Mặc định cho dịch vụ khác
+  type FacilityIcons = {
+    [key: string]: string; // Cho phép dùng các khóa kiểu string
+};
+
+  const getIcon = (iconName: string) => {
+    return iconMapping[iconName] || iconMapping["default.png"];
   };
+
+
+const facilityIcons: FacilityIcons = {
+    "Wifi miễn phí": require('../../assets/icons/wifi.png'),
+    "Máy lạnh": "ac-unit",
+    "Kitchen": "Kitchen", 
+    "Hồ bơi": "pool",
+    "Lửa trái": "fire",
+    "Bãi đỗ xe": "local-parking",
+    "Nhà hàng": "restaurant",
+    "Phòng gym": "fitness-center",
+    "Spa": "spa",
+    "Bar": "local-bar",
+    "Dịch vụ khác": "help",
+};
   
   const [services, setServices] = useState<Service[]>([]);  // Khai báo rõ ràng kiểu dữ liệu
   
@@ -61,6 +73,8 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
     const [selectedDate2, setSelectedDate2] = useState('');
     const [locationDetails, setLocationDetails] = useState<any>(null);
     //const [services, setServices] = useState<string[]>([]);
+    const [minPrice, setMinPrice] = useState(0);
+    const [roomsStatus, setRoomsStatus] = useState('');
 
 
     const showDatePicker1 = () => {
@@ -182,6 +196,7 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
         const result = await response.json();
     
         if (result.isSuccess && result.data) {
+          
           // Lấy danh sách dịch vụ từ tất cả các phòng
           console.log('room',result.data);
           const allServices = result.data.flatMap((room: any) => room.facility || []);
@@ -192,14 +207,31 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
                                   }); // Loại bỏ dịch vụ trùng lặp
           setServices(uniqueServices);
         } else {
-          console.error('Error fetching room services:', result.error);
+          //console.error('Error fetching room services:', result.error);
         }
+
+        const allPrices = result.data?.map((room:any) => room.price);
+        const minPrice =Math.min(...allPrices);
+        setMinPrice(minPrice);
+
+        if (result.isSuccess && Array.isArray(result.data)){
+          const availableRooms = result.data?.filter((room: any) => room?.quantity > 0);
+        
+          if (availableRooms.length > 0){
+            setRoomsStatus('Còn phòng');
+          } else {
+            setRoomsStatus('Hết phòng');
+          }
+        } else {
+          setRoomsStatus('Hết phòng');
+        }
+
+
+
       } catch (error) {
         console.error('Error fetching room services:', error);
       }
     };
-  
-  
   
   return (
     <ScrollView style={styles.container}>
@@ -254,11 +286,7 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
         <View style={styles.facilityContainer}>
           {services.map((service, index) => (
             <View style={styles.facilityItem} key={index}>
-              <FontAwesome
-                name={facilityIcons[service.name] || facilityIcons["Dịch vụ khác"]}
-                size={18}
-                color="#555"
-              />
+                <Image source={getIcon(service?.icon)}/>
               <Text style={styles.facilityText}>{service?.name}</Text>
             </View>
           ))}
@@ -310,7 +338,7 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
           </View>
         </View>
 
-        {/* Number of People Input */}
+        {/* Number of People  */}
         <View style={styles.inputContainer}>
           <FontAwesome name="user" size={20} color="gray" style={styles.iconLeft} />
           <TextInput
@@ -324,7 +352,7 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
         {/* Availability State */}
         <View style={styles.stateContainer}>
           <Text style={styles.stateText}>Trang thái:</Text>
-          <Text style={styles.stateBadge}>Có sẵn</Text>
+          <Text style={styles.stateBadge}>{roomsStatus}</Text>
         </View>
 
         {/* Search Button */}
@@ -354,17 +382,21 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
 
         <Text style={styles.feedbackText}>
           “The location was perfect. The staff was friendly. Our bed was comfy. The pool was fresh with a great view. The breakfast was delicious! We had a hot tub on our balcony which was awesome.”
-        </Text>
+        </Text>   
       </View>
 
         {/* Giá và nút đặt */}
         <View style={styles.bookingSection}>
             <View>
                 <Text style={styles.priceLabel}>Giá chỉ từ</Text>
-                <Text style={styles.price}>500.000 VND</Text>
+                <Text style={styles.price}>{minPrice} VND</Text>
             </View>
           
-          <TouchableOpacity onPress={()=> navigation.navigate('reservation-required-screen')} style={styles.bookNowButton}>
+          <TouchableOpacity onPress={()=> navigation.navigate('available-room-screen', {
+            id: locationDetails._id,
+            checkinDate: date1, // Gửi ngày checkin
+            checkoutDate: date2, // Gửi ngày checkout
+          })} style={styles.bookNowButton}>
             <Text style={styles.bookNowText}>Đặt ngay</Text>
             <FontAwesome size={20} name='arrow-right' style={styles.iconBookNow}></FontAwesome>
           </TouchableOpacity>

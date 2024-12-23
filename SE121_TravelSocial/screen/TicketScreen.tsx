@@ -88,10 +88,10 @@ export default function TicketScreen() {
                 status={item.status}
                 imageUrl={item.imageUrl || 'https://via.placeholder.com/150'}
                 onCancel={() => console.log(`Cancel ticket: ${item._id}`)}
+                bookingId={item._id}
                 />
             )}
-        />
-      
+        /> 
     </View>
   );
 }

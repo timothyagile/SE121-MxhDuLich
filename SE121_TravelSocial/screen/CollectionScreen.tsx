@@ -4,13 +4,19 @@ import {Button, Text, View,  StyleSheet, Image, TouchableOpacity, TextInput,Moda
 import { NativeStackNavigationProp, NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 import { useUser } from '@/context/UserContext';
 import {API_BASE_URL} from '../constants/config';
+import Ticket from '@/components/BookingScreen/Booking';
+import { handleUrlParams } from 'expo-router/build/fork/getStateFromPath-forks';
+import CollectionItem from '@/components/CollectionScreen/Location';
 
 const { height } = Dimensions.get('window');
 
 type RootStackParamList = {
   'add-new-collection-screen': undefined;
   register: undefined;
+  "detail-screen": { id: string };
 };
+
+
 
 type CollectionScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -21,10 +27,13 @@ export default function CollectionScreen ()
 {
     const { userId } = useUser();
     const navigation = useNavigation<CollectionScreenNavigationProp>();
-    const [modalVisible, setModalVisible] = useState(true);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalVisible2, setModalVisible2] = useState(false);
+    const [tickets, setTickets] = useState<any[]>([]);
     const [collections, setCollections] = useState<any[]>([]);
+    const [selectedCollectionLocations, setSelectedCollectionLocations] = useState<any[]>([]);
       useEffect(() => {
-        setModalVisible(true);
+        setModalVisible(false);
       }, []);
 
       const addNewCollection = async () => {
@@ -64,18 +73,33 @@ export default function CollectionScreen ()
           if (result.isSuccess) {
             setCollections(result.data);
           } else {
-            console.error('Error fetching collections:', result.error);
+            //console.error('Error fetching collections:', result.error);
           }
         } catch (error) {
           console.error('Error fetching collections:', error);
         } finally {
-          
         }
       }
 
       useEffect(() => {
         fetchCollections();
       }, []);
+
+      const handleCollectionClick = async (collectionId: string) => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/collection/getbyid/${collectionId}`);
+          const result = await response.json();
+          if (result.isSuccess) {
+            setSelectedCollectionLocations(result.data.item); 
+            console.log('rs: ', result.data);
+            setModalVisible2(true); 
+          } else {
+            console.error("Error fetching locations for collection:", result.error);
+          }
+        } catch (error) {
+          console.error("Error fetching locations for collection:", error);
+        }
+      };
 
     return (
         <View style = {styles.container}>
@@ -116,12 +140,12 @@ export default function CollectionScreen ()
                     ) : (
                       // Giao diện collections thông thường
                       <View style={{ width: '50%', alignItems: 'center', marginVertical: 10 }}>
-                        <TouchableOpacity style={styles.square}>
+                        <TouchableOpacity style={styles.square} onPress={() => handleCollectionClick(item._id)}>
                           <Image
                             source={{
                               uri: item.imageUrl || 'https://via.placeholder.com/150',
                             }}
-                            style={styles.iconplus}
+                            style={{width:150, height:150, borderRadius:20}}
                           />
                         </TouchableOpacity>
                         <Text style={{ marginTop: 10, fontSize: 20 }}>{item.name}</Text>
@@ -130,8 +154,6 @@ export default function CollectionScreen ()
                   }
                   numColumns={2} 
                 />
-                
-
             </View>
 
             <Modal
@@ -156,6 +178,43 @@ export default function CollectionScreen ()
                                 onPress={() => setModalVisible(!modalVisible)}>
                             <Text style={styles.closeButtonText}>Tôi đã hiểu</Text>
                         </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible2}
+                onRequestClose={() => {
+                setModalVisible2(!modalVisible2);
+                }}>
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent1}>
+                        <TouchableOpacity
+                            style={styles.exitButton}
+                            onPress={() => setModalVisible2(!modalVisible2)}>
+                            <Image source={require('../assets/icons/exit.png')} style={styles.exitIcon} />
+                        </TouchableOpacity>
+                        <View style={{width:'100%', height:'100%', marginTop: 30,}}>
+                          <FlatList
+                            data={selectedCollectionLocations}
+                            keyExtractor={(item) => item._id} // Giả sử mỗi location có _id
+                            renderItem={({ item }) => (
+                              <CollectionItem
+                                imageUrl={item.imageUrl || "https://via.placeholder.com/150"}
+                                name={item.name}
+                                rating={item.rating || 1.0}
+                                cancellation="Hủy miễn phí trong 24h"
+                                onPress={() => { 
+                                  navigation.navigate('detail-screen', { id: item._id });
+                                  setModalVisible2(false);
+                                }}// Thêm logic nếu cần
+                              />
+                            )}
+                            showsVerticalScrollIndicator={false}
+                          />
+                        </View>
                     </View>
                 </View>
             </Modal>
@@ -245,6 +304,16 @@ const styles = StyleSheet.create({
         padding: 20,
         alignItems: 'center',
         justifyContent: 'center',
+      },
+      modalContent1: {
+        width: '100%',
+        height: height * 0.8,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection:'column',
       },
       modalText: {
         fontSize: 18,

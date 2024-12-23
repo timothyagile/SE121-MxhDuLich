@@ -157,7 +157,7 @@ const fetchPopularLocations = async (id: string) => {
           { useNativeDriver: false }
         )}
         scrollEventThrottle={16}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) => item._id}
         renderItem={renderItem}
       />
       <CustomModal visible={modalVisible} onClose={() => setModalVisible(false)} ></CustomModal>

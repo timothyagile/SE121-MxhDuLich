@@ -2,6 +2,9 @@ import {View, Text} from 'react-native'
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
+(Text as any).defaultProps = (Text as any).defaultProps || {};
+(Text as any).defaultProps.style = { fontFamily: 'UTMTimesBold'};
+
 import WelcomeScreen1 from '@/screen/Welcome/WelcomeScreen1'
 import LoginScreen from '@/screen/Welcome/LoginScreen'
 import RegisterScreen from '@/screen/Welcome/RegisterScreen'
@@ -22,6 +25,7 @@ import DetailScreen1 from '@/screen/HomeScreen/DetailScreen1'
 import DetailScreen from '@/screen/HomeScreen/DetailScreen'
 import { UserProvider } from '@/context/UserContext'
 import { RootStackParamList } from '@/types/navigation'
+import DetailBookingScreen from '@/screen/DetailBookingScreen';
 
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -144,6 +148,11 @@ export default function App() {
             options={{
               headerShown: false}}/>
 
+            <Stack.Screen
+            name = "detail-booking-screen"
+            component={DetailBookingScreen}
+            options={{
+              headerShown: false}}/>
 
           </Stack.Navigator>
         </UserProvider>
