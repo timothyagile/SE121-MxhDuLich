@@ -19,7 +19,7 @@ module.exports.createNewLocation = async (req, res, next) => {
     // const images = req.files.map((file) => ({
     //     url: file.path,
     //     publicId: file.filename
-    // }))
+    // }))re
 
     const locationData = new Location({
         name,

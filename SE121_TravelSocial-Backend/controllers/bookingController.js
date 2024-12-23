@@ -82,6 +82,7 @@ module.exports.createBooking = async (req, res, next) => {
         items,
         services,
         status,
+        totalPrice
     } = req.body
     
     try {
@@ -120,23 +121,6 @@ module.exports.updateBooking = async (req, res, next) => {
         next(error)
     }
 }
-
-module.exports.addServices = async (req, res, next) => {
-    const bookingId = req.params.id
-    const {serviceId} = req.body
-    try {
-        const result = await bookingSvc.addServices(bookingId, serviceId)
-        res.status(201).json({
-            isSuccess: true,
-            data: result,
-            error: null
-        })
-    }
-    catch (error) {
-        next(error)
-    }
-}
-
 module.exports.deleteBooking = async (req, res, next) => {
     const {bookingId} = req.params
     try {
