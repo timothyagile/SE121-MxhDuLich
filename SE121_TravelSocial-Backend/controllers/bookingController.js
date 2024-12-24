@@ -82,18 +82,22 @@ module.exports.createBooking = async (req, res, next) => {
         items,
         services,
         status,
-        totalPrice
+        totalPrice,
+        tax
     } = req.body
     
     try {
         const bookingData = new Booking({
+            userId,
             dateBooking,
             checkinDate,
             checkoutDate,
             items,
             services,
             totalPrice,
-            status,       
+            tax,
+            status,  
+            amountPaid,              
         })
         const result = await bookingSvc.createBooking(bookingData)
         res.status(201).json({

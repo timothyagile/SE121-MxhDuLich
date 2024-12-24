@@ -199,14 +199,31 @@ const saveQRImageToGallery = async () => {
             // Cấu trúc dữ liệu gửi đi
             const bookingData = {
                 userId: userId,
-                //locationId,
-                totalPrice: parseInt(totalPrice),
-                //paymentMethod: selectedButton,
-                status:'pending',
-                checkInDate: selectedRoomsData[0].roomDetails.checkinDate,
-                checkOutDate: selectedRoomsData[0].roomDetails.checkoutDate,
-                dateBooking:  new Date()
+                tax: 0.04,
+                totalPrice: totalPrice,
+                //checkinDate: selectedRoomsData[0].roomDetails.checkinDate,
+                //checkoutDate: selectedRoomsData[0].roomDetails.checkoutDate,
+                //dateBooking:  new Date(),
+                items: selectedRoomsData.map((room) => {
+                    // Tính số đêm
+                    const checkIn = new Date(room.roomDetails.checkinDate);
+                    const checkOut = new Date(room.roomDetails.checkoutDate);
+                    const checkInTime = checkIn.getTime();
+                    const checkOutTime = checkOut.getTime();
+                    const diffTime = checkOutTime - checkInTime; 
+                    const night = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24))); // Số ngày, tối thiểu là 1
+    
+                    return {
+                        roomId: room.roomId,
+                        price: room.roomDetails.price,
+                        quantity: room.count,
+                        nights: night,
+                    };
+                }),
+                amountPaid: parseInt(totalPrice),
             };
+
+            console.log('booking data: ',bookingData)
     
             const response = await fetch(`${API_BASE_URL}/booking/createbooking`, {
                 method: 'POST',
@@ -220,7 +237,7 @@ const saveQRImageToGallery = async () => {
     
             if (result.isSuccess) {
                 Alert.alert('Thành công!', 'Đặt chỗ của bạn đã được tạo.');
-                navigation.navigate('BookingDetailsScreen', { bookingId: result.bookingId }); // Điều hướng đến màn hình chi tiết
+                navigation.navigate('collection-screen', { bookingId: result.bookingId }); // Điều hướng đến màn hình chi tiết
             } else {
                 Alert.alert('Lỗi!', result.message || 'Không thể tạo đặt chỗ.');
             }
