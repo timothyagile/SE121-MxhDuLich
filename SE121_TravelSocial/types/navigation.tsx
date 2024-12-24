@@ -6,6 +6,8 @@ export type SelectedRoom = {
     roomDetails: {
       name: string;
       price: number;
+      checkinDate: Date;
+      checkoutDate: Date;
     };
   };
   
@@ -21,7 +23,7 @@ export type SelectedRoom = {
     'chat-board-screen': undefined;
     'chat-screen': undefined;
     'main-screen': undefined;
-    'payment-method-screen': {locationId: string, totalPrice: string};
+    'payment-method-screen': {locationId: string, totalPrice: string, selectedRoomsData: SelectedRoom[]};
     'add-new-payment-method-screen': undefined;
     'reservation-required-screen': { selectedRoomsData: SelectedRoom[] ,locationId: string};
     'available-room-screen': { id: string; checkinDate: string; checkoutDate: string };

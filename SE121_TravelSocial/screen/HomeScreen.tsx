@@ -17,12 +17,37 @@ export default function HomeScreen ({navigation} : {navigation : NativeStackNavi
     const [findContent, setFindContent] = useState("");
     const [selectedCategory, setSelectedCategory] = useState(categoryData.at(0));
     const [locations, setLocations] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
 
     const handleSetCategory = (category: typeof categoryData[0]) => {
         setSelectedCategory(category); 
     };
 
+    useEffect(() => {
+        // Giả lập thời gian tải dữ liệu
+        const loadData = async () => {
+            try {
+                // Thực hiện các tác vụ tải dữ liệu (ví dụ: gọi API)
+                await new Promise((resolve) => setTimeout(resolve, 0)); // Giả lập 2 giây chờ
+            } catch (error) {
+                console.error('Error loading data:', error);
+            } finally {
+                setIsLoading(false); // Sau khi tải xong, thay đổi trạng thái
+            }
+        };
+
+        loadData();
+    }, []); // useEffect chỉ chạy một lần khi component mount
+
+    // Nếu đang tải dữ liệu, hiển thị một component loading
+    if (isLoading) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text>Đang tải...</Text>
+            </View>
+        );
+    }
     
     return (
     <ImageBackground

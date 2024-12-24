@@ -10,10 +10,39 @@ import {API_BASE_URL} from '../constants/config';
 
 type ReservationRouteProp = RouteProp<RootStackParamList, 'reservation-required-screen'>;
 
+interface RoomDetails {
+    name: string;
+    price: number;
+    checkinDate: string;
+    checkoutDate: string;
+}
+
+interface SelectedRoomData {
+    count: number;
+    roomDetails: RoomDetails;
+    roomId: string;
+}
+
 export default function ReservationRequiredScreen({ navigation }: {navigation: NativeStackNavigatorProps}) {
     const route = useRoute<ReservationRouteProp>();
     const { selectedRoomsData, locationId } = route.params;
-    console.log('location id: ',locationId);
+
+    const formatDate = (dateString: string) =>
+        new Intl.DateTimeFormat('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        }).format(new Date(dateString));
+    //console.log('xxx:',selectedRoomsData);
+    const roomList = selectedRoomsData.map((room) => ({
+        id: room.roomId,
+        name: room.roomDetails.name,
+        price: room.roomDetails.price,
+        checkinDate: room.roomDetails.checkinDate,
+        checkoutDate: room.roomDetails.checkoutDate,
+        count: room.count,
+    }));
+    console.log('selected room dataa: ',selectedRoomsData);
 
     const [isEditing, setIsEditing] = useState<string | null>(null);
     const [name, setName] = useState({ firstName: '', lastName: '' });
@@ -169,7 +198,9 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                 <Text style={styles.yourbooking}>Booking của bạn</Text>
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>Ngày</Text>
-                    <Text style={styles.secondtext}>26/6 - 27/6</Text>
+                    <Text style={styles.secondtext}>{selectedRoomsData.length > 0
+        ? `${(selectedRoomsData[0].roomDetails.checkinDate)}- ${(selectedRoomsData[0].roomDetails.checkoutDate)}`
+        : "No room selected"} </Text>
                 </View>
                 {/* <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>Số người</Text>
@@ -302,6 +333,7 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                     <TouchableOpacity style={styles.addpaymentmethod2} onPress={()=> navigation.navigate('payment-method-screen',{
                         locationId: locationId,
                         totalPrice: displayedTotalPrice,
+                        selectedRoomsData: selectedRoomsData,
                         })} >
                         <Text style={styles.boxText3}>Tiếp tục để thanh toán</Text>
                     </TouchableOpacity>
@@ -309,12 +341,7 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
             </View>
 
             </ScrollView>
-            
-            
-            
-        </View>
-
-        
+        </View>  
 );
 }
 

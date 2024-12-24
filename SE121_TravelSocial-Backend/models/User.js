@@ -14,7 +14,7 @@ const userSchema = new Schema({
         lowercase: true,
         validate: [isEmail, 'Email chưa chính xác']
     },
-    userPassword: {
+    userPassword: { 
         type: String, 
         required: [true, 'Hãy nhập mật khẩu của bạn'],
         minLength: [6, 'Mật khẩu cần tối thiểu 6 kí tự']

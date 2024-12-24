@@ -43,6 +43,7 @@ export default function PopularSection({ categoryId, navigation }: PopularSectio
 
     const [loading, setLoading] = useState(true);
     const [modalVisible, setModalVisible] = useState(false);
+    const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
 
   const scrollX = useRef(new Animated.Value(0)).current;
 
@@ -51,6 +52,7 @@ export default function PopularSection({ categoryId, navigation }: PopularSectio
       ...prevState,
       [id]: !prevState[id],
     }));
+    setSelectedLocationId(id);
     setModalVisible(true); 
   };
 
@@ -73,7 +75,7 @@ const fetchPopularLocations = async (id: string) => {
         }
     } catch (error) {
         console.error("Fetch error:", error);
-    }
+    } 
 }; 
 
   const renderItem = ({ item, index }: { item: any; index: number }) => {
@@ -160,7 +162,7 @@ const fetchPopularLocations = async (id: string) => {
         keyExtractor={(item, index) => item._id}
         renderItem={renderItem}
       />
-      <CustomModal visible={modalVisible} onClose={() => setModalVisible(false)} ></CustomModal>
+      <CustomModal visible={modalVisible} onClose={() => setModalVisible(false)} onSelectCollection={(collectionId:any)=>console.log('selected:', collectionId)} selectedLocationId={selectedLocationId}></CustomModal>
     </View>
   );
 }

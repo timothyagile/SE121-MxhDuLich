@@ -19,6 +19,8 @@ interface Room {
     price: number;
     image: string[]; 
     description: string;
+    checkinDate: Date;
+    checkoutDate: Date;
     facility: {
         name: string; 
         description?: string; 
@@ -80,6 +82,7 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
       
               if (Array.isArray(roomData.data)) {
                 const rooms = roomData.data;
+
 
                 const availableRooms = rooms.filter((room: any) => {
                   const isBooked = bookings.some((booking: any) => {
@@ -161,6 +164,8 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
         roomDetails: {
           name: string;
           price: number;
+          checkinDate: Date;
+          checkoutDate: Date;
         };
       };
 
@@ -173,6 +178,8 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
               roomDetails: {
                 name: room?.name || '',
                 price: room?.price || 0,
+                checkinDate: checkinDate || '',
+                checkoutDate: checkoutDate || ''
               },
             };
           });
