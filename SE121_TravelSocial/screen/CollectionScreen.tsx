@@ -7,6 +7,7 @@ import {API_BASE_URL} from '../constants/config';
 import Ticket from '@/components/BookingScreen/Booking';
 import { handleUrlParams } from 'expo-router/build/fork/getStateFromPath-forks';
 import CollectionItem from '@/components/CollectionScreen/Location';
+import LoadingScreen from '@/components/Loading/LoadingScreen';
 
 const { height } = Dimensions.get('window');
 
@@ -32,6 +33,7 @@ export default function CollectionScreen ()
     const [tickets, setTickets] = useState<any[]>([]);
     const [collections, setCollections] = useState<any[]>([]);
     const [selectedCollectionLocations, setSelectedCollectionLocations] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true); 
       useEffect(() => {
         setModalVisible(false);
       }, []);
@@ -78,6 +80,7 @@ export default function CollectionScreen ()
         } catch (error) {
           console.error('Error fetching collections:', error);
         } finally {
+          setLoading(false); // Dữ liệu đã được tải, cập nhật trạng thái loading
         }
       }
 
@@ -101,9 +104,13 @@ export default function CollectionScreen ()
         }
       };
 
+      if (loading) {
+        return <LoadingScreen />; // Hiển thị LoadingScreen khi dữ liệu đang được tải
+      }
+
     return (
         <View style = {styles.container}>
-            <Image source={require('../assets/icons/logo.png')} style={styles.logo} />
+            {/* <Image source={require('../assets/icons/logo.png')} style={styles.logo} /> */}
             <View style = {{alignItems:'center', width:'100%'}}>
                 <View style={styles.search}>
                     <TouchableOpacity onPress={() => console.log('Search icon pressed')}>
@@ -114,6 +121,7 @@ export default function CollectionScreen ()
                         placeholder="Tìm kiếm"
                         placeholderTextColor="#000000"
                     />
+                    <Image source={require('../assets/icons/logoblue.png')} style={styles.logo}/>
                 </View>
             </View>
             <Text style={styles.collections }>Bộ sưu tập</Text>
@@ -233,11 +241,11 @@ const styles = StyleSheet.create({
     },
 
     logo:{
-        marginTop: 20,
-        width:50,
-        height:50,
-        marginLeft: 10,
-    },
+      marginTop: 0,
+      width:35,
+      height:35,
+      marginLeft: 10,
+  },
 
     search: {
         marginTop: 30,
