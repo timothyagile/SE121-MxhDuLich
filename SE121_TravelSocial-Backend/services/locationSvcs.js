@@ -2,6 +2,7 @@ const Location = require('../models/Location');
 const NotFoundException = require('../errors/exception');
 const { findById } = require('../models/User');
 const cloudinary =  require("../config/cloudinaryConfig") 
+const emailSvc = require('./emailSvc')
 
 const createLocation = async (locationData, imageFiles) => {
     const imageUrls = []
@@ -98,6 +99,26 @@ const deleteLocation = async(locationId) => {
         throw new NotFoundException('Not found location to delete')
 }
 
+const getInfoOwnerByLocationId = async (locationId) => {
+    const result = await Location.findById(locationId).populate('ownerId')
+    if(result)
+        return result
+    else
+        throw new NotFoundException('Not found this location')
+}
+
+const sendAppoveEmailService = async (email) => {
+    const transporter = emailSvc.transporter
+    const approveMail = emailSvc.approveMail(email, email)
+    transporter.sendMail(approveMail, function(error, info) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+        return info
+    });
+}
 module.exports = {
     getAllLocation, 
     createLocation,
@@ -107,5 +128,7 @@ module.exports = {
     getLocationByName,
     getLocationById,
     updateLocation,
-    deleteLocation
+    deleteLocation,
+    getInfoOwnerByLocationId,
+    sendAppoveEmailService
 }

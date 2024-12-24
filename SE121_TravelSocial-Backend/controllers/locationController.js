@@ -192,3 +192,23 @@ module.exports.deleteLocation = async (req, res, next) => {
 }
 
 //--DELETE LOCATION DATA--\\
+
+
+//EMAIL SENDER
+
+module.exports.sendApproveEmail = async (req, res, next) => {
+    const locationId  = req.params.locationId;
+    try {
+        const location = await locationSvc.getInfoOwnerByLocationId(locationId)
+        const email = location.ownerId.userEmail
+        const result = await locationSvc.sendAppoveEmailService(email)
+        res.status(200).json({
+            isSuccess: true,
+            data: result,
+            error: null,
+        });
+    }
+    catch(error) {
+        next(error)
+    }
+}
