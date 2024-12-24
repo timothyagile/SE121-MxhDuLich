@@ -9,6 +9,8 @@ const bookingRoute = require('./routes/bookingRoute')
 const recommendationRoute = require('./routes/recommendationRoute')
 const userCollectionRoute = require('./routes/userCollectionRoute')
 const uploadImageRoute = require('./routes/uploadImageRoute')
+const invoiceRoute = require('./routes/invoiceRoute')
+const paymentRoute = require('./routes/paymentRoute')
 const {requireAuth, checkUser} = require('./middleware/authMiddleware');
 const {errorHandler} = require('./middleware/errorMiddleware')
 const app = express();
@@ -54,5 +56,7 @@ app.use(roomRoute)
 app.use(userCollectionRoute)
 app.use(uploadImageRoute)
 app.use(recommendationRoute)
+app.use(paymentRoute)
+app.use(invoiceRoute)
 
 app.use(errorHandler);
