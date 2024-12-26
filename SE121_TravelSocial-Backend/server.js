@@ -13,6 +13,7 @@ const invoiceRoute = require('./routes/invoiceRoute')
 const paymentRoute = require('./routes/paymentRoute')
 const serviceRoute = require('./routes/serviceRoute')
 const messageRoute = require('./routes/messageRoute')
+const reviewRoute = require('./routes/reviewRoute')
 const {requireAuth, checkUser} = require('./middleware/authMiddleware');
 const {errorHandler} = require('./middleware/errorMiddleware')
 const app = express();
@@ -62,6 +63,7 @@ app.use(paymentRoute)
 app.use(invoiceRoute)
 app.use(serviceRoute)
 app.use(messageRoute)
+app.use(reviewRoute)
 
 
 app.use(errorHandler);

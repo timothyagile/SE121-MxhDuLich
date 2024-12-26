@@ -110,7 +110,6 @@ BookingSchema.pre('save', async function (next) {
     this.totalPrice = totalRoomPrice + totalServicePrice
     this.tax = this.totalPrice * 0.08
     this.totalPriceAfterTax = this.totalPrice + this.tax
-    console.log(this.totalPrice)
 
     if(this.totalPriceAfterTax > this.amountPaid)
         this.status = 'confirm'
