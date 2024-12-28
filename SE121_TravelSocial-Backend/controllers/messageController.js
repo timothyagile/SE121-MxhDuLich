@@ -1,7 +1,8 @@
 const messageSvc = require('../services/messageSvc')
-module.exports.getAllMessage = async (req, res, next) => {
+module.exports.getMessageByConvId = async (req, res, next) => {
+    const conversationId = req.params.conversationId
     try {
-        const result = await messageSvc.getAllMessage()
+        const result = await messageSvc.getMessageByConvId(conversationId)
         res.status(201).json({
             isSuccess: true,
             data: result,
@@ -12,53 +13,16 @@ module.exports.getAllMessage = async (req, res, next) => {
         next(error)
     }
 }
-module.exports.getMessageByUserId = async (req, res, next) => {
-    const userId = req.params.userId
-    try {
-        const result = await messageSvc.getMessageByUserId(userId)
-        res.status(201).json({
-            isSuccess: true,
-            data: result,
-            error: null
-        })
-    }
-    catch (error) {
-        next(error)
-    }
-}
+
 module.exports.createMessage = async (req, res, next) => {
-    const {senderId, receiverId, message} = req.body
+    const {conversationId, senderId, message} = req.body
     try {
-        const result = await messageSvc.createMessage({senderId, receiverId, message})
-        res.status(201).json({
-            isSuccess: true,
-            data: result,
-            error: null
+        const messageData = new Message({
+            conversationId: conversationId,
+            senderId: senderId,
+            message: message
         })
-    }
-    catch (error) {
-        next(error)
-    }
-}
-module.exports.updateMessage = async (req, res, next) => {
-    const id = req.params.id
-    const messageData = req.body
-    try {
-        const result = await messageSvc.updateMessage(id, messageData)
-        res.status(201).json({
-            isSuccess: true,
-            data: result,
-            error: null
-        })
-    }
-    catch (error) {
-        next(error)
-    }
-}
-module.exports.deleteMessage = async (req, res, next) => {
-    const id = req.params.id
-    try {
-        const result = await messageSvc.deleteMessage(id)
+        const result = await messageSvc.createMessage(messageData)
         res.status(201).json({
             isSuccess: true,
             data: result,

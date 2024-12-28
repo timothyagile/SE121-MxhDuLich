@@ -3,10 +3,8 @@ const messageController = require('../controllers/messageController')
 
 const router = new Router()
 
-router.get('/api/message', messageController.getAllMessage)
-router.get('/api/message/:userId', messageController.getMessageByUserId)
-router.post('/api/message', messageController.createMessage)
-router.put('/api/message/:id', messageController.updateMessage)
-router.delete('/api/message/:id', messageController.deleteMessage)
+router.post('/message', messageController.createMessage)
+router.get('/message/:conversationId', messageController.getMessageByConvId)
+
 
 module.exports = router

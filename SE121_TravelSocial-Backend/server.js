@@ -1,6 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose')
 const cookieParser = require('cookie-parser')
+const http = require('http');
+const path = require('path');
+const cors = require('cors');
+const {Server} = require('socket.io')
+
 const authRoute = require('./routes/authRoute')
 const locationRoute = require('./routes/locationRoute')
 const businessRoute = require('./routes/businessRoute')
@@ -12,11 +17,19 @@ const uploadImageRoute = require('./routes/uploadImageRoute')
 const invoiceRoute = require('./routes/invoiceRoute')
 const paymentRoute = require('./routes/paymentRoute')
 const serviceRoute = require('./routes/serviceRoute')
+const conversationRoute = require('./routes/conversationRoute')
 const messageRoute = require('./routes/messageRoute')
 const reviewRoute = require('./routes/reviewRoute')
+
 const {requireAuth, checkUser} = require('./middleware/authMiddleware');
 const {errorHandler} = require('./middleware/errorMiddleware')
+const socketHandler = require('./socket/socketHandler')
+
+//Khoi tao app
 const app = express();
+//Khoi tao socket
+const server = http.createServer(app);
+const io = new Server(server);
 const PORT = process.env.PORT || 3000
 
 //Middleware
@@ -25,6 +38,8 @@ app.use(cookieParser());
 
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', 'http://localhost:3001');
+    res.header('Access-Control-Allow-Origin', 'http://localhost:3002');
+    res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     next();
@@ -40,6 +55,9 @@ mongoose.connect(mongoURL)
     .then(console.log("Db is connected"))
     .catch(error => console.log(error));
 
+//Xu ly su kien socket
+socketHandler(io)
+
 app.listen(PORT, () => {
     console.log('Server is running on port:', PORT)
 })
@@ -47,7 +65,7 @@ app.listen(PORT, () => {
 
 //Route
 //app.get('*', checkUser)
-app.get('/', (req, res) => res.render('home'))
+app.get('/', (req, res) => res.render('index'))
 app.get('/signup', (req, res) => {res.render('signup')})
 app.get('/signin', (req, res) => {res.render('signin')})
 
@@ -64,6 +82,6 @@ app.use(invoiceRoute)
 app.use(serviceRoute)
 app.use(messageRoute)
 app.use(reviewRoute)
-
+app.use(conversationRoute)
 
 app.use(errorHandler);
