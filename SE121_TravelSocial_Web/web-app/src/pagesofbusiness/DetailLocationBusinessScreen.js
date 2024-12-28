@@ -46,22 +46,23 @@ const DetailLocationBusinessScreen =({ mapLoaded }) => {
     const [locationInfo, setLocationInfo] = useState(locations);
     const [isEditing, setIsEditing] = useState(false);
 
+
+
     useEffect(() => {
         const fetchLocationInfo = async () => {
-          try {
-            const response = await fetch(`http://localhost:3000/locationbyid/${id}`);
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
-            setLocationInfo(data.data);
-            console.log('id: ', id);
-            console.log('location infor: ',locationInfo);
-          } catch (error) {
-            console.error('Lỗi khi gọi API:', error);
-          } 
-        };
-    
+            try {
+              const response = await fetch(`http://localhost:3000/locationbyid/${id}`);
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              const data = await response.json();
+              setLocationInfo(data.data);
+              console.log('id: ', id);
+              console.log('location infor: ',locationInfo);
+            } catch (error) {
+              console.error('Lỗi khi gọi API:', error);
+            } 
+          };
         if (id) {
           fetchLocationInfo();
         }
@@ -243,7 +244,7 @@ const DetailLocationBusinessScreen =({ mapLoaded }) => {
                                             className="border p-2 rounded"
                                             />
                                         ) : (
-                                        <p class="font-semibold">{locationInfo?.category.name || 'Khách sạn'}</p>
+                                        <p class="font-semibold">{locationInfo?.category?.name || 'Khách sạn'}</p>
                                         )}
                                     </div>
                                     <div>

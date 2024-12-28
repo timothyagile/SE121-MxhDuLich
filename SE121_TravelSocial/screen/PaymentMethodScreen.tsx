@@ -201,9 +201,9 @@ const saveQRImageToGallery = async () => {
                 userId: userId,
                 tax: 0.04,
                 totalPrice: totalPrice,
-                //checkinDate: selectedRoomsData[0].roomDetails.checkinDate,
-                //checkoutDate: selectedRoomsData[0].roomDetails.checkoutDate,
-                //dateBooking:  new Date(),
+                checkinDate: selectedRoomsData[0].roomDetails.checkinDate,
+                checkoutDate: selectedRoomsData[0].roomDetails.checkoutDate,
+                dateBooking:  new Date(),
                 items: selectedRoomsData.map((room) => {
                     // Tính số đêm
                     const checkIn = new Date(room.roomDetails.checkinDate);
@@ -237,7 +237,7 @@ const saveQRImageToGallery = async () => {
     
             if (result.isSuccess) {
                 Alert.alert('Thành công!', 'Đặt chỗ của bạn đã được tạo.');
-                navigation.navigate('collection-screen', { bookingId: result.bookingId }); // Điều hướng đến màn hình chi tiết
+                navigation.navigate('main-screen', { screen: 'Booking' }); 
             } else {
                 Alert.alert('Lỗi!', result.message || 'Không thể tạo đặt chỗ.');
             }

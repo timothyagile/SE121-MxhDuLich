@@ -1,22 +1,18 @@
 export default [
     {
-        id: "coffee-shop",
+        id: "all",
         name: "Địa điểm"
     },
     {
-        id: "restaurant",
+        id: "hotel",
+        name: "Hotel"
+    },
+    {
+        id: "homestay",
         name: "Homestay"
     },
     {
-        id: "3",
-        name: "Khách sạn"
-    },
-    {
-        id: "4",
+        id: "guest home",
         name: "Nhà nghỉ"
     },
-    {
-        id: "5",
-        name: "Nhà hàng"
-    }
 ]

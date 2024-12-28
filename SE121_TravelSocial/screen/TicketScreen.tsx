@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Image, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
 import Ticket from '@/components/BookingScreen/Booking';
 import {API_BASE_URL} from '../constants/config'; // Import component Ticket
 import { useUser } from '@/context/UserContext';
@@ -8,6 +8,7 @@ export default function TicketScreen() {
   const { userId } = useUser();
   const [tickets, setTickets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Hàm gọi API lấy danh sách ticket
   const fetchTickets = async () => {
@@ -22,7 +23,7 @@ export default function TicketScreen() {
         const ticketWithNames = await Promise.all(
           result.data.map(async (ticket: any) => {
             // Gọi API room để lấy locationId
-            const room = await fetchRoomDetails(ticket.roomId);
+            const room = await fetchRoomDetails(ticket.items[0]?.roomId);  
 
             // Gọi API location để lấy tên địa điểm
             const location = room && room.locationId ? await fetchLocationDetails(room.locationId) : null;
@@ -70,6 +71,12 @@ export default function TicketScreen() {
     }
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true); // Bắt đầu trạng thái làm mới
+    await fetchTickets(); // Gọi lại API để cập nhật danh sách
+    setRefreshing(false); // Kết thúc trạng thái làm mới
+  };
+
   useEffect(() => {
     fetchTickets();
   }, []);
@@ -84,13 +91,16 @@ export default function TicketScreen() {
             renderItem={({ item }) => (
                 <Ticket
                 title={item.locationName} // Hiển thị roomId (hoặc tuỳ chỉnh)
-                date={`${new Date(item.checkInDate).toLocaleDateString()} - ${new Date(item.checkOutDate).toLocaleDateString()}`}
+                date={`${new Date(item.checkinDate).toLocaleDateString()} - ${new Date(item.checkoutDate).toLocaleDateString()}`}
                 status={item.status}
                 imageUrl={item.imageUrl || 'https://via.placeholder.com/150'}
                 onCancel={() => console.log(`Cancel ticket: ${item._id}`)}
                 bookingId={item._id}
                 />
             )}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
         /> 
     </View>
   );

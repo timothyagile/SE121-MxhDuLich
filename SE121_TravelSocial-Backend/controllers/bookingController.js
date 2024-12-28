@@ -76,6 +76,7 @@ module.exports.getBookingByBusinessId = async (req, res, next) => {
 
 module.exports.createBooking = async (req, res, next) => {
     const {
+        userId,
         dateBooking,
         checkinDate,
         checkoutDate,
@@ -83,7 +84,8 @@ module.exports.createBooking = async (req, res, next) => {
         services,
         status,
         totalPrice,
-        tax
+        tax,
+        amountPaid, 
     } = req.body
     
     try {
@@ -114,7 +116,7 @@ module.exports.updateBooking = async (req, res, next) => {
     const bookingData = req.body
     const {bookingId} = req.params
     try {
-        const result = await bookingSvc(bookingId, bookingData)
+        const result = await bookingSvc.updateBooking(bookingId, bookingData)
         res.status(201).json({
             isSuccess: true,
             data: result,

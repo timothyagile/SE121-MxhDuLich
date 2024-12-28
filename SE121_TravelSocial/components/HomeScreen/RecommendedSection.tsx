@@ -12,8 +12,13 @@ type LikedItems = {
     [key: string]: boolean; 
 };
 
+interface PopularSectionProps {
+    categoryId: string | undefined;
+    navigation: any;
+  }
 
-export default function RecommendedSection() {
+
+export default function RecommendedSection({ categoryId, navigation }: PopularSectionProps) {
     const [likedItems, setLikedItems] = useState<LikedItems>({});
     const [locations, setLocations] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -66,7 +71,7 @@ export default function RecommendedSection() {
             keyExtractor={item => item._id}
             renderItem={({item, index}) => {
                 return (
-                    <TouchableOpacity style = {[
+                    <TouchableOpacity onPress={() => navigation.navigate('detail-screen', { id: item._id })} style = {[
                         styles.cardContainer,
                         {
                         marginLeft: 24,
