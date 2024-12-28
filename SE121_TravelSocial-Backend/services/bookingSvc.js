@@ -90,7 +90,9 @@ const getBookingByLocationId = async (locationId) => {
 }
 
 const createBooking = async (bookingData) => {
-    const result = bookingData.save()
+    console.log('before: ', bookingData);
+    const result = await bookingData.save();
+    console.log('after: ',result);
     if(result)
         return result
     else

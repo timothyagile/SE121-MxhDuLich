@@ -1,8 +1,9 @@
+import { API_BASE_URL } from '@/constants/config';
 import { RootStackParamList } from '@/types/navigation';
 import { NavigationProp } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 
 interface TicketProps {
   title: string;
@@ -18,8 +19,34 @@ const Ticket: React.FC<TicketProps> = ({ title, date, status, onCancel, imageUrl
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const handleNavigate = () => {
-    navigation.navigate('detail-booking-screen', {bookingId}); // Truyền bookingId
+    navigation.navigate('detail-booking-screen', {bookingId}); 
+    console.log(bookingId)// Truyền bookingId
   };
+
+  const handleCancelBooking = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/booking/update/${bookingId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: 'canceled' }), // Truyền trạng thái mới
+      });
+
+      const result = await response.json();
+
+      if (result.isSuccess) {
+        Alert.alert('Thành công', 'Booking đã được hủy.');
+        onCancel(); // Cập nhật danh sách sau khi hủy
+      } else {
+        Alert.alert('Lỗi', result.message || 'Không thể hủy booking.');
+      }
+    } catch (error) {
+      console.error('Error canceling booking:', error);
+      Alert.alert('Lỗi', 'Không thể kết nối với máy chủ.');
+    }
+  };
+  
   return (
     <TouchableOpacity onPress={handleNavigate}>
       <View style={styles.body}>
@@ -35,7 +62,7 @@ const Ticket: React.FC<TicketProps> = ({ title, date, status, onCancel, imageUrl
                 <Text style={{ color: '#666', fontSize: 14 }}>Trạng thái: </Text>
                 <Text style={styles.stateText}>{status}</Text>
               </View>
-              <TouchableOpacity style={styles.featureBox} onPress={onCancel}>
+              <TouchableOpacity style={styles.featureBox} onPress={handleCancelBooking}>
                 <Text style={styles.boxText}>Hủy</Text>
               </TouchableOpacity>
             </View>

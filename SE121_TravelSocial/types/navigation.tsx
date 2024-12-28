@@ -29,5 +29,6 @@ export type SelectedRoom = {
     'available-room-screen': { id: string; checkinDate: string; checkoutDate: string };
     'detail-screen': { id: string };
     'detail-booking-screen': {bookingId: string};
+    'booking-screen': undefined;
   };
   

@@ -4,12 +4,12 @@ import '../styles/LoginScreen.css';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-function LoginScreen() {
+function LoginScreen() { 
   const navigate = useNavigate(); 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [userId, setUserId] = useState('');
+  const [email, setEmail] = useState(''); 
+  const [password, setPassword] = useState(''); 
+  const [error, setError] = useState(''); 
+  const [userId, setUserId] = useState(''); 
   
 
   //API CHECK ĐĂNG NHẬP
