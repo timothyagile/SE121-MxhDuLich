@@ -59,8 +59,8 @@ const BookingSchema = new Schema({
         default: []
     },
     totalPrice: {type: Number, required: true},
-    tax: {type: Number, required: 0},
-    totalPriceAfterTax: {type: Number, default: 0},
+    tax: {type: Number, required: true},
+    totalPriceAfterTax: {type: Number, required: true},
     amountPaid: {type: Number, default: 0},
     status: {
         type: String,
@@ -92,27 +92,34 @@ const MonthlyStatisticsSchema = new Schema({
 //Recalculate totalPrice
 
 const calculateTotalRoomPrice = (rooms) => {
+    if(rooms.length === 0)
+        return 0
     return rooms.reduce((total, room) => {
       return total + (room.price * room.nights * room.quantity);
     }, 0);
   };
   
 const calculateTotalServicePrice = (services) => {
+    if(services.length === 0)
+        return 0
     return services.reduce((total, service) => {
         return total + (service.price * service.quantity);
     }, 0);
 };
   
 //Hook
-BookingSchema.pre('save', async function (next) {
+BookingSchema.pre('validate', async function (next) {
+    if (!this.items || this.items.length === 0) {
+        return next(new Error("Items array cannot be empty"));
+    }
     const totalRoomPrice = calculateTotalRoomPrice(this.items);
     const totalServicePrice = calculateTotalServicePrice(this.services);
     this.totalPrice = totalRoomPrice + totalServicePrice
     this.tax = this.totalPrice * 0.08
     this.totalPriceAfterTax = this.totalPrice + this.tax
-
+    console.log('Chay toi day')
     if(this.totalPriceAfterTax > this.amountPaid)
-        this.status = 'confirm'
+        this.status = 'pending'
     if(this.totalPriceAfterTax === this.amountPaid)
         this.status = 'complete'
     next()
