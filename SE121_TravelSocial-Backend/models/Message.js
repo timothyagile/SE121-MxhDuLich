@@ -4,16 +4,16 @@ const Schema = mongoose.Schema;
 
 
 const MessageSchema = new Schema({
+    conversationId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Conversation",
+        require: true,
+    },
     senderId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         require: true,
-    },
-    reciverId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        require: true,
-    },
+    }, 
     date: {
         type: Date,
         require: true,

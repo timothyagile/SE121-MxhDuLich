@@ -8,13 +8,17 @@
     "cloudinary": "^2.5.1",
     "cookie-parser": "^1.4.7",
     "cookies": "^0.9.1",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "ejs": "^3.1.10",
     "express": "^4.21.1",
+    "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.7.1",
     "node-fetch": "^3.3.2",
     "nodemailer": "^6.9.16",
+    "path": "^0.12.7",
+    "socket.io": "^4.8.1",
     "validator": "^13.12.0"
   }
 }
