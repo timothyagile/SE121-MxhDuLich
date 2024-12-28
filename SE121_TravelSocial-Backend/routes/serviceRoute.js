@@ -1,6 +1,5 @@
 const Router = require('express')
 const serviceController = require('../controllers/serviceController')
-
 const router = new Router()
 
 router.get('/service', serviceController.getAllService)
