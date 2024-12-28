@@ -46,7 +46,7 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
 
 
 const facilityIcons: FacilityIcons = {
-    "Wifi miễn phí": require('../../assets/icons/wifi.png'),
+    "Wifi miễn phí": "wifi",
     "Máy lạnh": "ac-unit",
     "Kitchen": "Kitchen", 
     "Hồ bơi": "pool",
@@ -229,7 +229,7 @@ const facilityIcons: FacilityIcons = {
 
 
       } catch (error) {
-        console.error('Error fetching room services:', error);
+        // console.error('Error fetching room services:', error);
       }
     };
   
@@ -286,7 +286,7 @@ const facilityIcons: FacilityIcons = {
         <View style={styles.facilityContainer}>
           {services.map((service, index) => (
             <View style={styles.facilityItem} key={index}>
-                <Image source={getIcon(service?.icon)}/>
+                <Image source={getIcon(service?.id)}/>
               <Text style={styles.facilityText}>{service?.name}</Text>
             </View>
           ))}

@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "multer": "^1.4.5-lts.1",
-    "multer-storage-cloudinary": "^4.0.0"
+    "multer-storage-cloudinary": "^4.0.0",
+    "react-native-image-picker": "^7.2.3"
   }
 }
