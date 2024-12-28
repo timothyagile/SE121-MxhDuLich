@@ -6,7 +6,7 @@ const router = Router();
 //create
 //router.post('/createlocation', checkLocationOwner, locationController.createNewLocation);
 //create with image
-router.post('/createlocation', checkLocationOwner, upload.array('images', 10), locationController.createLocation);
+router.post('/createlocation', checkLocationOwner, locationController.createLocation);
 //read
 router.get('/alllocation', locationController.getAllLocation);
 router.get('/locationbycategory/:categoryId', locationController.getLocationByCategory);

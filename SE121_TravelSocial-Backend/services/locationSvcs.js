@@ -1,5 +1,6 @@
 const Location = require('../models/Location');
 const NotFoundException = require('../errors/exception').NotFoundException;
+const cloudinary = require('../config/cloudinaryConfig')
 
 const createLocation = async (locationData) => {
     const savedLocation = await locationData.save();
@@ -9,7 +10,7 @@ const createLocation = async (locationData) => {
         throw new NotFoundException('Cannot create new location');
 }
 
-const createLocationWithImage = async (locationData) => {
+const createLocationWithImage = async (locationData, imageFiles) => {
     const imageUrls = []
     if(imageFiles && imageFiles.length > 0) {
         for(let image of imageFiles) {

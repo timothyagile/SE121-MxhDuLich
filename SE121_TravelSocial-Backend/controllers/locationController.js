@@ -64,12 +64,11 @@ module.exports.createLocation = async (req, res, next) => {
             address,
             category,
             ownerId: res.locals.user._id,
-            image: images
         });
-        const savedLocation = await locationSvc.createLocationWithImage(locationData); // Lưu địa điểm mới vào cơ sở dữ liệu
+        const savedLocation = await locationSvc.createLocationWithImage(locationData, images); // Lưu địa điểm mới vào cơ sở dữ liệu
         res.status(201).json({
             isSuccess: true,
-            data: 'success',
+            data: savedLocation,
             error: null,
         });
     } catch (error) {
