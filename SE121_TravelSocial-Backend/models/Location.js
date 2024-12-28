@@ -32,6 +32,11 @@ const locationSchema = new Schema({
         min: 0,
         max: 5,
         default: 0,
+        set: value => Math.round(value * 10) / 10
+    },
+    numberOfRating: {
+        type: Number,
+        default: 0,
     },
     image: {
         type: [imageSchema],
