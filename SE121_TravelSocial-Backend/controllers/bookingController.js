@@ -80,12 +80,8 @@ module.exports.createBooking = async (req, res, next) => {
         dateBooking,
         checkinDate,
         checkoutDate,
-        items,
-        services,
-        status,
-        totalPrice,
-        tax,
-        amountPaid, 
+        items, //Item nhap data gom: id phong, so luong (default: 1), so dem
+        services, //Service nhap data gom: id phong, so luong (default: 1), so dem
     } = req.body
     
     try {
@@ -95,12 +91,9 @@ module.exports.createBooking = async (req, res, next) => {
             checkinDate,
             checkoutDate,
             items,
-            services,
-            totalPrice,
-            tax,
-            status,  
-            amountPaid,              
+            services,             
         })
+        console.log(bookingData)    
         const result = await bookingSvc.createBooking(bookingData)
         res.status(201).json({
             isSuccess: true,
@@ -114,7 +107,7 @@ module.exports.createBooking = async (req, res, next) => {
 }
 module.exports.updateBooking = async (req, res, next) => {
     const bookingData = req.body
-    const {bookingId} = req.params
+    const bookingId = req.params.id
     try {
         const result = await bookingSvc.updateBooking(bookingId, bookingData)
         res.status(201).json({

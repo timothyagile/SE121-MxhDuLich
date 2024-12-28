@@ -23,7 +23,7 @@ const roomSchema = new Schema({
     name: { type: String, required: true },
     quantity: {type: String, required: true, min: 0},
     rating: { type: Number, min: 0, max: 5 },
-    pricePernNight: { type: Number, required: true },
+    pricePerNight: { type: Number, required: true },
     capacity: {type: Number, required: true},
     description: { type: String},
     facility: { type: [facilitySchema], default: [] },
