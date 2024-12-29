@@ -9,6 +9,7 @@ import { useRoute,RouteProp } from '@react-navigation/native';
 import {API_BASE_URL} from '../../constants/config';
 import { Icon } from 'react-native-paper';
 import {iconMapping} from '../../constants/icon';
+import CustomModal from '@/components/CollectionScreen/AddIntoCollection';
 
 
 const { width, height } = Dimensions.get('window');
@@ -19,6 +20,10 @@ const ADDRESS = 'FFXQ+X94, Bung Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, V
 
 type RootStackParamList = {
   'detail-screen': { id: string }; 
+};
+
+type LikedItems = {
+  [key: string]: boolean;
 };
 
 type DetailScreenRouteProp = RouteProp<RootStackParamList, 'detail-screen'>;
@@ -46,7 +51,7 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
 
 
 const facilityIcons: FacilityIcons = {
-    "Wifi miễn phí": require('../../assets/icons/wifi.png'),
+    "Wifi miễn phí": "wifi",
     "Máy lạnh": "ac-unit",
     "Kitchen": "Kitchen", 
     "Hồ bơi": "pool",
@@ -75,6 +80,9 @@ const facilityIcons: FacilityIcons = {
     //const [services, setServices] = useState<string[]>([]);
     const [minPrice, setMinPrice] = useState(0);
     const [roomsStatus, setRoomsStatus] = useState('');
+    const [likedItems, setLikedItems] = useState<LikedItems>({});
+    const [modalVisible, setModalVisible] = useState(false);
+    const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
 
 
     const showDatePicker1 = () => {
@@ -114,7 +122,18 @@ const facilityIcons: FacilityIcons = {
     };
 
     const toggleLike = () => {
-        setIsLiked(!isLiked);
+        
+
+    };
+
+    const handlePress = (id: string) => {
+      setIsLiked(!isLiked);
+      setLikedItems((prevState) => ({
+        ...prevState,
+        [id]: !prevState[id],
+      }));
+      setSelectedLocationId(id);
+      setModalVisible(true); 
     };
 
     const toggleExpanded = () => {
@@ -229,7 +248,7 @@ const facilityIcons: FacilityIcons = {
 
 
       } catch (error) {
-        console.error('Error fetching room services:', error);
+        // console.error('Error fetching room services:', error);
       }
     };
   
@@ -248,9 +267,11 @@ const facilityIcons: FacilityIcons = {
             <Image style={{width:30, height:30}} source={require('../../assets/icons/message.png')}></Image>
           {/* <FontAwesome name="message" size={24} color="#FF4500" /> */}
         </TouchableOpacity>
-        <TouchableOpacity style={styles.heartButton} onPress={toggleLike}>
+        <TouchableOpacity style={styles.heartButton} onPress={() => handlePress(id.toString())}>
           <FontAwesome name="heart" size={24}  color={isLiked ? "red" : "#000"} />
         </TouchableOpacity>
+        <CustomModal visible={modalVisible} onClose={() => setModalVisible(false)} onSelectCollection={(collectionId:any)=>console.log('selected:', collectionId)} selectedLocationId={selectedLocationId}></CustomModal>
+
       </View>
 
       {/* Thông tin địa điểm */}
@@ -286,7 +307,7 @@ const facilityIcons: FacilityIcons = {
         <View style={styles.facilityContainer}>
           {services.map((service, index) => (
             <View style={styles.facilityItem} key={index}>
-                <Image source={getIcon(service?.icon)}/>
+                <Image source={getIcon(service?.id)}/>
               <Text style={styles.facilityText}>{service?.name}</Text>
             </View>
           ))}
@@ -350,10 +371,10 @@ const facilityIcons: FacilityIcons = {
         </View>
 
         {/* Availability State */}
-        <View style={styles.stateContainer}>
+        {/* <View style={styles.stateContainer}>
           <Text style={styles.stateText}>Trang thái:</Text>
           <Text style={styles.stateBadge}>{roomsStatus}</Text>
-        </View>
+        </View> */}
 
         {/* Search Button */}
         <TouchableOpacity onPress={()=> {

@@ -13,26 +13,28 @@ type ReservationRouteProp = RouteProp<RootStackParamList, 'reservation-required-
 interface RoomDetails {
     name: string;
     price: number;
-    checkinDate: string;
-    checkoutDate: string;
+    checkinDate: Date;
+    checkoutDate: Date;
+    pricePerNight: number;
 }
 
 interface SelectedRoomData {
     count: number;
     roomDetails: RoomDetails;
     roomId: string;
+    nights: number;
 }
 
 export default function ReservationRequiredScreen({ navigation }: {navigation: NativeStackNavigatorProps}) {
     const route = useRoute<ReservationRouteProp>();
     const { selectedRoomsData, locationId } = route.params;
 
-    const formatDate = (dateString: string) =>
-        new Intl.DateTimeFormat('vi-VN', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-        }).format(new Date(dateString));
+    const formatRoomDate = (date: Date): string => {
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      };
     //console.log('xxx:',selectedRoomsData);
     const roomList = selectedRoomsData.map((room) => ({
         id: room.roomId,
@@ -58,14 +60,14 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
     const totalRooms = selectedRoomsData.reduce((sum, room) => sum + room.count, 0);
 
     const roomPrice = selectedRoomsData.reduce(
-        (sum, room) => sum + room.roomDetails.price * room.count,
+        (sum, room) => sum + room.roomDetails.price * room.count * room.nights,
         0
       );
 
-      const cleaningFee = 15000.0;
-      const serviceFee = roomPrice * 0.01;
-      const tax = roomPrice * 0.04;
-      const totalPrice = roomPrice + cleaningFee + serviceFee + tax;
+    //   const cleaningFee = 15000.0;
+    //   const serviceFee = roomPrice * 0.01;
+      const tax = roomPrice * 0.08;
+      const totalPrice = roomPrice+  tax;
 
       const [displayedTotalPrice, setDisplayedTotalPrice] = useState(totalPrice);
     
@@ -103,6 +105,8 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
           setDisplayedTotalPrice(totalPrice / 2); // Trả một nửa
         }
       };
+
+
 
     const handleSave = (field: string) => {
         if (field === 'name') {
@@ -198,9 +202,11 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                 <Text style={styles.yourbooking}>Booking của bạn</Text>
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>Ngày</Text>
-                    <Text style={styles.secondtext}>{selectedRoomsData.length > 0
-        ? `${(selectedRoomsData[0].roomDetails.checkinDate)}- ${(selectedRoomsData[0].roomDetails.checkoutDate)}`
-        : "No room selected"} </Text>
+                    <Text style={styles.secondtext}>
+                        {selectedRoomsData.length > 0
+                        ? `${formatRoomDate(selectedRoomsData[0].roomDetails.checkinDate)} - ${formatRoomDate(selectedRoomsData[0].roomDetails.checkoutDate)}`
+                        : "No room selected"}
+                    </Text>
                 </View>
                 {/* <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>Số người</Text>
@@ -227,14 +233,14 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                     <Text style={styles.firsttext}>Phòng ({totalRooms} phòng)</Text>
                     <Text style={styles.secondtext1}>{roomPrice.toFixed(0)} VND</Text>
                 </View>
-                <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
+                {/* <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>Phí dọn dẹp</Text>
                     <Text style={styles.secondtext1}>{cleaningFee.toFixed(0)} VND</Text>
                 </View>
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>Phí dịch vụ</Text>
                     <Text style={styles.secondtext1}>{serviceFee.toFixed(0)} VND</Text>
-                </View>
+                </View> */}
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>Thuế</Text>
                     <Text style={styles.secondtext1}>{tax.toFixed(0)} VND</Text>

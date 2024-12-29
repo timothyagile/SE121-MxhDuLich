@@ -6,7 +6,11 @@ const router = Router();
 //create
 //router.post('/createlocation', checkLocationOwner, locationController.createNewLocation);
 //create with image
-router.post('/createlocation', checkLocationOwner, locationController.createLocation);
+router.post('/createlocation', upload.array('file', 10), (req, res, next) => {
+    console.log('Middleware multer processed files:', req.files);
+    next();
+  }, checkLocationOwner, locationController.createLocation);
+  
 //read
 router.get('/alllocation', locationController.getAllLocation);
 router.get('/locationbycategory/:categoryId', locationController.getLocationByCategory);

@@ -13,6 +13,7 @@ const createLocation = async (locationData) => {
 const createLocationWithImage = async (locationData, imageFiles) => {
     const imageUrls = []
     if(imageFiles && imageFiles.length > 0) {
+        console.log('images: ',imageFiles);
         for(let image of imageFiles) {
             const buffer = await image.toBuffer()
             const upload = await new Promise((resolve, reject) => {

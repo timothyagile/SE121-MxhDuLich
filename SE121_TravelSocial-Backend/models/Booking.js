@@ -113,10 +113,14 @@ BookingSchema.pre('validate', async function (next) {
         return next(new Error("Items array cannot be empty"));
     }
     const totalRoomPrice = calculateTotalRoomPrice(this.items);
+    console.log('totalroomprice: ',totalRoomPrice);
     const totalServicePrice = calculateTotalServicePrice(this.services);
-    this.totalPrice = totalRoomPrice + totalServicePrice
-    this.tax = this.totalPrice * 0.08
-    this.totalPriceAfterTax = this.totalPrice + this.tax
+    this.totalPrice = totalRoomPrice + totalServicePrice;
+    console.log('totalprice: ', this.totalPrice);
+    this.tax = this.totalPrice * 0.08;
+    console.log('tax: ', this.tax);
+    this.totalPriceAfterTax = this.totalPrice + this.tax;
+    console.log('totalpriceaftertax: ',this.totalPriceAfterTax);
     console.log('Chay toi day')
     if(this.totalPriceAfterTax > this.amountPaid)
         this.status = 'pending'

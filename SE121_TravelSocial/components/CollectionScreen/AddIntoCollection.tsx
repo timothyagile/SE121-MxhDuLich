@@ -72,7 +72,7 @@ const CustomModal: React.FC<CustomModalProps> = ({ visible, onClose, onSelectCol
           Alert.alert("Thành công", "Địa điểm đã được thêm vào bộ sưu tập.");
         } else {
           console.error("Lỗi khi thêm vào bộ sưu tập:", data.error);
-          Alert.alert("Lỗi", "Không thể thêm vào bộ sưu tập.");
+          Alert.alert("Thông báo", "Địa điểm đã tồn tại trong bộ sưu tập!");
         }
       } catch (error) {
         console.error("Fetch error:", error);

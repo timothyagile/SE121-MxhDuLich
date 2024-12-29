@@ -1,7 +1,8 @@
 const Location = require('../models/Location');
 const locationSvc = require('../services/locationSvcs')
 const errorHandler = require('../middleware/authMiddleware')
-const cloudinary =  require("../config/cloudinaryConfig") 
+const cloudinary =  require("../config/cloudinaryConfig"); 
+const upload = require('../middleware/cloudinaryMiddleware');
 
 //--CREATE NEW LOCATION
 module.exports.createNewLocation = async (req, res, next) => {
@@ -50,8 +51,23 @@ module.exports.createLocation = async (req, res, next) => {
         address,
         category,
     } = req.body;
+
+    console.log('req.body:', req.body);
+    console.log('req.files:', req.files);
+
     //console.log(res.locals.user._id)
-    const images = req.files.map((file) => ({
+
+    console.log('Received file info:', req.file); 
+    console.log('Received files info:', req.files);
+
+    if (!req.files || req.files.length === 0) {
+        return res.status(400).json({ message: 'No files uploaded' });
+    }
+
+
+
+
+    const images = req.files?.map((file) => ({
         url: file.path,
         publicId: file.filename
     }))
@@ -77,8 +93,7 @@ module.exports.createLocation = async (req, res, next) => {
         }
         next(error)
     }
-
-}
+};
 
 //--GET ALL LOCATION DATA--\\
 module.exports.getAllLocation = async (req, res, next) => {
