@@ -195,12 +195,16 @@ const saveQRImageToGallery = async () => {
     }, [locationId]);
 
     const createBooking = async () => {
+        const totalPriceAfterTax = Math.max(parseInt(totalPrice) * 0.08);
         try {
             // Cấu trúc dữ liệu gửi đi
             const bookingData = {
-                userId: userId,
-                tax: 0.04,
+                tax: 0.08,
                 totalPrice: totalPrice,
+                userId: userId,
+                totalPriceAfterTax: totalPriceAfterTax,
+                // tax: 0.04,
+                // totalPrice: totalPrice,
                 checkinDate: selectedRoomsData[0].roomDetails.checkinDate,
                 checkoutDate: selectedRoomsData[0].roomDetails.checkoutDate,
                 dateBooking:  new Date(),
@@ -220,7 +224,7 @@ const saveQRImageToGallery = async () => {
                         nights: night,
                     };
                 }),
-                amountPaid: parseInt(totalPrice),
+                // amountPaid: parseInt(totalPrice),
             };
 
             console.log('booking data: ',bookingData)
@@ -234,6 +238,8 @@ const saveQRImageToGallery = async () => {
             });
     
             const result = await response.json();
+            console.log('API response status:', response.status);
+            console.log('API response data:', result);
     
             if (result.isSuccess) {
                 Alert.alert('Thành công!', 'Đặt chỗ của bạn đã được tạo.');
