@@ -29,7 +29,7 @@ export type SelectedRoom = {
     'reservation-required-screen': { selectedRoomsData: SelectedRoom[] ,locationId: string};
     'available-room-screen': { id: string; checkinDate: Date; checkoutDate: Date };
     'detail-screen': { id: string };
-    'detail-booking-screen': {bookingId: string};
+    'detail-booking-screen': {bookingId: string; title: string; status: string};
     'booking-screen': undefined;
   };
   

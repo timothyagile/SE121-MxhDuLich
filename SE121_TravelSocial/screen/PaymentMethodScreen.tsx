@@ -195,14 +195,14 @@ const saveQRImageToGallery = async () => {
     }, [locationId]);
 
     const createBooking = async () => {
-        const totalPriceAfterTax = Math.max(parseInt(totalPrice) * 0.08);
+        // const totalPriceAfterTax = Math.max(parseInt(totalPrice) * 0.08);
         try {
             // Cấu trúc dữ liệu gửi đi
             const bookingData = {
-                tax: 0.08,
-                totalPrice: totalPrice,
+                // tax: 0.08,
+                // totalPrice: totalPrice,
                 userId: userId,
-                totalPriceAfterTax: totalPriceAfterTax,
+                // totalPriceAfterTax: totalPriceAfterTax,
                 // tax: 0.04,
                 // totalPrice: totalPrice,
                 checkinDate: selectedRoomsData[0].roomDetails.checkinDate,
@@ -219,7 +219,7 @@ const saveQRImageToGallery = async () => {
     
                     return {
                         roomId: room.roomId,
-                        price: room.roomDetails.price,
+                        // price: room.roomDetails.price,
                         quantity: room.count,
                         nights: night,
                     };
