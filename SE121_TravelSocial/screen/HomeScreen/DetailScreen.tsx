@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions, ScrollView, Linking, TextInput, Alert } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions, ScrollView, Linking, TextInput, Alert, SafeAreaView, StatusBar } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import Facility from '@/components/HomeScreen/Facility';
 import axios from 'axios';
@@ -39,6 +39,12 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
     quantity: number;
     icon: string;
     description: string;
+  }
+
+  interface Review {
+    senderId: string;
+    review: string;
+    rating: number;
   }
 
   type FacilityIcons = {
@@ -83,6 +89,9 @@ const facilityIcons: FacilityIcons = {
     const [likedItems, setLikedItems] = useState<LikedItems>({});
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
+    const [reviews, setReviews] = useState<Review[]>([]);
+    const [loadingReviews, setLoadingReviews] = useState(false);
+    const [userNames, setUserNames] = useState<{ [key: string]: string }>({});
 
 
     const showDatePicker1 = () => {
@@ -251,179 +260,243 @@ const facilityIcons: FacilityIcons = {
         // console.error('Error fetching room services:', error);
       }
     };
+
+    useEffect(() => {
+      const fetchReviews = async () => {
+        setLoadingReviews(true);
+        try {
+          const response = await fetch(`${API_BASE_URL}/review/location/${id}`);
+          const result = await response.json();
+    
+          if (response.ok && result.isSuccess) {
+            setReviews(result.data);
+            const userPromises = result.data.map(async (review: any) => {
+              const userResponse = await fetch(`${API_BASE_URL}/user/getbyid/${review.senderId}`);
+              const userResult = await userResponse.json();
+              return { senderId: review.senderId, name: userResult.data?.userName || 'Ẩn danh' };
+            });
+
+            const userNamesArray = await Promise.all(userPromises);
+            const userNamesMap = userNamesArray.reduce((acc, user) => {
+              acc[user.senderId] = user.name;
+              return acc;
+            }, {});
+            setUserNames(userNamesMap);
+          } else {
+            Alert.alert('Lỗi', result.message || 'Không thể lấy phản hồi.');
+          }
+        } catch (error) {
+          console.error('Error fetching reviews:', error);
+          Alert.alert('Lỗi', 'Không thể kết nối với máy chủ.');
+        } finally {
+          setLoadingReviews(false);
+        }
+      };
+    
+      fetchReviews();
+    }, [id]);
   
   return (
-    <ScrollView style={styles.container}>
-      {/* Hình ảnh và nút quay lại */}
-      <View style={styles.imageContainer}>
-        <Image
-        source={require('../../assets/images/bai-truoc-20.jpg')}
-          style={[styles.image, ]}
-        />
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <FontAwesome name="arrow-left" size={24} color="#1E90FF" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('chat-board-screen')} style={styles.messageButton}>
-            <Image style={{width:30, height:30}} source={require('../../assets/icons/message.png')}></Image>
-          {/* <FontAwesome name="message" size={24} color="#FF4500" /> */}
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.heartButton} onPress={() => handlePress(id.toString())}>
-          <FontAwesome name="heart" size={24}  color={isLiked ? "red" : "#000"} />
-        </TouchableOpacity>
-        <CustomModal visible={modalVisible} onClose={() => setModalVisible(false)} onSelectCollection={(collectionId:any)=>console.log('selected:', collectionId)} selectedLocationId={selectedLocationId}></CustomModal>
-
-      </View>
-
-      {/* Thông tin địa điểm */}
-      <View style={styles.infoSection}>
-      <View style = {styles.header}>
-        <Text style={styles.title}>{locationDetails?.name || 'Tên địa điểm'}</Text>
-        <TouchableOpacity onPress={openMap} >
-            <Text style = {styles.showMap}>Map</Text>
-        </TouchableOpacity>
-      </View>
-        
-        <View style={styles.rating}>
-          <FontAwesome name="star" size={16} color="#FFD700" />
-          <Text style={styles.ratingText}>{locationDetails?.rating || '0'} ({locationDetails?.reviews || 0} Đánh giá)</Text>
-        </View>
-        <View>
-        <Text style={styles.description}  
-                numberOfLines={isExpanded ? undefined : 4}
-                ellipsizeMode="tail">
-                {locationDetails?.description || 'Mô tả chưa có sẵn.'}
-            </Text>
-            <TouchableOpacity onPress={toggleExpanded}>
-                <Text style={styles.readMore}>
-                    {isExpanded ? 'Show Less' : 'Read More'}
-                </Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#f0f4f8' }}>
+      <View style={styles.container}>
+        <ScrollView >
+          {/* Hình ảnh và nút quay lại */}
+          <View style={styles.imageContainer}>
+            <Image
+            source={require('../../assets/images/bai-truoc-20.jpg')}
+              style={[styles.image, ]}
+            />
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+              <FontAwesome name="arrow-left" size={24} color="#1E90FF" />
             </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('chat-board-screen')} style={styles.messageButton}>
+                <Image style={{width:30, height:30}} source={require('../../assets/icons/message.png')}></Image>
+              {/* <FontAwesome name="message" size={24} color="#FF4500" /> */}
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.heartButton} onPress={() => handlePress(id.toString())}>
+              <FontAwesome name="heart" size={24}  color={isLiked ? "red" : "#000"} />
+            </TouchableOpacity>
+            <CustomModal visible={modalVisible} onClose={() => setModalVisible(false)} onSelectCollection={(collectionId:any)=>console.log('selected:', collectionId)} selectedLocationId={selectedLocationId}></CustomModal>
 
-        </View>
-        {/* Tiện ích */}
-        <Text style={styles.facilityTitle}>Dịch vụ</Text>
+          </View>
 
-
-        <View style={styles.facilityContainer}>
-          {services.map((service, index) => (
-            <View style={styles.facilityItem} key={index}>
-                <Image source={getIcon(service?.id)}/>
-              <Text style={styles.facilityText}>{service?.name}</Text>
-            </View>
-          ))}
-        </View>
-
-        <View style={styles.section}>
-        <Text style={styles.title2}>Tìm phòng</Text>
-
-        {/* Checkin Date - Checkout Date Input */}
-        <View style={{flexDirection:'row', justifyContent:'space-between'}}>
-          <View style={[styles.inputContainer, {width:'47%'}]}>
+          {/* Thông tin địa điểm */}
+          <View style={styles.infoSection}>
+          <View style = {styles.header}>
+            <Text style={styles.title}>{locationDetails?.name || 'Tên địa điểm'}</Text>
+            <TouchableOpacity onPress={openMap} >
+                <Text style = {styles.showMap}>Map</Text>
+            </TouchableOpacity>
+          </View>
             
-            <TouchableOpacity onPress={showDatePicker1}>
-              <FontAwesome name="calendar" size={20} color="gray" style={styles.iconLeft} />
-            </TouchableOpacity>
-            <TextInput
-              readOnly
-              placeholder="Checkin"
-              value={selectedDate1}
-              style={styles.input}
-            />
-            {showPicker1 && (
-              <DateTimePicker
-                value={date1}
-                mode="date"
-                display="default"
-                onChange={onDateChange1}
-              />
-            )}
-          </View>
-          <View style={[styles.inputContainer,{width:'47%'}]}>
-            <TouchableOpacity onPress={showDatePicker2}>
-              <FontAwesome name="calendar" size={20} color="gray" style={styles.iconLeft} />
-            </TouchableOpacity>            
-            <TextInput
-              readOnly
-              placeholder="Checkout"
-              value={selectedDate2}
-              style={styles.input}
-            />
-            {showPicker2 && (
-              <DateTimePicker
-                value={date2}
-                mode="date"
-                display="default"
-                onChange={onDateChange2}
-              />
-            )}
-          </View>
-        </View>
-
-        {/* Number of People  */}
-        <View style={styles.inputContainer}>
-          <FontAwesome name="user" size={20} color="gray" style={styles.iconLeft} />
-          <TextInput
-            placeholder="Số người"
-            style={styles.input}
-             keyboardType="numeric"
-          />
-          <FontAwesome name="chevron-down" size={20} color="gray" style={styles.iconRight} />
-        </View>
-
-        {/* Availability State */}
-        {/* <View style={styles.stateContainer}>
-          <Text style={styles.stateText}>Trang thái:</Text>
-          <Text style={styles.stateBadge}>{roomsStatus}</Text>
-        </View> */}
-
-        {/* Search Button */}
-        <TouchableOpacity onPress={()=> {
-          console.log('Navigating with ID: ', locationDetails._id);
-          navigation.navigate('available-room-screen', {
-            id: locationDetails._id,
-            checkinDate: date1, // Gửi ngày checkin
-            checkoutDate: date2, // Gửi ngày checkout
-          });}} style={styles.searchButton}>
-          <Text style={styles.searchButtonText}>Tìm kiếm</Text>
-        </TouchableOpacity>
-      </View>
-
-       {/* Feedback Section */}
-       <View style={styles.section}>
-        <Text style={styles.title2}>Phản hồi từ người dùng</Text>
-
-        <View style={styles.feedbackContainer}>
-          <View style={styles.avatarContainer}>
-            <Image source={require('../../assets/images/avt.png')} style={styles.avatar} />
-          </View>
-          <View>
-            <Text style={styles.customerName}>To Hoang Huy</Text>
-          </View>
-        </View>
-
-        <Text style={styles.feedbackText}>
-          “The location was perfect. The staff was friendly. Our bed was comfy. The pool was fresh with a great view. The breakfast was delicious! We had a hot tub on our balcony which was awesome.”
-        </Text>   
-      </View>
-
-        {/* Giá và nút đặt */}
-        <View style={styles.bookingSection}>
-            <View>
-                <Text style={styles.priceLabel}>Giá chỉ từ</Text>
-                <Text style={styles.price}>{minPrice} VND</Text>
+            <View style={styles.rating}>
+              <FontAwesome name="star" size={16} color="#FFD700" />
+              <Text style={styles.ratingText}>{locationDetails?.rating || '0'} ({locationDetails?.reviews || 0} Đánh giá)</Text>
             </View>
-          
-          <TouchableOpacity onPress={()=> navigation.navigate('available-room-screen', {
-            id: locationDetails._id,
-            checkinDate: date1, // Gửi ngày checkin
-            checkoutDate: date2, // Gửi ngày checkout
-          })} style={styles.bookNowButton}>
-            <Text style={styles.bookNowText}>Đặt ngay</Text>
-            <FontAwesome size={20} name='arrow-right' style={styles.iconBookNow}></FontAwesome>
-          </TouchableOpacity>
-        </View>
-      </View>   
-    </ScrollView>
+            <View>
+            <Text style={styles.description}  
+                    numberOfLines={isExpanded ? undefined : 4}
+                    ellipsizeMode="tail">
+                    {locationDetails?.description || 'Mô tả chưa có sẵn.'}
+                </Text>
+                <TouchableOpacity onPress={toggleExpanded}>
+                    <Text style={styles.readMore}>
+                        {isExpanded ? 'Show Less' : 'Read More'}
+                    </Text>
+                </TouchableOpacity>
+
+            </View>
+            {/* Tiện ích */}
+            <Text style={styles.facilityTitle}>Dịch vụ</Text>
+
+
+            <View style={styles.facilityContainer}>
+              {services.map((service, index) => (
+                <View style={styles.facilityItem} key={index}>
+                    <Image source={getIcon(service?.id)}/>
+                  <Text style={styles.facilityText}>{service?.name}</Text>
+                </View>
+              ))}
+            </View>
+
+            <View style={styles.section}>
+            <Text style={styles.title2}>Tìm phòng</Text>
+
+            {/* Checkin Date - Checkout Date Input */}
+            <View style={{flexDirection:'row', justifyContent:'space-between'}}>
+              <View style={[styles.inputContainer, {width:'47%'}]}>
+                
+                <TouchableOpacity onPress={showDatePicker1}>
+                  <FontAwesome name="calendar" size={20} color="gray" style={styles.iconLeft} />
+                </TouchableOpacity>
+                <TextInput
+                  readOnly
+                  placeholder="Checkin"
+                  value={selectedDate1}
+                  style={styles.input}
+                />
+                {showPicker1 && (
+                  <DateTimePicker
+                    value={date1}
+                    mode="date"
+                    display="default"
+                    onChange={onDateChange1}
+                  />
+                )}
+              </View>
+              <View style={[styles.inputContainer,{width:'47%'}]}>
+                <TouchableOpacity onPress={showDatePicker2}>
+                  <FontAwesome name="calendar" size={20} color="gray" style={styles.iconLeft} />
+                </TouchableOpacity>            
+                <TextInput
+                  readOnly
+                  placeholder="Checkout"
+                  value={selectedDate2}
+                  style={styles.input}
+                />
+                {showPicker2 && (
+                  <DateTimePicker
+                    value={date2}
+                    mode="date"
+                    display="default"
+                    onChange={onDateChange2}
+                  />
+                )}
+              </View>
+            </View>
+
+            {/* Number of People  */}
+            <View style={styles.inputContainer}>
+              <FontAwesome name="user" size={20} color="gray" style={styles.iconLeft} />
+              <TextInput
+                placeholder="Số người"
+                style={styles.input}
+                keyboardType="numeric"
+              />
+              <FontAwesome name="chevron-down" size={20} color="gray" style={styles.iconRight} />
+            </View>
+
+            {/* Availability State */}
+            {/* <View style={styles.stateContainer}>
+              <Text style={styles.stateText}>Trang thái:</Text>
+              <Text style={styles.stateBadge}>{roomsStatus}</Text>
+            </View> */}
+
+            {/* Search Button */}
+            <TouchableOpacity onPress={()=> {
+              console.log('Navigating with ID: ', locationDetails._id);
+              navigation.navigate('available-room-screen', {
+                id: locationDetails._id,
+                checkinDate: date1, // Gửi ngày checkin
+                checkoutDate: date2, // Gửi ngày checkout
+              });}} style={styles.searchButton}>
+              <Text style={styles.searchButtonText}>Tìm kiếm</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Feedback Section */}
+          <View style={styles.section}>
+            <Text style={styles.title2}>Phản hồi từ người dùng</Text>
+
+            {loadingReviews ? (
+              <Text>Đang tải phản hồi...</Text>
+            ) : reviews.length > 0 ? (
+              reviews.map((review, index) => (
+                <View style={styles.reviewframe} key={index}>
+                  <View style={styles.feedbackContainer}>
+                    <View style={styles.avatarContainer}>
+                      <Image source={require('../../assets/images/avt.png')} style={styles.avatar} />
+                    </View>
+                    <View>
+                      <Text style={styles.customerName}>{userNames[review.senderId] || 'Ẩn danh'}</Text>
+                      <View style={styles.rating}>
+                        {[...Array(5)].map((_, index) => (
+                          <Image
+                            key={index}
+                            source={
+                              index < (review.rating || 0)
+                                ? require('../../assets/icons/star.png')
+                                : require('../../assets/icons/emptystar.png')
+                            }
+                            style={{ width: 15, height: 15, marginRight: 3 }}
+                          />
+                        ))}
+                      </View>
+                    </View>
+                  </View>
+                  <Text style={styles.feedbackText}>{`"${review.review || 'Không có nhận xét.'}"`}</Text>
+
+                </View>
+                
+              ))
+            ) : (
+              <Text>Không có phản hồi nào cho địa điểm này.</Text>
+            )}
+          </View>
+
+            {/* Giá và nút đặt */}
+            
+          </View>   
+            </ScrollView>
+            <View style={styles.bookingSection}>
+                <View>
+                    <Text style={styles.priceLabel}>Giá chỉ từ</Text>
+                    <Text style={styles.price}>{minPrice} VND</Text>
+                </View>
+              
+              <TouchableOpacity onPress={()=> navigation.navigate('available-room-screen', {
+                id: locationDetails._id,
+                checkinDate: date1, // Gửi ngày checkin
+                checkoutDate: date2, // Gửi ngày checkout
+              })} style={styles.bookNowButton}>
+                <Text style={styles.bookNowText}>Đặt ngay</Text>
+                <FontAwesome size={20} name='arrow-right' style={styles.iconBookNow}></FontAwesome>
+              </TouchableOpacity>
+            </View>
+      </View>
+    </SafeAreaView>
+
+    
   );
 }
 
@@ -431,6 +504,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f0f4f8',
+    margin: 0,
+    padding: 0,
   },
   imageContainer: {
     width: '100%',
@@ -534,6 +609,8 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   bookingSection: {
+    marginHorizontal: 10,
+    marginVertical:10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -573,6 +650,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#1E90FF',
     fontWeight: 'bold',
+},
+
+reviewframe: {
+  // backgroundColor: 'white',
+  width:'100%',
+  marginVertical:10,
+  borderTopWidth: 1,
+  borderBottomWidth: 1,
+  borderColor: '#E7E7E7',
+  borderStyle: 'solid',
 },
 
 section: {
@@ -652,6 +739,7 @@ searchButtonText: {
   fontWeight: 'bold',
 },
 feedbackContainer: {
+  marginTop: 10,
   flexDirection: 'row',
   alignItems: 'center',
   marginBottom: 12,
@@ -670,5 +758,6 @@ feedbackText: {
   color: '#4a4a4a',
   fontSize: 14,
   lineHeight: 20,
+  marginBottom: 10,
 },
 });
