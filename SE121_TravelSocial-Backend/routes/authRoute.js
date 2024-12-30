@@ -1,5 +1,7 @@
 const {Router} = require('express')
 const authController = require('../controllers/authController')
+const uploadMiddleware = require('../middleware/cloudinaryMiddleware')
+const upload = uploadMiddleware('travel-social')
 const router = Router()
 
 
@@ -12,6 +14,7 @@ router.get('/logout', authController.logout_get)
 router.get('/user/getall', authController.getAllUser)
 router.get('/user/getbyid/:id', authController.getUserById)
 router.put('/user/update/:id', authController.updateUser)
+router.put('/user/avt/:id', upload.single('file'), authController.updateAvata)
 router.delete('/user/delete/:id', authController.deleteUser)
 
 module.exports = router

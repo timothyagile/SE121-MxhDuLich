@@ -10,22 +10,22 @@ const createLocation = async (locationData) => {
         throw new NotFoundException('Cannot create new location');
 }
 
-const createLocationWithImage = async (locationData, imageFiles) => {
-    const imageUrls = []
-    if(imageFiles && imageFiles.length > 0) {
-        for(let image of imageFiles) {
-            const buffer = await image.toBuffer()
-            const upload = await new Promise((resolve, reject) => {
-                cloudinary.uploader.upload_stream({folder: 'travel-social'}, (error, result) => {
-                    if(error)
-                        return reject(new NotFoundException('Cannot upload'))
-                    resolve(result)
-                }).end(buffer)
-            })
-            imageUrls.push(upload.secure_url)
-        }
-    }
-    locationData.image = imageUrls
+const createLocationWithImage = async (locationData) => {
+    // const imageUrls = []
+    // if(imageFiles && imageFiles.length > 0) {
+    //     for(let image of imageFiles) {
+    //         const buffer = await image.toBuffer()
+    //         const upload = await new Promise((resolve, reject) => {
+    //             cloudinary.uploader.upload_stream({folder: 'travel-social'}, (error, result) => {
+    //                 if(error)
+    //                     return reject(new NotFoundException('Cannot upload'))
+    //                 resolve(result)
+    //             }).end(buffer)
+    //         })
+    //         imageUrls.push(upload.secure_url)
+    //     }
+    // }
+    // locationData.image = imageUrls
     const savedLocation = await locationData.save();
     if(savedLocation)
         return savedLocation;
