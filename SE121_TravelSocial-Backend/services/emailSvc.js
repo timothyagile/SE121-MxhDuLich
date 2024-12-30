@@ -1,4 +1,9 @@
 const nodemailer = require('nodemailer');
+const fs = require('fs');
+const path = require('path');
+
+const htmlFilePath = path.join(__dirname, '../utils', 'confirmBookingEmail.html');
+const htmlContent = fs.readFileSync(htmlFilePath, 'utf8');
 
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -19,8 +24,18 @@ const approveMail = (from, email) => {
     }
 };
 
+const confirmBookingEmail = (from, email) => {
+    return {
+        from: 'nguyenphucthinh123pro@gmail.com',
+        to: '22521415@gm.uit.edu.vn',
+        subject: 'Đơn đặt phòng của bạn đã được xác nhận',
+        html: htmlContent
+    }
+}
+
 module.exports = {
     transporter,
     approveMail,
+    confirmBookingEmail
 }
 

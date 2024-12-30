@@ -4,6 +4,17 @@ const bcrypt = require('bcryptjs');
 
 const Schema = mongoose.Schema;
 
+const imageSchema = new Schema({
+    url: {
+        type: String,
+        required: true
+    },
+    publicId: {
+        type: String,
+        required: true
+    }
+})
+
 const userSchema = new Schema({
     userRole: String,
     userName: String,
@@ -23,7 +34,7 @@ const userSchema = new Schema({
     longtitude: Number,
     userPhoneNumber: String, 
     userDateOfBirth: String,
-    userAvatar: String,
+    userAvatar: {type: imageSchema},
     providerType: {
         type: String,
         enum: ["Google", "Facebook"]

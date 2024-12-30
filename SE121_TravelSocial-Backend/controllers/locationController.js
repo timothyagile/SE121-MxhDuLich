@@ -13,14 +13,7 @@ module.exports.createNewLocation = async (req, res, next) => {
         address,
         category,
     } = req.body;
-    const imageFiles = req.files
-    // Tạo locationData
-    //console.log(res.locals.user._id)
-
-    // const images = req.files.map((file) => ({
-    //     url: file.path,
-    //     publicId: file.filename
-    // }))re
+    
 
     const locationData = new Location({
         name,
@@ -32,7 +25,15 @@ module.exports.createNewLocation = async (req, res, next) => {
         ownerId: res.locals.user._id
     });
     try {
-        const savedLocation = await locationSvc.createLocation(locationData, imageFiles); // Lưu địa điểm mới vào cơ sở dữ liệu
+        if (!req.files) {
+            // No file was uploaded
+            return res.status(400).json({ error: "No file uploaded" });
+        }
+        const images = req.files.map((file) => ({
+            url: file.path,
+            publicId: file.filename
+        }))
+        const savedLocation = await locationSvc.createLocation(locationData); // Lưu địa điểm mới vào cơ sở dữ liệu
         res.status(201).json({
             isSuccess: true,
             data: savedLocation,
@@ -44,56 +45,49 @@ module.exports.createNewLocation = async (req, res, next) => {
 }
 
 module.exports.createLocation = async (req, res, next) => {
-    const {
-        name,
-        description,
-        rating,
-        address,
-        category,
-    } = req.body;
-
-    console.log('req.body:', req.body);
-    console.log('req.files:', req.files);
-
-    //console.log(res.locals.user._id)
-
-    console.log('Received file info:', req.file); 
-    console.log('Received files info:', req.files);
-
-    if (!req.files || req.files.length === 0) {
-        return res.status(400).json({ message: 'No files uploaded' });
-    }
-
-
-
-
-    const images = req.files?.map((file) => ({
-        url: file.path,
-        publicId: file.filename
-    }))
-    console.log(images)
     try {
+        const {
+            name,
+            description,
+            address,
+            category,
+        } = req.body;
+        //console.log(res.locals.user._id)
+        const images = req.files.map((file) => ({
+            url: file.path,
+            publicId: file.filename
+        }))
+        // console.log(images)
         const locationData = new Location({
             name,
             description,
-            rating,
             address,
             category,
             ownerId: res.locals.user._id,
+            image: images
         });
-        const savedLocation = await locationSvc.createLocationWithImage(locationData, images); // Lưu địa điểm mới vào cơ sở dữ liệu
+        const savedLocation = await locationSvc.createLocationWithImage(locationData); // Lưu địa điểm mới vào cơ sở dữ liệu
         res.status(201).json({
             isSuccess: true,
             data: savedLocation,
             error: null,
         });
     } catch (error) {
-        for (let image of images) {
-            await cloudinary.uploader.destroy(image.url)
-        }
-        next(error)
+        req.files.map(async file => {
+            try {
+                await cloudinary.uploader.destroy(file.filename);
+                console.log(`Deleted: ${file.filename}`);
+                res.status(404).json({
+                isSuccess: true,
+                data: 'upload fail',
+                error: null,
+            });
+            } catch (err) {
+                console.error(`Failed to delete ${file.filename}:`, err.message);
+            }
+        })
     }
-};
+}
 
 //--GET ALL LOCATION DATA--\\
 module.exports.getAllLocation = async (req, res, next) => {

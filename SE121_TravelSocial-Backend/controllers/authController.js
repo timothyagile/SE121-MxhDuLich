@@ -2,6 +2,7 @@ const User = require('../models/User')
 const authServices = require('../services/authService')
 const cookie = require('cookies');
 const jwt = require('jsonwebtoken');
+const cloudinary =  require("../config/cloudinaryConfig") 
 
 module.exports.signup_get = (req, res) => { //Render home screen
     res.render('new user')
@@ -125,4 +126,37 @@ module.exports.deleteUser = async (req, res, next) => {
     }
 }
 
-
+module.exports.updateAvata = async (req, res, next) => {
+    const userId = req.params.id
+    try {
+        if(!req.file) {
+            console.log('No file uploaded')
+        }
+        const image = ({
+            url: req.file.path,
+            publicId: req.file.filename
+        })
+        console.log(image)
+        const result = await authServices.updateAvata(userId, image)
+        res.status(201).json({
+            isSuccess: true,
+            data: result,
+            error: null
+        })
+    }
+    catch (error) {
+        try {
+            console.log('No file')
+            await cloudinary.uploader.destroy(req.file.filename);
+            console.log('deleted');
+            res.status(404).json({
+                isSuccess: true,
+                data: 'upload fail',
+                error: null,
+            });
+        } 
+        catch (err) {
+            next(err)
+        }
+    }
+}
