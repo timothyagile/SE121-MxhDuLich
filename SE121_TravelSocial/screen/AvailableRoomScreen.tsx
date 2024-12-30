@@ -134,6 +134,7 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                   const isBooked = bookings.some((booking: any) => {
                     const bookingCheckin = new Date(booking.checkInDate).getTime();
                     const bookingCheckout = new Date(booking.checkOutDate).getTime();
+                    
                     const userCheckin = new Date(checkinDate).getTime();
                     const userCheckout = new Date(checkoutDate).getTime();
                     console.log('booking checkin: ',bookingCheckin);
@@ -142,9 +143,9 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                     console.log('user checkout: ',userCheckout);
                     
                     return (
-                      room._id === booking.roomId &&
+                      room._id === booking?.items?.roomId && 
                       ((userCheckin >= bookingCheckin && userCheckin <= bookingCheckout) ||
-                        (userCheckout >= bookingCheckin && userCheckout <= bookingCheckout))
+                        (userCheckout >= bookingCheckin && userCheckout <= bookingCheckout))  
                     );
                   });
       
