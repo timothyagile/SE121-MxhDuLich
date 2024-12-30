@@ -82,4 +82,35 @@ export default StyleSheet.create({
         marginBottom: '0%',
     },
     popularList: {},
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // semi-transparent background
+    },
+    modalContent: {
+        height:'50%',
+        width: '80%',
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: 20,
+    },
+    dropdownContainer: {
+        position: 'absolute',
+        top: 60, // Adjust this depending on where you want the dropdown to appear
+        left: 10,
+        right: 10,
+        maxHeight: 400,
+        backgroundColor: 'white',
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        zIndex: 1, // Ensure the dropdown appears on top
+    },
+    locationItem: {
+        padding: 10,
+        fontSize: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ccc',
+    },
 });

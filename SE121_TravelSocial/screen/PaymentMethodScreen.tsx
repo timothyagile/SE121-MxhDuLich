@@ -4,6 +4,7 @@ import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/n
 import { RootStackParamList } from '@/types/navigation';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import {API_BASE_URL} from '../constants/config';
+import { useUser } from '@/context/UserContext';
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
@@ -24,13 +25,16 @@ interface Bank {
 
 export default function PaymentMethodScreen({ navigation }: {navigation: NativeStackNavigatorProps}) {
     const route = useRoute<ReservationRouteProp>();
-    const { locationId, totalPrice } = route.params;
+    const { locationId, totalPrice, selectedRoomsData } = route.params;
+    console.log('roomdata in payment: ', selectedRoomsData);
+    const {userId} = useUser(); 
     const [selectedButton, setSelectedButton] = useState<string | null>(null);
     const [locationDetails, setLocationDetails] = useState<any>(null);
     const [banks, setBanks] = useState<Bank[]>([]);
     const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
     const [loading, setLoading] = useState(true);
     const [qrImage, setQrImage] = useState<string | null>(null)
+    const [isSubmitting, setIsSubmitting] = useState(false);
     
 
     const handlePress = (button: string) => {
@@ -146,13 +150,26 @@ const saveQRImageToGallery = async () => {
 
     };
 
-    const applyAndPay = () => {
+    const applyAndPay = async () => {
+        // if (selectedBank) {
+        //     Linking.openURL(selectedBank.deeplink).catch(err => 
+        //         Alert.alert('Error', 'Không thể mở ứng dụng ngân hàng.')
+        //     );
+        // } else {
+        //     Alert.alert('Error', 'Vui lòng chọn một ngân hàng trước khi thanh toán.');
+        // }
+        setIsSubmitting(true);
+
+    try {
         if (selectedBank) {
-            Linking.openURL(selectedBank.deeplink).catch(err => 
+            await Linking.openURL(selectedBank.deeplink).catch(err =>
                 Alert.alert('Error', 'Không thể mở ứng dụng ngân hàng.')
             );
-        } else {
-            Alert.alert('Error', 'Vui lòng chọn một ngân hàng trước khi thanh toán.');
+        }
+        // Gọi API tạo booking
+            await createBooking();
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -176,6 +193,68 @@ const saveQRImageToGallery = async () => {
           fetchLocationDetails(locationId); 
         }
     }, [locationId]);
+
+    const createBooking = async () => {
+        // const totalPriceAfterTax = Math.max(parseInt(totalPrice) * 0.08);
+        try {
+            // Cấu trúc dữ liệu gửi đi
+            const bookingData = {
+                // tax: 0.08,
+                // totalPrice: totalPrice,
+                userId: userId,
+                // totalPriceAfterTax: totalPriceAfterTax,
+                // tax: 0.04,
+                // totalPrice: totalPrice,
+                checkinDate: selectedRoomsData[0].roomDetails.checkinDate,
+                checkoutDate: selectedRoomsData[0].roomDetails.checkoutDate,
+                dateBooking:  new Date(),
+                items: selectedRoomsData.map((room) => {
+                    // Tính số đêm
+                    const checkIn = new Date(room.roomDetails.checkinDate);
+                    const checkOut = new Date(room.roomDetails.checkoutDate);
+                    const checkInTime = checkIn.getTime();
+                    const checkOutTime = checkOut.getTime();
+                    const diffTime = checkOutTime - checkInTime; 
+                    const night = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24))); // Số ngày, tối thiểu là 1
+    
+                    return {
+                        roomId: room.roomId,
+                        // price: room.roomDetails.price,
+                        quantity: room.count,
+                        nights: night,
+                    };
+                }),
+                // amountPaid: parseInt(totalPrice),
+            };
+
+            console.log('booking data: ',bookingData)
+    
+            const response = await fetch(`${API_BASE_URL}/booking/createbooking`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(bookingData),
+            });
+    
+            const result = await response.json();
+            console.log('API response status:', response.status);
+            console.log('API response data:', result);
+    
+            if (result.isSuccess) {
+                Alert.alert('Thành công!', 'Đặt chỗ của bạn đã được tạo.');
+                navigation.navigate('main-screen', { screen: 'Booking' }); 
+            } else {
+                Alert.alert('Lỗi!', result.message || 'Không thể tạo đặt chỗ.');
+            }
+        } catch (error) {
+            console.error('Error creating booking:', error);
+            Alert.alert('Lỗi!', 'Không thể kết nối với máy chủ.');
+        }
+    };
+
+    
+    
 
     return (
 
@@ -228,15 +307,9 @@ const saveQRImageToGallery = async () => {
                                 style={{ bottom: 15, right: 20}} 
                             />                        
                         </TouchableOpacity>
-                    </View>
-                    
+                    </View>                   
                 </View>
 
-                {/* <View style={{marginLeft:20, marginTop:25,}}>
-                    <TouchableOpacity style={styles.addpaymentmethod} onPress={() => navigation.navigate('add-new-payment-method-screen')}>
-                            <Text style={styles.boxText2}>Thêm phương thức thanh toán</Text>
-                    </TouchableOpacity>
-                </View> */}
                 <View style={styles.imagesRow}>
 
                     <View style={{justifyContent:'center',alignItems:'center',}}>
@@ -305,9 +378,17 @@ const saveQRImageToGallery = async () => {
                     <Text style={{marginLeft:30, fontSize:24, marginBottom:20,}}> Thanh toán {totalPrice} VND</Text>
                     <View style = {{  alignItems:'center', justifyContent:'center',alignContent:'center',width:'100%'}}>
                         
-                        <TouchableOpacity style={styles.addpaymentmethod2} onPress={applyAndPay}>
-                                <Text style={styles.boxText3}>Xác Nhận Thanh Toán</Text>
-                        </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.addpaymentmethod2}
+                        onPress={applyAndPay}
+                        disabled={isSubmitting} // Vô hiệu hóa nút trong khi xử lý
+                    >
+                        {isSubmitting ? (
+                            <ActivityIndicator color="#fff" />
+                        ) : (
+                            <Text style={styles.boxText3}>Xác Nhận Thanh Toán</Text>
+                        )}
+                    </TouchableOpacity>
                     </View>
                 </View>
             </ScrollView>

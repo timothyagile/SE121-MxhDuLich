@@ -1,8 +1,9 @@
+import { API_BASE_URL } from '@/constants/config';
 import { RootStackParamList } from '@/types/navigation';
 import { NavigationProp } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Alert, Modal, TextInput } from 'react-native';
 
 interface TicketProps {
   title: string;
@@ -16,10 +17,138 @@ interface TicketProps {
 
 const Ticket: React.FC<TicketProps> = ({ title, date, status, onCancel, imageUrl, bookingId }) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [rating, setRating] = useState('');
+  const [review, setReview] = useState('');
 
   const handleNavigate = () => {
-    navigation.navigate('detail-booking-screen', {bookingId}); // Truyền bookingId
+    navigation.navigate('detail-booking-screen', {bookingId ,title, status}); 
+    console.log(bookingId)// Truyền bookingId
+    console.log(title)
+    console.log(status)
   };
+
+  const handleSubmitBooking = async () => {
+    try {
+      // Gọi API để gửi đánh giá
+      const response = await fetch(`${API_BASE_URL}/reviews`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bookingId,
+          rating,
+          review,
+        }),
+      });
+
+      const result = await response.json();
+      if (result.isSuccess) {
+        alert('Đánh giá đã được gửi!');
+        setModalVisible(false); // Đóng modal sau khi gửi thành công
+      } else {
+        alert(result.message || 'Không thể gửi đánh giá.');
+      }
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      alert('Lỗi khi gửi đánh giá.');
+    }
+  };
+
+  const handleRateBooking = () =>{
+    setModalVisible(true)
+  }
+
+  const handleRebook = () => {
+    // navigation.navigate('rebook-screen', { bookingId }); // Điều hướng tới màn hình đặt lại
+  };
+
+  const handleCancelBooking = () => {
+    Alert.alert(
+      'Xác nhận hủy',
+      'Bạn có chắc chắn muốn hủy booking này?',
+      [
+        {
+          text: 'Không',
+          style: 'cancel',
+        },
+        {
+          text: 'Có',
+          onPress: async () => {
+            try {
+              const response = await fetch(`${API_BASE_URL}/booking/update/${bookingId}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: 'canceled' }), // Truyền trạng thái mới
+              });
+  
+              const result = await response.json();
+  
+              if (result.isSuccess) {
+                Alert.alert('Thành công', 'Booking đã được hủy.');
+                onCancel(); // Cập nhật danh sách sau khi hủy
+              } else {
+                Alert.alert('Lỗi', result.message || 'Không thể hủy booking.');
+              }
+            } catch (error) {
+              console.error('Error canceling booking:', error);
+              Alert.alert('Lỗi', 'Không thể kết nối với máy chủ.');
+            }
+          },
+        },
+      ],
+      { cancelable: true } // Cho phép hủy bỏ thông báo bằng cách nhấn ra ngoài
+    );
+  };
+  
+
+  let statusText = '';
+  let statusColor = '#000';
+  let buttonText = '';
+  let buttonAction: () => void = handleNavigate;
+  let buttonColor = '#000';
+
+  switch (status) {
+    case 'pending':
+      statusText = 'Chờ duyệt';
+      statusColor = 'F4C726';
+      buttonText = 'Hủy';
+      buttonColor = '#F45B69';
+      buttonAction = handleCancelBooking;
+      break;
+    case 'confirm':
+      statusText = 'Đã xác nhận';
+      statusColor = '#F4C726';
+      buttonText = 'Hủy';
+      buttonColor = '#F45B69';
+      buttonAction = handleCancelBooking;
+      break;
+    case 'finished':
+      statusText = 'Hoàn thành';
+      statusColor = '3FC28A';
+      buttonText = 'Đánh giá';
+      buttonColor = '#007AFF'; // Xanh dương đậm
+      buttonAction = handleRateBooking;
+      break;
+    case 'canceled':
+      statusText = 'Đã hủy';
+      statusColor = '#F45B69';
+      buttonText = 'Đặt lại';
+      buttonColor = '#007AFF';
+      buttonAction = handleRebook;
+      break;
+    default:
+      statusText = 'Không xác định';
+      statusColor = '#666';
+      buttonText = '';
+      buttonAction = () => {};
+      buttonColor = '#666';
+      break;
+  }
+  
   return (
     <TouchableOpacity onPress={handleNavigate}>
       <View style={styles.body}>
@@ -33,16 +162,53 @@ const Ticket: React.FC<TicketProps> = ({ title, date, status, onCancel, imageUrl
             <View style={styles.detailsContainer}>
               <View style={styles.ratingBox}>
                 <Text style={{ color: '#666', fontSize: 14 }}>Trạng thái: </Text>
-                <Text style={styles.stateText}>{status}</Text>
+                <Text  style={[styles.stateText, { color: statusColor }]}>{statusText}</Text>
               </View>
-              <TouchableOpacity style={styles.featureBox} onPress={onCancel}>
-                <Text style={styles.boxText}>Hủy</Text>
+              <TouchableOpacity style={[styles.featureBox]} onPress={buttonAction}>
+                <Text style={[styles.boxText, {color:buttonColor}]}>{buttonText}</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </View>
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setModalVisible(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Viết đánh giá</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Nhập đánh giá"
+              value={review}
+              onChangeText={setReview}
+              multiline
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Nhập số sao (1-5)"
+              value={rating}
+              onChangeText={setRating}
+              keyboardType="numeric"
+              maxLength={1}
+            />
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setModalVisible(false)}>
+                <Text style={styles.buttonText}>Hủy</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.submitButton} onPress={handleSubmitBooking}>
+                <Text style={styles.buttonText}>Gửi</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </TouchableOpacity>
+
     
   );
 };
@@ -114,6 +280,66 @@ const styles = StyleSheet.create({
   boxText: {
     fontWeight: '600',
     color: '#F00',
+  },
+  rateButton: {
+    backgroundColor: '#007bff',
+    padding: 10,
+    borderRadius: 5,
+  },
+  rateButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 15,
+  },
+  input: {
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  cancelButton: {
+    backgroundColor: '#ccc',
+    padding: 10,
+    borderRadius: 5,
+    flex: 1,
+    marginRight: 5,
+    alignItems: 'center',
+  },
+  submitButton: {
+    backgroundColor: '#28a745',
+    padding: 10,
+    borderRadius: 5,
+    flex: 1,
+    marginLeft: 5,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 

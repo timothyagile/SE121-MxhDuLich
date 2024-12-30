@@ -1,7 +1,8 @@
 const Location = require('../models/Location');
 const locationSvc = require('../services/locationSvcs')
 const errorHandler = require('../middleware/authMiddleware')
-const cloudinary =  require("../config/cloudinaryConfig") 
+const cloudinary =  require("../config/cloudinaryConfig"); 
+const upload = require('../middleware/cloudinaryMiddleware');
 
 //--CREATE NEW LOCATION
 module.exports.createNewLocation = async (req, res, next) => {

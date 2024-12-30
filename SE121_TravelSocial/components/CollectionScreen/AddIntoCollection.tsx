@@ -1,13 +1,17 @@
 // CustomModal.tsx
+import { API_BASE_URL } from '@/constants/config';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import React from 'react';
-import { Modal, View, Text, TouchableOpacity, Image, StyleSheet, Dimensions } from 'react-native';
-
+import React, { useEffect, useState } from 'react';
+import { Modal, View, Text, TouchableOpacity, Image, StyleSheet, Dimensions, ScrollView, ActivityIndicator, FlatList, Alert } from 'react-native';
+import { useUser } from '@/context/UserContext';
 
 interface CustomModalProps {
     visible: boolean; 
+    //collections: any[];
     onClose: () => void;  
+    onSelectCollection: (collectionId: string ) => void;
+    selectedLocationId: string | null;
 }
 const { height } = Dimensions.get('window');
 
@@ -21,8 +25,63 @@ type CollectionScreenNavigationProp = NativeStackNavigationProp<
   'add-new-collection-screen'
 >;
 
-const CustomModal: React.FC<CustomModalProps> = ({ visible, onClose }) => {
+const CustomModal: React.FC<CustomModalProps> = ({ visible, onClose, onSelectCollection, selectedLocationId }) => {
     const navigation = useNavigation<CollectionScreenNavigationProp>();
+    const [collections, setCollections] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
+    const { userId } = useUser();
+
+    useEffect(() => {
+      if (visible) {
+        fetchUserCollections();
+      }
+    }, [visible]);
+
+    const fetchUserCollections = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`${API_BASE_URL}/collection/getbyuserid/${userId}`);
+        const data = await response.json();
+        if (data.isSuccess) {
+          setCollections(data.data);
+        } else {
+          console.error("Error fetching collections:", data.error);
+        }
+      } catch (error) {
+        console.error("Fetch collections error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const handleCollectionClick = async (collectionId: string) => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/collection/createitem/${collectionId}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            locationId: selectedLocationId, // Truyền ID địa điểm đã chọn
+          }),
+        });
+    
+        const data = await response.json();
+    
+        if (data.isSuccess) {
+          Alert.alert("Thành công", "Địa điểm đã được thêm vào bộ sưu tập.");
+        } else {
+          console.error("Lỗi khi thêm vào bộ sưu tập:", data.error);
+          Alert.alert("Thông báo", "Địa điểm đã tồn tại trong bộ sưu tập!");
+        }
+      } catch (error) {
+        console.error("Fetch error:", error);
+        Alert.alert("Lỗi", "Có lỗi xảy ra trong quá trình thêm địa điểm.");
+      } finally {
+        onClose(); // Đóng modal sau khi thực hiện
+      }
+    };
+    
     return (
         <Modal
             animationType="slide"
@@ -31,20 +90,60 @@ const CustomModal: React.FC<CustomModalProps> = ({ visible, onClose }) => {
             onRequestClose={onClose}
         >
             <View style={styles.modalContainer}>
-               
                 <View style={styles.modalContent}>
-                    <View style ={{width:'50%', alignItems:'center', flexDirection:'column'}}>
-                        <TouchableOpacity 
-                            style={styles.square} 
-                            onPress={() => navigation.navigate('add-new-collection-screen')}>
-                            
-                            <Image source={require('../../assets/icons/plus.png')} style={styles.iconplus} />
-                        </TouchableOpacity>
-                        <Text style={{marginTop:10, fontSize: 20,}}>Thêm mới</Text>
-                    </View>
                     <TouchableOpacity style={styles.exitButton} onPress={onClose}>
                         <Image source={require('@/assets/icons/exit.png')} style={styles.exitIcon} />
                     </TouchableOpacity>
+
+                    <View style={styles.modalHeader}>
+                      <Text style={styles.headerText}>Chọn bộ sưu tập</Text>
+                    </View>
+                    <View style={styles.list}>
+                      {loading ? (
+                        <ActivityIndicator size="large" color="#0000ff" />
+                      ) : (
+                        <FlatList
+                          data={[...collections, { _id: "add-new", name: "Thêm mới", isAddNew: true }]}
+                          keyExtractor={(item) => item._id}
+                          renderItem={({ item }) =>
+                            item.isAddNew ? (
+                              // Giao diện ô "Thêm mới"
+                              <View style={{ width: "50%", alignItems: "center", marginVertical: 10 }}>
+                                <TouchableOpacity
+                                  style={styles.square}
+                                  onPress={() => {navigation.navigate("add-new-collection-screen");
+                                  onClose();
+                                  }}
+                                >
+                                  <Image
+                                    source={require("../../assets/icons/plus.png")}
+                                    style={styles.iconplus}
+                                  />
+                                </TouchableOpacity>
+                                <Text style={{ marginTop: 10, fontSize: 20 }}>{item.name}</Text>
+                              </View>
+                            ) : (
+                              // Giao diện collections thông thường
+                              <View style={{ width: "50%", alignItems: "center", marginVertical: 10 }}>
+                                <TouchableOpacity
+                                  style={styles.square}
+                                  onPress={() => handleCollectionClick(item._id)}
+                                >
+                                  <Image
+                                    source={{
+                                      uri: item.imageUrl || "https://via.placeholder.com/150",
+                                    }}
+                                    style={{ width: 150, height: 150, borderRadius: 20 }}
+                                  />
+                                </TouchableOpacity>
+                                <Text style={{ marginTop: 10, fontSize: 20 }}>{item.name}</Text>
+                              </View>
+                            )
+                          }
+                          numColumns={2}
+                        />
+                      )}
+                    </View> 
                 </View>
             </View>
         </Modal>
@@ -81,6 +180,34 @@ const styles = StyleSheet.create({
         padding: 20,
         alignItems: 'center',
         justifyContent: 'center',
+      },
+      modalHeader: {
+        marginBottom: 20,
+      },
+      headerText: {
+        fontSize: 18,
+        fontWeight: "bold",
+      },
+
+      list: {
+        marginTop: 20,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        flex: 1,
+        //width:'100%',
+      },
+
+      collectionList: {
+        width: "100%",
+      },
+      collectionItem: {
+        padding: 15,
+        backgroundColor: "#f7f7f7",
+        marginVertical: 5,
+        borderRadius: 8,
+      },
+      collectionName: {
+        fontSize: 16,
       },
       modalText: {
         fontSize: 18,

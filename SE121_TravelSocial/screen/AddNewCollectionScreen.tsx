@@ -1,9 +1,40 @@
+import { API_BASE_URL } from '@/constants/config';
 import React, { useState } from 'react';
-import { Text, View, StyleSheet, Image, TouchableOpacity, TextInput } from 'react-native';
+import { Text, View, StyleSheet, Image, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 
 export default function AddNewCollectionScreen({ navigation }: {navigation: NativeStackNavigatorProps}) {
   const [isFocused, setIsFocused] = useState(false);
+  const [collectionName, setCollectionName] = useState('');
+
+  const createCollection = async () => {
+    if (!collectionName.trim()) {
+      Alert.alert("Lỗi", "Vui lòng nhập tên bộ sưu tập.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/collection/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name: collectionName }),
+      });
+
+      const data = await response.json();
+
+      if (data.isSuccess) {
+        Alert.alert("Thành công", "Bộ sưu tập đã được tạo.");
+        navigation.goBack();
+      } else {
+        Alert.alert("Lỗi", data.error || "Không thể tạo bộ sưu tập.");
+      }
+    } catch (error) {
+      console.error("Error creating collection:", error);
+      Alert.alert("Lỗi", "Có lỗi xảy ra trong quá trình tạo bộ sưu tập.");
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -17,7 +48,8 @@ export default function AddNewCollectionScreen({ navigation }: {navigation: Nati
         <Text style={styles.headerTitle}>Bộ sưu tập mới</Text>
         <TouchableOpacity
           style={styles.createButton}
-          onPress={() => console.log('Create button pressed')}
+          onPress={createCollection}
+
         >
           <Text style={styles.createButtonText}>Tạo</Text>
         </TouchableOpacity>
@@ -33,6 +65,8 @@ export default function AddNewCollectionScreen({ navigation }: {navigation: Nati
           placeholderTextColor={isFocused ? '#196EEE' : '#000000'}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
+          value={collectionName}
+          onChangeText={setCollectionName}
         />
       </View>
     </View>

@@ -10,10 +10,41 @@ import {API_BASE_URL} from '../constants/config';
 
 type ReservationRouteProp = RouteProp<RootStackParamList, 'reservation-required-screen'>;
 
+interface RoomDetails {
+    name: string;
+    price: number;
+    checkinDate: Date;
+    checkoutDate: Date;
+    pricePerNight: number;
+}
+
+interface SelectedRoomData {
+    count: number;
+    roomDetails: RoomDetails;
+    roomId: string;
+    nights: number;
+}
+
 export default function ReservationRequiredScreen({ navigation }: {navigation: NativeStackNavigatorProps}) {
     const route = useRoute<ReservationRouteProp>();
     const { selectedRoomsData, locationId } = route.params;
-    console.log('location id: ',locationId);
+
+    const formatRoomDate = (date: Date): string => {
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      };
+    //console.log('xxx:',selectedRoomsData);
+    const roomList = selectedRoomsData.map((room) => ({
+        id: room.roomId,
+        name: room.roomDetails.name,
+        price: room.roomDetails.price,
+        checkinDate: room.roomDetails.checkinDate,
+        checkoutDate: room.roomDetails.checkoutDate,
+        count: room.count,
+    }));
+    console.log('selected room dataa: ',selectedRoomsData);
 
     const [isEditing, setIsEditing] = useState<string | null>(null);
     const [name, setName] = useState({ firstName: '', lastName: '' });
@@ -29,14 +60,14 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
     const totalRooms = selectedRoomsData.reduce((sum, room) => sum + room.count, 0);
 
     const roomPrice = selectedRoomsData.reduce(
-        (sum, room) => sum + room.roomDetails.price * room.count,
+        (sum, room) => sum + room.roomDetails.price * room.count * room.nights,
         0
       );
 
-      const cleaningFee = 15000.0;
-      const serviceFee = roomPrice * 0.01;
-      const tax = roomPrice * 0.04;
-      const totalPrice = roomPrice + cleaningFee + serviceFee + tax;
+    //   const cleaningFee = 15000.0;
+    //   const serviceFee = roomPrice * 0.01;
+      const tax = roomPrice * 0.08;
+      const totalPrice = roomPrice+  tax;
 
       const [displayedTotalPrice, setDisplayedTotalPrice] = useState(totalPrice);
     
@@ -74,6 +105,8 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
           setDisplayedTotalPrice(totalPrice / 2); // Trả một nửa
         }
       };
+
+
 
     const handleSave = (field: string) => {
         if (field === 'name') {
@@ -169,7 +202,11 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                 <Text style={styles.yourbooking}>Booking của bạn</Text>
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>Ngày</Text>
-                    <Text style={styles.secondtext}>26/6 - 27/6</Text>
+                    <Text style={styles.secondtext}>
+                        {selectedRoomsData.length > 0
+                        ? `${formatRoomDate(selectedRoomsData[0].roomDetails.checkinDate)} - ${formatRoomDate(selectedRoomsData[0].roomDetails.checkoutDate)}`
+                        : "No room selected"}
+                    </Text>
                 </View>
                 {/* <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>Số người</Text>
@@ -196,14 +233,14 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                     <Text style={styles.firsttext}>Phòng ({totalRooms} phòng)</Text>
                     <Text style={styles.secondtext1}>{roomPrice.toFixed(0)} VND</Text>
                 </View>
-                <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
+                {/* <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>Phí dọn dẹp</Text>
                     <Text style={styles.secondtext1}>{cleaningFee.toFixed(0)} VND</Text>
                 </View>
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>Phí dịch vụ</Text>
                     <Text style={styles.secondtext1}>{serviceFee.toFixed(0)} VND</Text>
-                </View>
+                </View> */}
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>Thuế</Text>
                     <Text style={styles.secondtext1}>{tax.toFixed(0)} VND</Text>
@@ -302,6 +339,7 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                     <TouchableOpacity style={styles.addpaymentmethod2} onPress={()=> navigation.navigate('payment-method-screen',{
                         locationId: locationId,
                         totalPrice: displayedTotalPrice,
+                        selectedRoomsData: selectedRoomsData,
                         })} >
                         <Text style={styles.boxText3}>Tiếp tục để thanh toán</Text>
                     </TouchableOpacity>
@@ -309,12 +347,7 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
             </View>
 
             </ScrollView>
-            
-            
-            
-        </View>
-
-        
+        </View>  
 );
 }
 

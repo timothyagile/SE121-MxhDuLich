@@ -8,6 +8,7 @@ const upload = uploadMiddleware('travel-social')
 //router.post('/createlocation', checkLocationOwner, locationController.createNewLocation);
 //create with image
 router.post('/createlocation', checkLocationOwner, upload.array('file', 20), locationController.createLocation);
+
 //read
 router.get('/alllocation', locationController.getAllLocation);
 router.get('/locationbycategory/:categoryId', locationController.getLocationByCategory);

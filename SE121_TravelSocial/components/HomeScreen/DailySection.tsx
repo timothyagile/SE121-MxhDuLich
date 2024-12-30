@@ -19,11 +19,16 @@ export default function DailySection({ categoryId }: DailySectionProps) {
     const [locations, setLocations] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        if (categoryId) {
-            fetchPopularLocations(categoryId);
-        }
-    }, [categoryId]);
+  useEffect(() => {
+    console.log('category: ',categoryId)
+    if (categoryId === "all") {
+      getAllLocations();
+      return;
+    }
+    if (categoryId) {
+      fetchPopularLocations(categoryId);
+    }
+}, [categoryId]);  
 
     const fetchPopularLocations = async (id: string) => {
         try {
@@ -44,6 +49,25 @@ export default function DailySection({ categoryId }: DailySectionProps) {
         }
     };
 
+    const getAllLocations = async () => {
+        try {
+            const ipAddress = await Network.getIpAddressAsync();
+            console.log('Device IP Address:', ipAddress);
+            const response = await fetch(`${API_BASE_URL}/alllocation`); 
+            
+            const data = await response.json();
+
+            if (data.isSuccess) {
+                setLocations(data.data); 
+            } else {
+                console.error(data.error);
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
     // Hiển thị vòng quay khi đang tải
     // if (loading) {
     //     return <ActivityIndicator size="large" color="#0000ff" />;

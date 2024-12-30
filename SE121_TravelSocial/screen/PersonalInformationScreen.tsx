@@ -42,6 +42,7 @@ export default function PersonalInformationScreen({ navigation }: {navigation: N
 
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [userUpdated, setUserUpdated] = useState(false);
 
 
 
@@ -58,47 +59,123 @@ export default function PersonalInformationScreen({ navigation }: {navigation: N
 
       const data = await response.json();
       setName({ firstName: data.data.userName || 'Người dùng khách', lastName: data.lastName || '' });
-      setPhoneNumber(data.data.phoneNumber || 'Chưa được cung cấp');
+      setPhoneNumber(data.data.userPhoneNumber || 'Chưa được cung cấp');
       setEmail(data.data.userEmail || '');
-      setAddress(data.address || 'Chưa được cung cấp');
-      setDob(data.dob || 'Chưa được cung cấp');
-      setNationality(data.nationality || 'Chưa được cung cấp');
-      setCitizenId(data.citizenId || 'Chưa được cung cấp');
+      setAddress(data.userAddress || 'Chưa được cung cấp');
+      setDob(data.userDateOfBirth || 'Chưa được cung cấp');
+      setNationality(data.Nationality || 'Chưa được cung cấp');
+      setCitizenId(data.CitizenId || 'Chưa được cung cấp');
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
   };
 
+  const updateUserData = async (field: EditFields, value: any) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/update/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ [field]: value }),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      console.log('Update successful:', data);
+      Alert.alert('Success', 'Information updated successfully!');
+    } catch (error) {
+      console.error('Error updating user data:', error);
+      Alert.alert('Error', 'Failed to update information. Please try again.');
+    }
+  };
+
   useEffect(() => {
     fetchUserData(); // Gọi API khi màn hình load
-  }, []);
+  }, [userUpdated]);
+
+  // const handleSave = (field: EditFields) => {
+  //   if (field === 'name' && (name.firstName.trim() === '' || name.lastName.trim() === '')) {
+  //     Alert.alert('Error', 'Họ và tên không được để trống');
+  //     return;
+  //   }
+  //   if (field === 'phoneNumber' && phoneNumber.trim() === '') {
+  //     Alert.alert('Error', 'Số điện thoại không được để trống');
+  //     return;
+  //   }
+  //   if (field === 'email' && email.trim() === '') {
+  //     Alert.alert('Error', 'Email không được để trống');
+  //     return;
+  //   }
+  //   if (field === 'address') {
+  //     const completeAddress = [
+  //       selectedWard?.label,
+  //       selectedDistrict?.label,
+  //       selectedProvince?.label
+  //     ].filter(Boolean).join(', ');
+    
+  //     setAddress(completeAddress || 'Not provided yet');
+  //   }
+    
+  //   if (field === 'dob' && dob.trim() === '') setDob('Not provided yet');
+  //   if (field === 'nationality' && nationality.trim() === '') setNationality('Not provided yet');
+  //   if (field === 'citizenId' && citizenId.trim() === '') setCitizenId('Not provided yet');
+  //   setIsEditing((prev) => ({ ...prev, [field]: false }));
+  // };
 
   const handleSave = (field: EditFields) => {
-    if (field === 'name' && (name.firstName.trim() === '' || name.lastName.trim() === '')) {
-      Alert.alert('Error', 'Họ và tên không được để trống');
-      return;
+    let value;
+  
+    switch (field) {
+      case 'name':
+        if (name.firstName.trim() === '' || name.lastName.trim() === '') {
+          Alert.alert('Error', 'Họ và tên không được để trống');
+          return;
+        }
+        value = `${name.firstName} ${name.lastName}`;
+        break;
+      case 'phoneNumber':
+        if (phoneNumber.trim() === '') {
+          Alert.alert('Error', 'Số điện thoại không được để trống');
+          return;
+        }
+        value = phoneNumber;
+        break;
+      case 'email':
+        if (email.trim() === '') {
+          Alert.alert('Error', 'Email không được để trống');
+          return;
+        }
+        value = email;
+        break;
+      case 'address':
+        value = [
+          selectedWard?.label,
+          selectedDistrict?.label,
+          selectedProvince?.label,
+        ]
+          .filter(Boolean)
+          .join(', ');
+        if (value.trim() === '') value = 'Chưa được cung cấp';
+        break;
+      case 'dob':
+        value = dob.trim() === '' ? 'Chưa được cung cấp' : dob;
+        break;
+      case 'nationality':
+        value = nationality.trim() === '' ? 'Chưa được cung cấp' : nationality;
+        break;
+      case 'citizenId':
+        value = citizenId.trim() === '' ? 'Chưa được cung cấp' : citizenId;
+        break;
+      default:
+        return;
     }
-    if (field === 'phoneNumber' && phoneNumber.trim() === '') {
-      Alert.alert('Error', 'Số điện thoại không được để trống');
-      return;
-    }
-    if (field === 'email' && email.trim() === '') {
-      Alert.alert('Error', 'Email không được để trống');
-      return;
-    }
-    if (field === 'address') {
-      const completeAddress = [
-        selectedWard?.label,
-        selectedDistrict?.label,
-        selectedProvince?.label
-      ].filter(Boolean).join(', ');
-    
-      setAddress(completeAddress || 'Not provided yet');
-    }
-    
-    if (field === 'dob' && dob.trim() === '') setDob('Not provided yet');
-    if (field === 'nationality' && nationality.trim() === '') setNationality('Not provided yet');
-    if (field === 'citizenId' && citizenId.trim() === '') setCitizenId('Not provided yet');
+  
+    updateUserData(field, value);
+    setUserUpdated(true);
     setIsEditing((prev) => ({ ...prev, [field]: false }));
   };
 

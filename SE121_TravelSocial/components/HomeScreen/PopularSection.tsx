@@ -34,15 +34,11 @@ interface PopularSectionProps {
 
 export default function PopularSection({ categoryId, navigation }: PopularSectionProps) {
   const [likedItems, setLikedItems] = useState<LikedItems>({});
-  const [locations, setLocations] = useState<any[]>([
-    // Example data for testing
-    { id: '1', name: 'Location 1', rating: 4.5, _id: '1' },
-    { id: '2', name: 'Location 2', rating: 3.5, _id: '2' },
-    { id: '3', name: 'Location 3', rating: 5.0, _id: '3' },
-  ]);
+  const [locations, setLocations] = useState<any[]>([]);
 
     const [loading, setLoading] = useState(true);
     const [modalVisible, setModalVisible] = useState(false);
+    const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
 
   const scrollX = useRef(new Animated.Value(0)).current;
 
@@ -51,12 +47,18 @@ export default function PopularSection({ categoryId, navigation }: PopularSectio
       ...prevState,
       [id]: !prevState[id],
     }));
+    setSelectedLocationId(id);
     setModalVisible(true); 
   };
 
   useEffect(() => {
+    console.log('category: ',categoryId)
+    if (categoryId === "all") {
+      getAllLocations();
+      return;
+    }
     if (categoryId) {
-        fetchPopularLocations(categoryId);
+      fetchPopularLocations(categoryId);
     }
 }, [categoryId]);  
 
@@ -73,8 +75,29 @@ const fetchPopularLocations = async (id: string) => {
         }
     } catch (error) {
         console.error("Fetch error:", error);
-    }
+    } 
 }; 
+
+    const getAllLocations = async () => {
+        try {
+            const ipAddress = await Network.getIpAddressAsync();
+            console.log('Device IP Address:', ipAddress);
+            const response = await fetch(`${API_BASE_URL}/alllocation`); 
+            
+            const data = await response.json();
+
+            if (data.isSuccess) {
+                setLocations(data.data); 
+            } else {
+                console.error(data.error);
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
   const renderItem = ({ item, index }: { item: any; index: number }) => {
     const inputRange = [
@@ -160,7 +183,7 @@ const fetchPopularLocations = async (id: string) => {
         keyExtractor={(item, index) => item._id}
         renderItem={renderItem}
       />
-      <CustomModal visible={modalVisible} onClose={() => setModalVisible(false)} ></CustomModal>
+      <CustomModal visible={modalVisible} onClose={() => setModalVisible(false)} onSelectCollection={(collectionId:any)=>console.log('selected:', collectionId)} selectedLocationId={selectedLocationId}></CustomModal>
     </View>
   );
 }

@@ -6,6 +6,8 @@ import {iconMapping} from '../constants/icon';
 import { RootStackParamList } from '@/types/navigation';
 import {API_BASE_URL} from '../constants/config';
 import axios from 'axios';
+import { FontAwesome } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const { width } = Dimensions.get('window');
 
@@ -17,9 +19,13 @@ interface Room {
     area: number; 
     quantity: number; 
     price: number;
+    nights:number;
     image: string[]; 
     description: string;
+    checkinDate: Date;
+    checkoutDate: Date;
     facility: {
+        id: string;
         name: string; 
         description?: string; 
         icon: string;
@@ -35,6 +41,12 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
     const route = useRoute<RouteProp<RootStackParamList, 'available-room-screen'>>();
     const { id, checkinDate, checkoutDate } = route.params;
     console.log('checkin ddate: ', checkinDate);
+    const [date1, setDate1] = useState(checkinDate);
+    const [date2, setDate2] = useState(checkoutDate);
+    const [selectedDate1, setSelectedDate1] = useState('');
+    const [selectedDate2, setSelectedDate2] = useState('');
+    const [showPicker1, setShowPicker1] = useState(false);
+    const [showPicker2, setShowPicker2] = useState(false);    
     const [rooms, setRooms] = useState<Room[]>([]);
     const [services, setServices] = useState([]);
     const [isModalVisible, setModalVisible] = useState(false);
@@ -44,6 +56,42 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
     const [currentRoomId, setCurrentRoomId] = useState<string | null>(null);
     const [buttonText, setButtonText] = useState("Chọn");
     const [currentIndex, setCurrentIndex] = useState(0);
+
+    const showDatePicker1 = () => {
+        setShowPicker1(true);
+    };
+  
+      const showDatePicker2 = () => {
+        setShowPicker2(true);
+    };
+
+    const onDateChange1 = (_: any, selected: Date | undefined) => {
+      setShowPicker1(false);
+      if (selected) {
+        if (selected > date2) {
+          Alert.alert("Lỗi", "Ngày checkin phải nhỏ hơn hoặc bằng ngày checkout.");
+        } else {
+          
+          setDate1(selected);
+          const formattedDate = selected.toLocaleDateString('vi-VN');
+          setSelectedDate1(formattedDate);
+        }
+      }
+    };
+
+    const onDateChange2 = (_: any, selected: Date | undefined) => {
+      setShowPicker2(false);
+      if (selected) {
+        // Kiểm tra nếu ngày checkout nhỏ hơn ngày checkin
+        if (selected < date1) {
+          Alert.alert("Lỗi", "Ngày checkout phải lớn hơn hoặc bằng ngày checkin.");
+        } else {
+          setDate2(selected);
+          const formattedDate = selected.toLocaleDateString('vi-VN');
+          setSelectedDate2(formattedDate);
+        }
+      }
+    };    
 
     const onScrollEnd = (e: any) => {
       const contentOffsetX = e.nativeEvent.contentOffset.x;
@@ -80,6 +128,7 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
       
               if (Array.isArray(roomData.data)) {
                 const rooms = roomData.data;
+
 
                 const availableRooms = rooms.filter((room: any) => {
                   const isBooked = bookings.some((booking: any) => {
@@ -161,6 +210,8 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
         roomDetails: {
           name: string;
           price: number;
+          checkinDate: Date;
+          checkoutDate: Date;
         };
       };
 
@@ -173,7 +224,10 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
               roomDetails: {
                 name: room?.name || '',
                 price: room?.price || 0,
+                checkinDate: date1,
+                checkoutDate: date2
               },
+              nights: Math.abs((date1.getTime() - date2.getTime()) / (1000 * 60 * 60 * 24)),
             };
           });
         navigation.navigate('reservation-required-screen', {
@@ -268,7 +322,7 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                                 <View key={index} style={styles.backgroundBox}>
                                     <Image
                                         
-                                        source={getIcon(facility.icon)}
+                                        source={getIcon(facility?.id)}
                                         style={{height:17, width:17, marginRight:3,}}
                                     />
                                     <Text style={styles.area}>{facility.name}</Text>
@@ -283,6 +337,48 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                                 <Text style={styles.statetext}> phòng</Text>
                             </View>
                         </View>
+                        
+                        <Text style={styles.chosedate}>Chọn ngày</Text>
+                        <View style={{flexDirection:'row', justifyContent:'space-between'}}>
+                            <View style={[styles.inputContainer, {width:'44%', marginLeft: 13,}]}>
+                                <TouchableOpacity onPress={showDatePicker1}>
+                                <FontAwesome name="calendar" size={20} color="gray" style={styles.iconLeft} />
+                                </TouchableOpacity>
+                                <TextInput
+                                readOnly
+                                placeholder="Checkin"
+                                value={selectedDate1}
+                                style={styles.input}
+                                />
+                                {showPicker1 && (
+                                <DateTimePicker
+                                    value={date1}
+                                    mode="date"
+                                    display="default"
+                                    onChange={onDateChange1}
+                                />
+                                )}
+                            </View>
+                            <View style={[styles.inputContainer,{width:'44%', marginRight: 13,}]}>
+                                <TouchableOpacity onPress={showDatePicker2}>
+                                <FontAwesome name="calendar" size={20} color="gray" style={styles.iconLeft} />
+                                </TouchableOpacity>            
+                                <TextInput
+                                readOnly
+                                placeholder="Checkout"
+                                value={selectedDate2}
+                                style={styles.input}
+                                />
+                                {showPicker2 && (
+                                <DateTimePicker
+                                    value={date2}
+                                    mode="date"
+                                    display="default"
+                                    onChange={onDateChange2}
+                                />
+                                )}
+                            </View>
+                            </View>
 
                         <View style={styles.endcontainer}>
                             <View style={{ flex: 4 }}>
@@ -467,6 +563,33 @@ const styles = StyleSheet.create({
           shadowOpacity: 2,
           shadowRadius: 4,
           elevation: 20,
+    },
+
+    inputContainer: {
+        marginTop: 20,
+
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+        marginBottom: 12,
+        paddingLeft: 10,
+        paddingRight: 10,
+      },
+    input: {
+        flex: 1,
+        padding: 10,
+      },
+    iconLeft: {
+        marginRight: 10,
+      },
+
+    chosedate: {
+        marginLeft:20,
+        marginTop:20,
+        fontSize:20,
+        fontWeight:'bold',
     },
 
     statetext:{

@@ -56,7 +56,7 @@ const createCollectionItem = async(collectionId, locationId) => {
     }
     
     if (collection.item.includes(locationId)) {
-        throw new ForbiddenError('This location was in collection')
+        // throw new ForbiddenError('This location was in collection')
     }
     collection.item.push(locationId)
     const result = await collection.save()

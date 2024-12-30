@@ -23,6 +23,7 @@ const getAllBooking = async () => {
     
 }
 const getBookingById = async (id) => {
+    console.log('id: ', id);    
     const result = await Booking.findById(id)
     .populate({
         path: 'items.roomId',
@@ -90,7 +91,19 @@ const getBookingByLocationId = async (locationId) => {
 }
 
 const createBooking = async (bookingData) => {
-    const result = bookingData.save()
+    for (let item of bookingData.items) {
+        const room = await Room.findById(item.roomId, 'pricePerNight');
+        console.log('room: ', room);
+        item.price = room.pricePerNight;
+    }
+    
+    for (let service of bookingData.services) {
+        const service = await Service.findById(service.serviceId);
+        service.price = service.price;
+    }
+    console.log('before: ', bookingData);
+    const result = await bookingData.save();
+    console.log('after: ',result);
     if(result)
         return result
     else
@@ -98,7 +111,8 @@ const createBooking = async (bookingData) => {
 }
 
 const updateBooking = async (bookingId, bookingData) => {
-    const result = Booking.findByIdAndUpdate(bookingId, bookingData, {new: true, runValidators: true})
+    console.log('booking: ', await Booking.findById(bookingId));
+    const result = await Booking.findByIdAndUpdate(bookingId, bookingData, {new: true, runValidators: true})
     if(result)
         return result
     else
