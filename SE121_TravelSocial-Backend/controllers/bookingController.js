@@ -1,6 +1,6 @@
 const Booking = require('../models/Booking').Booking
 const bookingSvc = require('../services/bookingSvc')
-
+const emailSvc = require('../services/emailSvc')
 module.exports.getAllBooking = async (req, res, next) => {
     try {
         const result = await bookingSvc.getAllBooking()
@@ -110,9 +110,10 @@ module.exports.updateBooking = async (req, res, next) => {
     const bookingId = req.params.id
     try {
         const result = await bookingSvc.updateBooking(bookingId, bookingData)
+        const resultEmail = await emailSvc.transporter.sendMail(emailSvc.confirmBookingEmail('abc', 'abc'))
         res.status(201).json({
             isSuccess: true,
-            data: result,
+            data: result, resultEmail,
             error: null
         })
     }
@@ -120,6 +121,25 @@ module.exports.updateBooking = async (req, res, next) => {
         next(error)
     }
 }
+
+module.exports.changStatusBooking = async (req, res, next) => {
+    const bookingData = req.body
+    const bookingId = req.params.id
+    try {
+        const result = await bookingSvc.updateBooking(bookingId, bookingData)
+        const resultEmail = emailSvc.transporter.sendMail(emailSvc.confirmBookingEmail)
+        res.status(201).json({
+            isSuccess: true,
+            data: result, resultEmail,
+            error: null
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
+
 
 module.exports.addServices = async (req, res, next) => {
     const bookingId = req.params.id

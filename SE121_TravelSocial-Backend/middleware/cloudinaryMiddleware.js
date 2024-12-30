@@ -1,25 +1,31 @@
 const {CloudinaryStorage} = require("multer-storage-cloudinary")  
-const cloudianry = require('../config/cloudinaryConfig')  
+const cloudinary = require('../config/cloudinaryConfig')  
+const path = require('path');
 const multer = require('multer')  
 
-// const storage = new CloudinaryStorage({
-//     cloudinary: cloudianry,
-//     params: {
-//         folder: "travel-social",
-//         format: "jpg",
-//     }
-// })
+function uploadMiddleware(folderName) {
+    const storage = new CloudinaryStorage({
+      cloudinary: cloudinary,
+      params: (req, file) => {
+        const folderPath = `${folderName.trim()}`; // Update the folder path here
+        const fileExtension = path.extname(file.originalname).substring(1);
+        const publicId = `file-${Date.now()}-${file.originalname}`;
+        
+        return {
+          folder: folderPath,
+          public_id: publicId,
+          format: fileExtension,
+        };
+      },
+    });
+  
+    return multer({
+      storage: storage,
+      limits: {
+        fileSize: 5 * 1024 * 1024, // keep images size < 5 MB
+      },
+    });
+  }
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        console.log('Multer is processing file:', file);
-        cb(null, './uploads'); // Lưu vào thư mục 'uploads'
-    },
-    filename: (req, file, cb) => {
-        console.log('Saving file as:', file.originalname);
-        cb(null, Date.now() + '-' + file.originalname); // Tên tệp lưu vào hệ thống
-    }
-});
 
-const upload = multer({storage: storage})
-module.exports = upload
+module.exports = uploadMiddleware
