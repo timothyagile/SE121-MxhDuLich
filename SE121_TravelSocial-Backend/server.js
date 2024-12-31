@@ -20,6 +20,7 @@ const serviceRoute = require('./routes/serviceRoute')
 const conversationRoute = require('./routes/conversationRoute')
 const messageRoute = require('./routes/messageRoute')
 const reviewRoute = require('./routes/reviewRoute')
+const VNPayRoute = require('./routes/vnpayRoute')
 
 const {requireAuth, checkUser} = require('./middleware/authMiddleware');
 const {errorHandler} = require('./middleware/errorMiddleware')
@@ -83,5 +84,7 @@ app.use(serviceRoute)
 app.use(messageRoute)
 app.use(reviewRoute)
 app.use(conversationRoute)
+app.use(VNPayRoute)
+
 
 app.use(errorHandler);
