@@ -139,8 +139,6 @@ module.exports.changStatusBooking = async (req, res, next) => {
     }
 }
 
-
-
 module.exports.addServices = async (req, res, next) => {
     const bookingId = req.params.id
     const {serviceId} = req.body
