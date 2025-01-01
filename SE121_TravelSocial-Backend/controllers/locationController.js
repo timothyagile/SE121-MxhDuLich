@@ -2,7 +2,8 @@ const Location = require('../models/Location');
 const locationSvc = require('../services/locationSvcs')
 const errorHandler = require('../middleware/authMiddleware')
 const cloudinary =  require("../config/cloudinaryConfig"); 
-const upload = require('../middleware/cloudinaryMiddleware');
+const bodyParser = require('body-parser');
+const { compare } = require('bcryptjs');
 
 //--CREATE NEW LOCATION
 module.exports.createNewLocation = async (req, res, next) => {
@@ -52,6 +53,8 @@ module.exports.createLocation = async (req, res, next) => {
             address,
             category,
         } = req.body;
+        const parseredCategory = JSON.parse(category)
+        console.log(parseredCategory)
         //console.log(res.locals.user._id)
         const images = req.files.map((file) => ({
             url: file.path,
@@ -62,7 +65,7 @@ module.exports.createLocation = async (req, res, next) => {
             name,
             description,
             address,
-            category,
+            category: parseredCategory,
             ownerId: res.locals.user._id,
             image: images
         });
