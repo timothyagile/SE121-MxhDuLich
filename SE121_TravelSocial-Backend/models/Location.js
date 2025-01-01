@@ -27,6 +27,7 @@ const locationSchema = new Schema({
         type: String,
         //required: true,
     },
+    slug: {type: String, required: true},
     rating: {
         type: Number,
         min: 0,
