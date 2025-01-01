@@ -188,7 +188,7 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                     <View style={styles.detailsContainer}>
                         <View style={styles.ratingBox}>
                             <Image source = {require('../assets/icons/star.png')} style={{height:20, width:20, marginRight:3,}}></Image>
-                            <Text style={styles.boxText}>{locationDetails?.rating || 0}</Text>
+                            <Text style={styles.boxText}>{locationDetails?.rating || 4}</Text>
                         </View>
                         <View style={styles.featureBox}>
                             <Image source={require('../assets/icons/clock.png')} style ={{marginRight:3,}}></Image>

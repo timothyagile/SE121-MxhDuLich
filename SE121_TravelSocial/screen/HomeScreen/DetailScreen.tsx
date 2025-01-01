@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions, ScrollView, Linking, TextInput, Alert, SafeAreaView, StatusBar } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions, ScrollView, Linking, TextInput, Alert, SafeAreaView, StatusBar, FlatList } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import Facility from '@/components/HomeScreen/Facility';
 import axios from 'axios';
@@ -10,6 +10,7 @@ import {API_BASE_URL} from '../../constants/config';
 import { Icon } from 'react-native-paper';
 import {iconMapping} from '../../constants/icon';
 import CustomModal from '@/components/CollectionScreen/AddIntoCollection';
+import ImageCarousel from '@/components/HomeScreen/ImageCarousel';
 
 
 const { width, height } = Dimensions.get('window');
@@ -50,6 +51,8 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
   type FacilityIcons = {
     [key: string]: string; // Cho phép dùng các khóa kiểu string
 };
+
+
 
   const getIcon = (iconName: string) => {
     return iconMapping[iconName] || iconMapping["default.png"];
@@ -238,7 +241,7 @@ const facilityIcons: FacilityIcons = {
           //console.error('Error fetching room services:', result.error);
         }
 
-        const allPrices = result.data?.map((room:any) => room.price);
+        const allPrices = result.data?.map((room:any) => room.pricePerNight);
         const minPrice =Math.min(...allPrices);
         setMinPrice(minPrice);
 
@@ -283,7 +286,7 @@ const facilityIcons: FacilityIcons = {
             }, {});
             setUserNames(userNamesMap);
           } else {
-            Alert.alert('Lỗi', result.message || 'Không thể lấy phản hồi.');
+            // Alert.alert('Lỗi', result.message || 'Không thể lấy phản hồi.');
           }
         } catch (error) {
           console.error('Error fetching reviews:', error);
@@ -295,6 +298,15 @@ const facilityIcons: FacilityIcons = {
     
       fetchReviews();
     }, [id]);
+
+    const renderImage = ({ item }: { item: { _id: string; url: string } }) => (
+      console.log('image:', item.url),
+      <Image
+        
+        source={{ uri: item.url }}
+        style={styles.image}
+      />
+    )
   
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#f0f4f8' }}>
@@ -302,10 +314,30 @@ const facilityIcons: FacilityIcons = {
         <ScrollView >
           {/* Hình ảnh và nút quay lại */}
           <View style={styles.imageContainer}>
-            <Image
-            source={require('../../assets/images/bai-truoc-20.jpg')}
-              style={[styles.image, ]}
-            />
+          {/* <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={true}
+          >
+            {locationDetails.image?.map((img:any) => (
+              <Image
+                key={img._id}
+                source={{ uri: img.url }}
+                style={styles.image}
+              />
+            ))}
+          </ScrollView> */}
+          {/* <Image
+            source={
+              locationDetails.image[0].url
+                  ? { uri:locationDetails.image[0].url }
+                  : require('@/assets/images/bai-truoc-20.jpg') // Hình ảnh mặc định
+              }
+              
+              style={styles.image}
+            />  */}
+
+          <ImageCarousel images={locationDetails?.image} />
+
             <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
               <FontAwesome name="arrow-left" size={24} color="#1E90FF" />
             </TouchableOpacity>
@@ -331,7 +363,7 @@ const facilityIcons: FacilityIcons = {
             
             <View style={styles.rating}>
               <FontAwesome name="star" size={16} color="#FFD700" />
-              <Text style={styles.ratingText}>{locationDetails?.rating || '0'} ({locationDetails?.reviews || 0} Đánh giá)</Text>
+              <Text style={styles.ratingText}>{locationDetails?.rating || '4'} ({locationDetails?.reviews || 1} Đánh giá)</Text>
             </View>
             <View>
             <Text style={styles.description}  

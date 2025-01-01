@@ -122,20 +122,20 @@ export default function DailySection({ categoryId }: DailySectionProps) {
         <View>
             <Text style = {styles.titleText}>Gợi ý hằng ngày</Text>
             <View style = {styles.container}>
-                {RCM.map((item, index) => {
+                {locations.map((item, index) => {
                     return (
                     <TouchableOpacity
                         key={index}
                         style = {{
                         marginLeft: 24,
-                        marginRight:  index === RCM.length - 1 ? 24 : 0}}>
+                        marginRight:  index === locations.length - 1 ? 24 : 0}}>
                         <View style={[styles.card]}>
                             <View style={styles.imageBox}>
                                 <Image style={styles.image} source={item.image} />
                             </View>
                             <View style={styles.footer}>
                                 <View>
-                                    <Text style={[styles.textStyle, {fontSize: 20}]}>{item.data?.name}</Text>
+                                    <Text style={[styles.textStyle, {fontSize: 20}]}>{item.name}</Text>
                                 </View>
                             </View>
                         </View>

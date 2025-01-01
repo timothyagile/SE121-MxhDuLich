@@ -40,10 +40,14 @@ export default function TicketScreen() {
 
             // Gọi API location để lấy tên địa điểm
             const location = room && room.locationId ? await fetchLocationDetails(room.locationId) : null;
+            console.log('location to image: ',location)
+            const imageUrl = location && location.image && location.image?.[0]?.url ? location.image?.[0].url : 'https://via.placeholder.com/150';
+            // console.log('location iamge 0: ', location.image[0].url)
             setLocationId(room.locationId);
             return {
               ...ticket,
-              locationName: location ? location.name : 'Unknown Location', // Bổ sung tên địa điểm
+              locationName: location ? location.name : 'Unknown Location',
+              imageUrl: imageUrl, // Bổ sung tên địa điểm
             };
           })
         );

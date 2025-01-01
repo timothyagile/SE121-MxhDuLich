@@ -18,7 +18,7 @@ interface Room {
     bedType: string;
     area: number; 
     quantity: number; 
-    price: number;
+    pricePerNight: number;
     nights:number;
     image: string[]; 
     description: string;
@@ -224,7 +224,7 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
               count: selectedRoomCounts[roomId],
               roomDetails: {
                 name: room?.name || '',
-                price: room?.price || 0,
+                price: room?.pricePerNight || 0,
                 checkinDate: date1,
                 checkoutDate: date2
               },
@@ -384,7 +384,7 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                         <View style={styles.endcontainer}>
                             <View style={{ flex: 4 }}>
                                 <Text style={styles.area2}>Giá</Text>
-                                <Text style={styles.pricetext}>{room.price} VND</Text>
+                                <Text style={styles.pricetext}>{room.pricePerNight} VND</Text>
                             </View>
                             <View style={{ flex: 6, justifyContent: 'center', alignItems: 'center' }}>    
                                 <TouchableOpacity style={styles.choosebutton} onPress={() => toggleModal(room._id)}>

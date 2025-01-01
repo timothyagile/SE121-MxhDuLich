@@ -88,7 +88,7 @@ export default function WelcomeScreen1 ({navigation}: {navigation: NativeStackNa
                   onPress={() => navigation.navigate('login')}
                 >
                   <Text style={{ fontWeight: 'bold', fontSize: 20, color: 'white'}}>
-                    Explore
+                    Khám phá 
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -112,7 +112,7 @@ export default function WelcomeScreen1 ({navigation}: {navigation: NativeStackNa
                     fontSize: 20,
                     color: 'white',
                   }}>
-                  Skip
+                  Bỏ qua
                 </Text>
               </TouchableOpacity>
               <View style={{width: 15}} />
@@ -126,7 +126,7 @@ export default function WelcomeScreen1 ({navigation}: {navigation: NativeStackNa
                     fontSize: 20,
                     color: 'white'
                   }}>
-                  Next
+                  Kế tiếp 
                 </Text>
               </TouchableOpacity>
               </View>

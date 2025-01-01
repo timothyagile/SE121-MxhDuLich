@@ -74,7 +74,8 @@ const fetchPopularLocations = async (id: string) => {
             setLocations(data.data);
             console.log('popular:',data.data);
         } else {
-            console.error("Error fetching popular locations:", data.error);
+            setLocations([]);
+            // console.error("Error fetching popular locations:", data.error);
         }
     } catch (error) {
         console.error("Fetch error:", error);
@@ -133,15 +134,15 @@ const fetchPopularLocations = async (id: string) => {
       >
         <TouchableOpacity onPress={() => navigation.navigate('detail-screen', { id: item._id })}>
           <View style={styles.imageBox}>
-            {/* <Image
+            <Image
             source={
-              item?.image[1].url
-                  ? { uri: item.image[1].url }
+              item?.image?.[0]?.url
+                  ? { uri: item.image[0].url }
                   : require('@/assets/images/bai-truoc-20.jpg') // Hình ảnh mặc định
               }
               
               style={styles.image}
-            /> */}
+            /> 
           </View>
           <View style={styles.titleBox}>
             <View style = {styles.textBox}>
@@ -149,10 +150,10 @@ const fetchPopularLocations = async (id: string) => {
             </View>
             <View style={{flexDirection:'row', marginTop: 2}}>
                 <View style={styles.textBox}>
-                {/* <Image
-                    source={{ uri: item.image[0].url || '' }}
+                <Image
+                    source={require('../../assets/icons/star.png')}
                     style={styles.star}
-                /> */}
+                />
                 <Text style={[styles.textStyle, { fontSize: 12 }]}>{item.rating}</Text>
                 </View>
                 <TouchableOpacity

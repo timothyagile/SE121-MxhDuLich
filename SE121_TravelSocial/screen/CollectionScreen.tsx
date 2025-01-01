@@ -9,6 +9,16 @@ import { handleUrlParams } from 'expo-router/build/fork/getStateFromPath-forks';
 import CollectionItem from '@/components/CollectionScreen/Location';
 import LoadingScreen from '@/components/Loading/LoadingScreen';
 
+import image1 from '../assets/collectionavts/image1.png';
+import image2 from '../assets/collectionavts/Collecting-pana.png'
+import image3 from '../assets/collectionavts/Collecting-rafiki.png'
+import image4 from '../assets/collectionavts/Collection-amico.png'
+import image5 from '../assets/collectionavts/Collection-pana.png'
+import image6 from '../assets/collectionavts/Online connection-pana.png'
+import image7 from '../assets/collectionavts/Trip-bro.png'
+
+const images = [image1, image2, image3, image4, image5, image6, image7];
+
 const { height } = Dimensions.get('window');
 
 type RootStackParamList = {
@@ -37,6 +47,11 @@ export default function CollectionScreen ()
       useEffect(() => {
         setModalVisible(false);
       }, []);
+
+      const getRandomImage = () => {
+        const randomIndex = Math.floor(Math.random() * images.length);
+        return images[randomIndex];
+      };
 
       const addNewCollection = async () => {
         try {
@@ -150,9 +165,7 @@ export default function CollectionScreen ()
                       <View style={{ width: '50%', alignItems: 'center', marginVertical: 10 }}>
                         <TouchableOpacity style={styles.square} onPress={() => handleCollectionClick(item._id)}>
                           <Image
-                            source={{
-                              uri: item.imageUrl || 'https://via.placeholder.com/150',
-                            }}
+                            source={getRandomImage()}
                             style={{width:150, height:150, borderRadius:20}}
                           />
                         </TouchableOpacity>
@@ -210,7 +223,7 @@ export default function CollectionScreen ()
                             keyExtractor={(item) => item._id} // Giả sử mỗi location có _id
                             renderItem={({ item }) => (
                               <CollectionItem
-                                imageUrl={item.imageUrl || "https://via.placeholder.com/150"}
+                                imageUrl={item.image?.[0]?.url || "https://via.placeholder.com/150"}
                                 name={item.name}
                                 rating={item.rating || 1.0}
                                 cancellation="Hủy miễn phí trong 24h"

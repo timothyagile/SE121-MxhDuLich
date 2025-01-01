@@ -119,7 +119,7 @@ const Ticket: React.FC<TicketProps> = ({ title, date, status, onCancel, imageUrl
   switch (status) {
     case 'pending':
       statusText = 'Chờ duyệt';
-      statusColor = 'F4C726';
+      statusColor = '#F4C726';
       buttonText = 'Hủy';
       buttonColor = '#F45B69';
       buttonAction = handleCancelBooking;
@@ -133,7 +133,7 @@ const Ticket: React.FC<TicketProps> = ({ title, date, status, onCancel, imageUrl
       break;
     case 'complete':
       statusText = 'Hoàn tất';
-      statusColor = '3FC28A';
+      statusColor = '#3FC28A';
       buttonText = 'Đánh giá';
       buttonColor = '#007AFF'; // Xanh dương đậm
       buttonAction = handleRateBooking;
