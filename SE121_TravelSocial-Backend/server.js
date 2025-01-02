@@ -66,7 +66,7 @@ app.listen(PORT, () => {
 
 //Route
 //app.get('*', checkUser)
-app.get('/', (req, res) => res.render('index'))
+app.get('/', (req, res) => res.render('signin'))
 app.get('/signup', (req, res) => {res.render('signup')})
 app.get('/signin', (req, res) => {res.render('signin')})
 
