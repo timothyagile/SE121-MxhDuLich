@@ -61,7 +61,7 @@ export default function RecommendedSection({ categoryId, navigation }: PopularSe
     return (
 
         <View style={{height:CARD_HEIGHT+50}}>
-            <Text style = {styles.titleText}>Đề xuất</Text>
+            <Text style = {styles.titleText}>Phổ biến</Text>
             <FlatList
             data={locations}
             
@@ -78,8 +78,15 @@ export default function RecommendedSection({ categoryId, navigation }: PopularSe
                         marginRight:  index === locationData.length - 1 ? 24 : 0}]}>
                         <View>
                             <View style = {[styles.imageBox, ]}>
-                                <Image source={require('@/assets/images/bai-truoc-20.jpg')}
-                                style={styles.image}></Image>
+                            <Image
+                            source={
+                            item?.image?.[0]?.url
+                                ? { uri: item.image[0].url }
+                                : require('@/assets/images/bai-truoc-20.jpg') // Hình ảnh mặc định
+                            }
+                            
+                            style={styles.image}
+                            /> 
                                 <View style= {styles.titleBox}>
                                     <View style = {[styles.textBox, {top: 10, width: 70}]}>
                                         <Image source={require('@/assets/icons/star.png')}

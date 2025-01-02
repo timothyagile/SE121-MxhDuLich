@@ -17,6 +17,7 @@ interface DailySectionProps {
 export default function DailySection({ categoryId }: DailySectionProps) {
 
     const [locations, setLocations] = useState<any[]>([]);
+    const [RCM, setRCM] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -28,6 +29,7 @@ export default function DailySection({ categoryId }: DailySectionProps) {
     if (categoryId) {
       fetchPopularLocations(categoryId);
     }
+    fetchRecommendedLocations();
 }, [categoryId]);  
 
     const fetchPopularLocations = async (id: string) => {
@@ -45,6 +47,41 @@ export default function DailySection({ categoryId }: DailySectionProps) {
             console.error("Fetch error:", error);
         }
         finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchRecommendedLocations = async () => {
+        try {
+            // Fetch danh sách các location được đề xuất
+            const response = await fetch(`${API_BASE_URL}/recommend`);
+            const data = await response.json();
+    
+            // if (data.isSuccess) {
+                console.log('RCM: ',data.recommendations);
+
+                // Duyệt qua từng location id và gọi API getlocationbyid để lấy thông tin chi tiết
+                    const locationDetailsPromises = data.recommendations.map(async (location:any) => {
+                        console.log('location id:', location.id);
+                        const locationResponse = await fetch(`${API_BASE_URL}/locationbyid/${location.id}`);
+                        const locationData = await locationResponse.json();
+                        console.log('location data: ', locationData);
+                        return locationData;
+                    });
+    
+                // Đợi tất cả các lời hứa (promises) hoàn thành và lấy dữ liệu chi tiết của tất cả các location
+                const locationsWithDetails = await Promise.all(locationDetailsPromises);
+
+                console.log('BCCCC',locationsWithDetails)
+                // Lưu dữ liệu chi tiết vào state
+                setRCM(locationsWithDetails);
+            // } 
+            // else {
+            //     console.error("Error fetching popular locations:", data.error);
+            // }
+        } catch (error) {
+            console.error("Fetch error:", error);
+        } finally {
             setLoading(false);
         }
     };
@@ -78,27 +115,26 @@ export default function DailySection({ categoryId }: DailySectionProps) {
         <View>
             <Text style = {styles.titleText}>Gợi ý hằng ngày</Text>
             <View style = {styles.container}>
-                {locations.map((item, index) => {
+                {RCM.map((item, index) => {
                     return (
                     <TouchableOpacity
                         key={index}
-                         style = {{
+                        style = {{
                         marginLeft: 24,
-                        marginRight:  index === locations.length - 1 ? 24 : 0}}>
+                        marginRight:  index === RCM.length - 1 ? 24 : 0}}>
                         <View style={[styles.card]}>
                             <View style={styles.imageBox}>
-                                <Image style={styles.image} source={item.image} />
+                                <Image style={styles.image} source={item.data?.image || require('../../assets/images/bai-truoc-20.jpg')} />
                             </View>
                             <View style={styles.footer}>
                                 <View>
-                                    <Text style={[styles.textStyle, {fontSize: 20}]}>{item.name}</Text>
+                                    <Text style={[styles.textStyle, {fontSize: 20}]}>{item.data?.name || 'Khách sạn mới'}</Text>
                                 </View>
                             </View>
                         </View>
                     </TouchableOpacity>
                     );
                 })}
-
             </View>
         </View>
     )

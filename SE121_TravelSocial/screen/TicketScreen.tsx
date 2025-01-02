@@ -9,6 +9,7 @@ import axios from 'axios';
 export default function TicketScreen() {
   const { userId } = useUser();
   const [tickets, setTickets] = useState<any[]>([]);
+  const [locationId, setLocationId] = useState('');
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -39,10 +40,14 @@ export default function TicketScreen() {
 
             // Gọi API location để lấy tên địa điểm
             const location = room && room.locationId ? await fetchLocationDetails(room.locationId) : null;
-
+            console.log('location to image: ',location)
+            const imageUrl = location && location.image && location.image?.[0]?.url ? location.image?.[0].url : 'https://via.placeholder.com/150';
+            // console.log('location iamge 0: ', location.image[0].url)
+            setLocationId(room.locationId);
             return {
               ...ticket,
-              locationName: location ? location.name : 'Unknown Location', // Bổ sung tên địa điểm
+              locationName: location ? location.name : 'Unknown Location',
+              imageUrl: imageUrl, // Bổ sung tên địa điểm
             };
           })
         );
@@ -223,6 +228,7 @@ export default function TicketScreen() {
                 imageUrl={item.imageUrl || 'https://via.placeholder.com/150'}
                 onCancel={() => console.log(`Cancel ticket: ${item._id}`)}
                 bookingId={item._id}
+                locationId={locationId}
                 />
             )}
             refreshControl={

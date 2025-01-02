@@ -4,6 +4,7 @@ import { NavigationProp } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Alert, Modal, TextInput } from 'react-native';
+import { Icon } from 'react-native-paper';
 
 interface TicketProps {
   title: string;
@@ -12,10 +13,10 @@ interface TicketProps {
   onCancel: () => void;
   imageUrl: string;
   bookingId: string;
-  
+  locationId: string;
 }
 
-const Ticket: React.FC<TicketProps> = ({ title, date, status, onCancel, imageUrl, bookingId }) => {
+const Ticket: React.FC<TicketProps> = ({ title, date, status, onCancel, imageUrl, bookingId, locationId }) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [modalVisible, setModalVisible] = useState(false);
   const [rating, setRating] = useState('');
@@ -31,13 +32,13 @@ const Ticket: React.FC<TicketProps> = ({ title, date, status, onCancel, imageUrl
   const handleSubmitBooking = async () => {
     try {
       // Gọi API để gửi đánh giá
-      const response = await fetch(`${API_BASE_URL}/reviews`, {
+      const response = await fetch(`${API_BASE_URL}/review`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          bookingId,
+          locationId,
           rating,
           review,
         }),
@@ -62,6 +63,10 @@ const Ticket: React.FC<TicketProps> = ({ title, date, status, onCancel, imageUrl
 
   const handleRebook = () => {
     // navigation.navigate('rebook-screen', { bookingId }); // Điều hướng tới màn hình đặt lại
+  };
+
+  const handleStarPress = (value:any) => {
+    setRating(value);
   };
 
   const handleCancelBooking = () => {
@@ -114,7 +119,7 @@ const Ticket: React.FC<TicketProps> = ({ title, date, status, onCancel, imageUrl
   switch (status) {
     case 'pending':
       statusText = 'Chờ duyệt';
-      statusColor = 'F4C726';
+      statusColor = '#F4C726';
       buttonText = 'Hủy';
       buttonColor = '#F45B69';
       buttonAction = handleCancelBooking;
@@ -126,9 +131,9 @@ const Ticket: React.FC<TicketProps> = ({ title, date, status, onCancel, imageUrl
       buttonColor = '#F45B69';
       buttonAction = handleCancelBooking;
       break;
-    case 'finished':
-      statusText = 'Hoàn thành';
-      statusColor = '3FC28A';
+    case 'complete':
+      statusText = 'Hoàn tất';
+      statusColor = '#3FC28A';
       buttonText = 'Đánh giá';
       buttonColor = '#007AFF'; // Xanh dương đậm
       buttonAction = handleRateBooking;
@@ -186,14 +191,20 @@ const Ticket: React.FC<TicketProps> = ({ title, date, status, onCancel, imageUrl
               onChangeText={setReview}
               multiline
             />
-            <TextInput
-              style={styles.input}
-              placeholder="Nhập số sao (1-5)"
-              value={rating}
-              onChangeText={setRating}
-              keyboardType="numeric"
-              maxLength={1}
-            />
+            <View style={styles.starsContainer}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <TouchableOpacity key={star} onPress={() => handleStarPress(star)}>
+                   <Image
+                    source={
+                      star <= parseFloat(rating)
+                        ? require('../../assets/icons/star.png') // Ngôi sao đầy
+                        : require('../../assets/icons/emptystar.png') // Ngôi sao rỗng
+                    }
+                    style={styles.star}
+                  />
+                </TouchableOpacity>
+              ))}
+            </View>
             <View style={styles.buttonRow}>
               <TouchableOpacity
                 style={styles.cancelButton}
@@ -227,6 +238,16 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 20,
     overflow: 'hidden',
+  },
+  starsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginVertical: 10,
+  },
+  star: {
+    width:40,
+    height:40,
+    marginHorizontal: 5,
   },
   image: {
     width: '100%',
@@ -330,7 +351,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   submitButton: {
-    backgroundColor: '#28a745',
+    backgroundColor: '#196EEE',
     padding: 10,
     borderRadius: 5,
     flex: 1,

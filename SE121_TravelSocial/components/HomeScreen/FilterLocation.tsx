@@ -14,7 +14,10 @@ interface Location {
   _id: string;
   name: string;
   rating: number;
-  imageUrl: string;
+  image:{
+    url: string;
+    publicId: string;
+  } [];
 }
 
 interface FilterLocationProps {
@@ -60,7 +63,7 @@ const FilterLocation: React.FC<FilterLocationProps> = ({ query, onSelect }) => {
     return (
       <TouchableOpacity onPress={() => onSelect(item)} style={styles.locationItem}>
         <View style={styles.imageContainer}>
-          <Image source={{ uri: item.imageUrl  }} style={styles.locationImage} />
+          <Image source={{  uri: item.image?.[0]?.url }} style={styles.locationImage} />
         </View>
         <View style={styles.content}>
             <Text style={styles.locationName}>{item.name}</Text>
