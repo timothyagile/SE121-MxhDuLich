@@ -145,7 +145,7 @@ export default function CollectionScreen ()
 
                   data={[...collections, { _id: 'add-new', name: 'Thêm mới', isAddNew: true }]}
                   keyExtractor={(item) => item._id}
-                  renderItem={({ item }) =>
+                  renderItem={({ item, index }) =>
                     item.isAddNew ? (
                       // Giao diện ô "Thêm mới"
                       <View style={{ width: '50%', alignItems: 'center', marginVertical: 10 }}>
@@ -165,7 +165,7 @@ export default function CollectionScreen ()
                       <View style={{ width: '50%', alignItems: 'center', marginVertical: 10 }}>
                         <TouchableOpacity style={styles.square} onPress={() => handleCollectionClick(item._id)}>
                           <Image
-                            source={getRandomImage()}
+                            source={images[index % images.length]}
                             style={{width:150, height:150, borderRadius:20}}
                           />
                         </TouchableOpacity>

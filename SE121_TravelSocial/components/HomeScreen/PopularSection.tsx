@@ -177,7 +177,7 @@ const fetchPopularLocations = async (id: string) => {
 
   return (
     <View style={{height:CARD_HEIGHT+70}}>
-      <Text style={styles.titleText}>Phổ biến</Text>
+      <Text style={styles.titleText}>Danh mục</Text>
       <Animated.FlatList
         data={locations}
         horizontal

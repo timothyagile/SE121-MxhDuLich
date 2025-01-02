@@ -11,6 +11,7 @@ import { Icon } from 'react-native-paper';
 import {iconMapping} from '../../constants/icon';
 import CustomModal from '@/components/CollectionScreen/AddIntoCollection';
 import ImageCarousel from '@/components/HomeScreen/ImageCarousel';
+import Recommendation from '@/components/DetailScreen/Recommendation';
 
 
 const { width, height } = Dimensions.get('window');
@@ -506,7 +507,7 @@ const facilityIcons: FacilityIcons = {
             )}
           </View>
 
-            {/* Giá và nút đặt */}
+            <Recommendation locationId={id} navigation={navigation}/>
             
           </View>   
             </ScrollView>

@@ -73,7 +73,6 @@ export default function DailySection({ categoryId }: DailySectionProps) {
                 const locationsWithDetails = await Promise.all(locationDetailsPromises);
 
                 console.log('BCCCC',locationsWithDetails)
-    
                 // Lưu dữ liệu chi tiết vào state
                 setRCM(locationsWithDetails);
             // } 
@@ -86,12 +85,6 @@ export default function DailySection({ categoryId }: DailySectionProps) {
             setLoading(false);
         }
     };
-
-
-    
-    
-
-
 
     const getAllLocations = async () => {
         try {
@@ -122,20 +115,20 @@ export default function DailySection({ categoryId }: DailySectionProps) {
         <View>
             <Text style = {styles.titleText}>Gợi ý hằng ngày</Text>
             <View style = {styles.container}>
-                {locations.map((item, index) => {
+                {RCM.map((item, index) => {
                     return (
                     <TouchableOpacity
                         key={index}
                         style = {{
                         marginLeft: 24,
-                        marginRight:  index === locations.length - 1 ? 24 : 0}}>
+                        marginRight:  index === RCM.length - 1 ? 24 : 0}}>
                         <View style={[styles.card]}>
                             <View style={styles.imageBox}>
-                                <Image style={styles.image} source={item.image} />
+                                <Image style={styles.image} source={item.data?.image || require('../../assets/images/bai-truoc-20.jpg')} />
                             </View>
                             <View style={styles.footer}>
                                 <View>
-                                    <Text style={[styles.textStyle, {fontSize: 20}]}>{item.name}</Text>
+                                    <Text style={[styles.textStyle, {fontSize: 20}]}>{item.data?.name || 'Khách sạn mới'}</Text>
                                 </View>
                             </View>
                         </View>

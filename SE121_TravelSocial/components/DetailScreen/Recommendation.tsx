@@ -13,12 +13,11 @@ type LikedItems = {
 };
 
 interface PopularSectionProps {
-    categoryId: string | undefined;
     navigation: any;
+    locationId: string;
   }
 
-
-export default function RecommendedSection({ categoryId, navigation }: PopularSectionProps) {
+export default function Recommendation({ navigation, locationId }: PopularSectionProps) {
     const [likedItems, setLikedItems] = useState<LikedItems>({});
     const [locations, setLocations] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -30,29 +29,62 @@ export default function RecommendedSection({ categoryId, navigation }: PopularSe
         }));
     };
 
-    const getAllLocations = async () => {
-        try {
-            const ipAddress = await Network.getIpAddressAsync();
-            console.log('Device IP Address:', ipAddress);
-            const response = await fetch(`${API_BASE_URL}/alllocation`); 
-            
-            const data = await response.json();
-
-            if (data.isSuccess) {
-                setLocations(data.data); 
-            } else {
-                console.error(data.error);
-            }
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
-        getAllLocations();
-    }, []);
+        const fetchRecommendations = async () => {
+          try {
+            console.log("location: ", locationId);
+      
+            // Gửi request để lấy danh sách ID
+            const response = await fetch(`${API_BASE_URL}/othermayyoulike`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                visitorId: "visitor123",
+                userId: "user456",
+                productId: locationId,
+              }),
+            });
+      
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+      
+            // Parse JSON từ phản hồi
+            const data = await response.json();
+            console.log('Recommendations IDs:', data.recommendations);
+      
+
+                    const locationDetailsPromises = data.recommendations.map(async (location:any) => {
+                        console.log('location id:', location.id);
+                        const locationResponse = await fetch(`${API_BASE_URL}/locationbyid/${location.id}`);
+                        const locationData = await locationResponse.json();
+                        console.log('location data: ', locationData);
+                        return locationData;
+                    }); 
+                    const locationsWithDetails = await Promise.all(locationDetailsPromises);
+                    console.log('BCCCC: ',locationsWithDetails)
+          
+            // Gọi API để lấy chi tiết từng location
+            // const locationDetails = await Promise.all(
+            //   data.recommendations.map((id: string) =>
+            //     fetch(`${API_BASE_URL}/locationbyid/${id}`).then((res) => res.json())
+            //   )
+            // );
+      
+            // console.log('Location details:', locationDetails);
+            setLocations(locationsWithDetails);
+          } catch (error) {
+            console.error('Error fetching recommendations:', error);
+          } finally {
+            setLoading(false);
+          }
+        };
+      
+        fetchRecommendations();
+      }, [locationId]);
+      
 
     if (loading) {
         return <ActivityIndicator size="large" color="#0000ff" />; // Hiển thị loading indicator
@@ -61,17 +93,17 @@ export default function RecommendedSection({ categoryId, navigation }: PopularSe
     return (
 
         <View style={{height:CARD_HEIGHT+50}}>
-            <Text style = {styles.titleText}>Phổ biến</Text>
+            <Text style = {styles.titleText}>Có thể bạn sẽ thích</Text>
             <FlatList
             data={locations}
             
             horizontal
             snapToInterval={CARD_WIDTH_SPACING}
             decelerationRate={"fast"}
-            keyExtractor={item => item._id}
+            keyExtractor={item => item?._id}
             renderItem={({item, index}) => {
                 return (
-                    <TouchableOpacity onPress={() => navigation.navigate('detail-screen', { id: item._id })} style = {[
+                    <TouchableOpacity onPress={() => navigation.navigate('detail-screen', { id: item?._id })} style = {[
                         styles.cardContainer,
                         {
                         marginLeft: 24,
@@ -80,8 +112,8 @@ export default function RecommendedSection({ categoryId, navigation }: PopularSe
                             <View style = {[styles.imageBox, ]}>
                             <Image
                             source={
-                            item?.image?.[0]?.url
-                                ? { uri: item.image[0].url }
+                            item?.data?.image
+                                ? { uri: item?.data.image?.[0].url}
                                 : require('@/assets/images/bai-truoc-20.jpg') // Hình ảnh mặc định
                             }
                             
@@ -91,7 +123,7 @@ export default function RecommendedSection({ categoryId, navigation }: PopularSe
                                     <View style = {[styles.textBox, {top: 10, width: 70}]}>
                                         <Image source={require('@/assets/icons/star.png')}
                                         style = {styles.star}></Image>
-                                        <Text style = {[styles.textrating, {fontSize: 15}]}>{item.rating}</Text>
+                                        <Text style = {[styles.textrating, {fontSize: 15}]}>{item?.data?.rating}</Text>
                                     </View>
                                     
                                     <TouchableOpacity onPress={()=>handlePress(item._id.toString())} style= {[styles.textBox2,{ bottom: 25,}]}>
@@ -105,7 +137,7 @@ export default function RecommendedSection({ categoryId, navigation }: PopularSe
                             </View>
                             <View style = {styles.footer}>
                                 <View>
-                                    <Text style = {[styles.textStyle, {fontSize: 14}]}>{item.name}</Text>
+                                    <Text style = {[styles.textStyle, {fontSize: 14}]}>{item?.data?.name}</Text>
                                 </View>
                                 <View style = {[styles.textBox,{borderWidth:3, borderColor:'white'}]}>
                                     <Text style = {[styles.textStyle2, {marginHorizontal: 5, color: 'white'}]}>hot deal</Text>
@@ -141,8 +173,8 @@ const styles = StyleSheet.create({
     titleText: {
         fontSize: 24,
         fontWeight: 'bold',
-        left: 20
-
+        left: 20,
+        marginBottom: 20,
     },
     card: {
         width: CARD_WIDTH,
