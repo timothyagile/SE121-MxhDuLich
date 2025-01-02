@@ -47,6 +47,7 @@ module.exports.getReviewByLocationId = async (req, res, next) => {
 
 module.exports.createReview = async (req, res, next) => {
     try {
+        console.log(req.body)
         const {locationId, rating, review} = req.body
         const reviewData = new Review({
             locationId: locationId,

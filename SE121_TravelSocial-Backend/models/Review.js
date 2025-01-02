@@ -36,6 +36,8 @@ const reCaculateRating = async (oldRating, numberOfRating, newRating) => {
 
 ReviewSchema.pre('save', async function(next) {
     const location = await Location.findById(this.locationId)
+    if(!location)
+        throw new Error('Location not found')
     const rate = await reCaculateRating(location.rating, location.numberOfRating, this.rating)
     location.rating = rate
     location.numberOfRating += 1
