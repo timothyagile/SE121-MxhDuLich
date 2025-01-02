@@ -128,7 +128,7 @@ export default function DailySection({ categoryId }: DailySectionProps) {
                             </View>
                             <View style={styles.footer}>
                                 <View>
-                                    <Text style={[styles.textStyle, {fontSize: 20}]}>{item.data?.name || 'Khách sạn mới'}</Text>
+                                    <Text style={[styles.textStyle, {fontSize: 16}]}>{item.data?.name || 'Khách sạn mới'}</Text>
                                 </View>
                             </View>
                         </View>
@@ -149,7 +149,8 @@ const styles = StyleSheet.create({
     titleText: {
         fontSize: 24,
         fontWeight: 'bold',
-        left: 20
+        left: 20,
+        marginBottom: 10,
         
     },
     card: {
@@ -177,6 +178,7 @@ const styles = StyleSheet.create({
         height: 30,
     },
     textStyle: {
+        marginTop: 6,
         fontWeight: 'medium',
         color: 'black',
         marginLeft: 5,

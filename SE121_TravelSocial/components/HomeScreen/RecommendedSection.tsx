@@ -141,7 +141,8 @@ const styles = StyleSheet.create({
     titleText: {
         fontSize: 24,
         fontWeight: 'bold',
-        left: 20
+        left: 20,
+        marginBottom:10,
 
     },
     card: {
@@ -187,8 +188,8 @@ const styles = StyleSheet.create({
         bottom:25,
     },
     star: {
-        width: 24,
-        height: 24,
+        width: 18,
+        height: 18,
         left: 10
     },
     heart: {

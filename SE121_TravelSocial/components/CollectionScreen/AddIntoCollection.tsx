@@ -5,6 +5,15 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useEffect, useState } from 'react';
 import { Modal, View, Text, TouchableOpacity, Image, StyleSheet, Dimensions, ScrollView, ActivityIndicator, FlatList, Alert } from 'react-native';
 import { useUser } from '@/context/UserContext';
+import image1 from '../../assets/collectionavts/image1.png';
+import image2 from '../../assets/collectionavts/Collecting-pana.png'
+import image3 from '../../assets/collectionavts/Collecting-rafiki.png'
+import image4 from '../../assets/collectionavts/Collection-amico.png'
+import image5 from '../../assets/collectionavts/Collection-pana.png'
+import image6 from '../../assets/collectionavts/Online connection-pana.png'
+import image7 from '../../assets/collectionavts/Trip-bro.png'
+
+const images = [image1, image2, image3, image4, image5, image6, image7];
 
 interface CustomModalProps {
     visible: boolean; 
@@ -105,7 +114,7 @@ const CustomModal: React.FC<CustomModalProps> = ({ visible, onClose, onSelectCol
                         <FlatList
                           data={[...collections, { _id: "add-new", name: "Thêm mới", isAddNew: true }]}
                           keyExtractor={(item) => item._id}
-                          renderItem={({ item }) =>
+                          renderItem={({ item, index }) =>
                             item.isAddNew ? (
                               // Giao diện ô "Thêm mới"
                               <View style={{ width: "50%", alignItems: "center", marginVertical: 10 }}>
@@ -130,9 +139,7 @@ const CustomModal: React.FC<CustomModalProps> = ({ visible, onClose, onSelectCol
                                   onPress={() => handleCollectionClick(item._id)}
                                 >
                                   <Image
-                                    source={{
-                                      uri: item.imageUrl || "https://via.placeholder.com/150",
-                                    }}
+                                    source={images[index % images.length]}
                                     style={{ width: 150, height: 150, borderRadius: 20 }}
                                   />
                                 </TouchableOpacity>

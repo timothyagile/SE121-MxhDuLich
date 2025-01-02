@@ -108,7 +108,7 @@ export default function Recommendation({ navigation, locationId }: PopularSectio
                         {
                         marginLeft: 24,
                         marginRight:  index === locationData.length - 1 ? 24 : 0}]}>
-                        <View>
+                        <View style={{width: 224}}>
                             <View style = {[styles.imageBox, ]}>
                             <Image
                             source={
@@ -135,12 +135,12 @@ export default function Recommendation({ navigation, locationId }: PopularSectio
                                     </TouchableOpacity>
                                 </View>
                             </View>
-                            <View style = {styles.footer}>
-                                <View>
+                            <View style = {[styles.footer,{}]}>
+                                <View style ={{ width:150}}>
                                     <Text style = {[styles.textStyle, {fontSize: 14}]}>{item?.data?.name}</Text>
                                 </View>
-                                <View style = {[styles.textBox,{borderWidth:3, borderColor:'white'}]}>
-                                    <Text style = {[styles.textStyle2, {marginHorizontal: 5, color: 'white'}]}>hot deal</Text>
+                                <View style = {[styles.textBox,{borderWidth:3, borderColor:'white',}]}>
+                                    <Text style = {[styles.textStyle2, {marginHorizontal: 5, color: 'white' }]}>hot deal</Text>
                                 </View>
                             </View>
                         </View>
@@ -219,8 +219,8 @@ const styles = StyleSheet.create({
         bottom:25,
     },
     star: {
-        width: 24,
-        height: 24,
+        width: 18,
+        height: 18,
         left: 10
     },
     heart: {
@@ -229,12 +229,14 @@ const styles = StyleSheet.create({
         left: 10
     },
     textStyle: {
+        
         fontWeight: 'medium',
         color: 'black',
         marginLeft: 5,
         left:7,
         top:2,
         marginVertical: 2,
+        
     },
     textrating: {
         fontWeight: 'medium',
