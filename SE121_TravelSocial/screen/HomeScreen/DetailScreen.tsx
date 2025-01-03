@@ -96,6 +96,8 @@ const facilityIcons: FacilityIcons = {
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loadingReviews, setLoadingReviews] = useState(false);
     const [userNames, setUserNames] = useState<{ [key: string]: string }>({});
+    const [reviewCount, setReviewCount] = useState(0);
+
 
 
     const showDatePicker1 = () => {
@@ -174,9 +176,9 @@ const facilityIcons: FacilityIcons = {
     };
 
     //Gọi hàm lấy tọa độ khi component được render
-    // useEffect(() => {
-    //     getCoordinatesFromAddress(ADDRESS);
-    // }, []);
+    useEffect(() => {
+        getCoordinatesFromAddress(ADDRESS);
+    }, []);
 
     useEffect(() => {
       console.log(locationDetails?.address)
@@ -233,9 +235,9 @@ const facilityIcons: FacilityIcons = {
           console.log('room',result.data);
           const allServices = result.data.flatMap((room: any) => room.facility || []);
           console.log('service: ',allServices);
-          const uniqueServices = Array.from(new Set(allServices.map((service: any) => service.name)))
-                                  .map((name) => {
-                                    return allServices.find((service: any) => service.name === name); // Lấy thông tin dịch vụ
+          const uniqueServices = Array.from(new Set(allServices.map((service: any) => service.id)))
+                                  .map((id) => {
+                                    return allServices.find((service: any) => service.id === id); // Lấy thông tin dịch vụ
                                   }); // Loại bỏ dịch vụ trùng lặp
           setServices(uniqueServices);
         } else {
@@ -273,6 +275,7 @@ const facilityIcons: FacilityIcons = {
           const result = await response.json();
     
           if (response.ok && result.isSuccess) {
+            setReviewCount(result.data.length);
             setReviews(result.data);
             const userPromises = result.data.map(async (review: any) => {
               const userResponse = await fetch(`${API_BASE_URL}/user/getbyid/${review.senderId}`);
@@ -364,7 +367,7 @@ const facilityIcons: FacilityIcons = {
             
             <View style={styles.rating}>
               <FontAwesome name="star" size={16} color="#FFD700" />
-              <Text style={styles.ratingText}>{locationDetails?.rating || '4'} ({locationDetails?.reviews || 1} Đánh giá)</Text>
+              <Text style={styles.ratingText}>{locationDetails?.rating || '0'} ({reviewCount || 0} Đánh giá)</Text>
             </View>
             <View>
             <Text style={styles.description}  

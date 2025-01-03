@@ -49,6 +49,9 @@ app.use((req, res, next) => {
 //View engine
 app.set('view engine', 'ejs')
 
+app.use(cors());
+
+
 //Database connection
 
 const mongoURL = "mongodb+srv://thinhnguyenphuc:6RUfHulVdn6qLyO8@thinhnguyenphuc.dxqeq.mongodb.net/TravelSocial?retryWrites=true&w=majority&appName=thinhnguyenphuc";

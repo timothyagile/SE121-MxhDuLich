@@ -20,7 +20,7 @@ interface PopularSectionProps {
 export default function Recommendation({ navigation, locationId }: PopularSectionProps) {
     const [likedItems, setLikedItems] = useState<LikedItems>({});
     const [locations, setLocations] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     const handlePress = (id: string) => {
         setLikedItems((prevState) => ({
@@ -29,61 +29,85 @@ export default function Recommendation({ navigation, locationId }: PopularSectio
         }));
     };
 
-    useEffect(() => {
-        const fetchRecommendations = async () => {
-          try {
-            console.log("location: ", locationId);
+    // useEffect(() => {
+    //     const fetchRecommendations = async () => {
+    //       try {
+    //         console.log("location: ", locationId);
       
-            // Gửi request để lấy danh sách ID
-            const response = await fetch(`${API_BASE_URL}/othermayyoulike`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                visitorId: "visitor123",
-                userId: "user456",
-                productId: locationId,
-              }),
-            });
+    //         // Gửi request để lấy danh sách ID
+    //         const response = await fetch(`${API_BASE_URL}/othermayyoulike`, {
+    //           method: 'POST',
+    //           headers: {
+    //             'Content-Type': 'application/json',
+    //           },
+    //           body: JSON.stringify({
+    //             visitorId: "visitor123",
+    //             userId: "user456",
+    //             productId: locationId,
+    //           }),
+    //         });
       
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
+    //         if (!response.ok) {
+    //           throw new Error(`HTTP error! status: ${response.status}`);
+    //         }
       
-            // Parse JSON từ phản hồi
-            const data = await response.json();
-            console.log('Recommendations IDs:', data.recommendations);
+    //         // Parse JSON từ phản hồi
+    //         const data = await response.json();
+    //         console.log('Recommendations IDs:', data.recommendations);
       
 
-                    const locationDetailsPromises = data.recommendations.map(async (location:any) => {
-                        console.log('location id:', location.id);
-                        const locationResponse = await fetch(`${API_BASE_URL}/locationbyid/${location.id}`);
-                        const locationData = await locationResponse.json();
-                        console.log('location data: ', locationData);
-                        return locationData;
-                    }); 
-                    const locationsWithDetails = await Promise.all(locationDetailsPromises);
-                    console.log('BCCCC: ',locationsWithDetails)
+    //                 const locationDetailsPromises = data.recommendations.map(async (location:any) => {
+    //                     console.log('location id:', location.id);
+    //                     const locationResponse = await fetch(`${API_BASE_URL}/locationbyid/${location.id}`);
+    //                     const locationData = await locationResponse.json();
+    //                     console.log('location data: ', locationData);
+    //                     return locationData;
+    //                 }); 
+    //                 const locationsWithDetails = await Promise.all(locationDetailsPromises);
+    //                 console.log('BCCCC: ',locationsWithDetails)
           
-            // Gọi API để lấy chi tiết từng location
-            // const locationDetails = await Promise.all(
-            //   data.recommendations.map((id: string) =>
-            //     fetch(`${API_BASE_URL}/locationbyid/${id}`).then((res) => res.json())
-            //   )
-            // );
+    //         // Gọi API để lấy chi tiết từng location
+    //         // const locationDetails = await Promise.all(
+    //         //   data.recommendations.map((id: string) =>
+    //         //     fetch(`${API_BASE_URL}/locationbyid/${id}`).then((res) => res.json())
+    //         //   )
+    //         // );
       
-            // console.log('Location details:', locationDetails);
-            setLocations(locationsWithDetails);
-          } catch (error) {
-            console.error('Error fetching recommendations:', error);
-          } finally {
-            setLoading(false);
-          }
+    //         // console.log('Location details:', locationDetails);
+    //         setLocations(locationsWithDetails);
+    //       } catch (error) {
+    //         console.error('Error fetching recommendations:', error);
+    //       } finally {
+    //         setLoading(false);
+    //       }
+    //     };
+      
+    //     fetchRecommendations();
+    //   }, [locationId]);
+
+     const getAllLocations = async () => {
+            try {
+                const ipAddress = await Network.getIpAddressAsync();
+                console.log('Device IP Address:', ipAddress);
+                const response = await fetch(`${API_BASE_URL}/alllocation`); 
+                
+                const data = await response.json();
+    
+                if (data.isSuccess) {
+                    setLocations(data.data); 
+                } else {
+                    console.error(data.error);
+                }
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
         };
-      
-        fetchRecommendations();
-      }, [locationId]);
+
+    useEffect(() => {
+        getAllLocations();
+    }, [locationId]);
       
 
     if (loading) {
@@ -108,12 +132,12 @@ export default function Recommendation({ navigation, locationId }: PopularSectio
                         {
                         marginLeft: 24,
                         marginRight:  index === locationData.length - 1 ? 24 : 0}]}>
-                        <View>
+                        <View style={{width: 224}}>
                             <View style = {[styles.imageBox, ]}>
                             <Image
                             source={
-                            item?.data?.image
-                                ? { uri: item?.data.image?.[0].url}
+                            item?.image
+                                ? { uri: item?.image?.[0]?.url}
                                 : require('@/assets/images/bai-truoc-20.jpg') // Hình ảnh mặc định
                             }
                             
@@ -123,7 +147,7 @@ export default function Recommendation({ navigation, locationId }: PopularSectio
                                     <View style = {[styles.textBox, {top: 10, width: 70}]}>
                                         <Image source={require('@/assets/icons/star.png')}
                                         style = {styles.star}></Image>
-                                        <Text style = {[styles.textrating, {fontSize: 15}]}>{item?.data?.rating}</Text>
+                                        <Text style = {[styles.textrating, {fontSize: 15}]}>{item?.rating}</Text>
                                     </View>
                                     
                                     <TouchableOpacity onPress={()=>handlePress(item._id.toString())} style= {[styles.textBox2,{ bottom: 25,}]}>
@@ -135,12 +159,12 @@ export default function Recommendation({ navigation, locationId }: PopularSectio
                                     </TouchableOpacity>
                                 </View>
                             </View>
-                            <View style = {styles.footer}>
-                                <View>
-                                    <Text style = {[styles.textStyle, {fontSize: 14}]}>{item?.data?.name}</Text>
+                            <View style = {[styles.footer,{}]}>
+                                <View style ={{ width:150}}>
+                                    <Text style = {[styles.textStyle, {fontSize: 14}]}>{item?.name}</Text>
                                 </View>
-                                <View style = {[styles.textBox,{borderWidth:3, borderColor:'white'}]}>
-                                    <Text style = {[styles.textStyle2, {marginHorizontal: 5, color: 'white'}]}>hot deal</Text>
+                                <View style = {[styles.textBox,{borderWidth:3, borderColor:'white',}]}>
+                                    <Text style = {[styles.textStyle2, {marginHorizontal: 5, color: 'white' }]}>hot deal</Text>
                                 </View>
                             </View>
                         </View>
@@ -219,8 +243,8 @@ const styles = StyleSheet.create({
         bottom:25,
     },
     star: {
-        width: 24,
-        height: 24,
+        width: 18,
+        height: 18,
         left: 10
     },
     heart: {
@@ -229,12 +253,14 @@ const styles = StyleSheet.create({
         left: 10
     },
     textStyle: {
+        
         fontWeight: 'medium',
         color: 'black',
         marginLeft: 5,
         left:7,
         top:2,
         marginVertical: 2,
+        
     },
     textrating: {
         fontWeight: 'medium',
