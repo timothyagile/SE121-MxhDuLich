@@ -47,7 +47,7 @@ const FilterLocation: React.FC<FilterLocationProps> = ({ query, onSelect }) => {
         if (data.isSuccess) {
           setFilterLocations(data.data);  // Update locations
         } else {
-          console.error('Error fetching locations:', data.error);
+          //sconsole.error('Error fetching locations:', data.error);
         }
       } catch (error) {
         console.error('Fetch error:', error);
