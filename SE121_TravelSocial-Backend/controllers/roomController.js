@@ -51,9 +51,11 @@ module.exports.createRoom = async (req, res, next) => {
         name,
         quantity,
         rating,
-        price,
+        pricePerNight,
+        capacity,
         description,
         facility,
+        area,
         bed,
         image, 
     } = req.body
@@ -62,9 +64,11 @@ module.exports.createRoom = async (req, res, next) => {
         name,
         quantity,
         rating,
-        price,
+        pricePerNight,
+        capacity,
         description,
         facility,
+        area,
         bed,
         image, 
     })
@@ -72,7 +76,7 @@ module.exports.createRoom = async (req, res, next) => {
         const savedRoom = await roomSvc.createRoom(roomData)
         res.status(201).json({
             isSuccess: true,
-            data: roomData,
+            data: savedRoom,
             error: null
         })
     }

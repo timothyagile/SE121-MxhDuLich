@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {Button, Text, View,  StyleSheet, Image, TouchableOpacity, TextInput, Alert} from 'react-native';
+import {KeyboardAvoidingView, Button, Text, View,  StyleSheet, Image, TouchableOpacity, TextInput, Alert, Platform} from 'react-native';
 //import CheckBox from '@react-native-community/checkbox';
 import Checkbox from 'expo-checkbox';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
@@ -9,8 +9,10 @@ export default function RegisterScreen2 ({navigation}: {navigation: NativeStackN
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [repassword, setRePassword] = useState('');
     const [toggleCheckBox, setToggleCheckBox] = useState(false);
     const [secureTextEntry, setSecureTextEntry] = useState(true);
+    const [secureTextEntry2, setSecureTextEntry2] = useState(true);
 
     const handleSignUp = async () => {
         if (!email || !password) {
@@ -55,94 +57,114 @@ export default function RegisterScreen2 ({navigation}: {navigation: NativeStackN
     
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.textsignup}>Đăng ký</Text>
-            <Text style={styles.text1}>Đăng ký bằng email và đăng nhập để tiếp tục sử dụng ứng dụng</Text>
-            <Text style={styles.text2}>Đăng ký với</Text>
+        
+            <View style={styles.container}>
+                <Text style={styles.textsignup}>Đăng ký</Text>
+                <Text style={styles.text1}>Đăng ký bằng email và đăng nhập để tiếp tục sử dụng ứng dụng</Text>
+                <Text style={styles.text2}>Đăng ký với</Text>
 
-            <View style={styles.buttonRow}>
+                <View style={styles.buttonRow}>
+                    <TouchableOpacity
+                        style={styles.circleButtonGoogle}
+                        onPress={() => navigation.navigate('main-screen')}
+                    >
+                        <Image source={require('../../assets/icons/icongoogle.png')} style={styles.buttonIcon} />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.circleButtonFacebook}
+                        onPress={() => navigation.navigate('main-screen')}
+                    >
+                        <Image source={require('../../assets/icons/iconfacebook.png')} style={styles.buttonIcon} />
+                    </TouchableOpacity>
+                </View>
+                <View style ={styles.backgroundinput}>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Nhập email"
+                        value={email}
+                        onChangeText={setEmail}
+                    />
+                </View>
+                
+                <View style ={styles.backgroundinput}>
+                    <TextInput
+                        style={styles.input2}
+                        placeholder="Nhập mật khẩu"
+                        value={password}
+                        onChangeText={setPassword}
+                        secureTextEntry={secureTextEntry}
+                    />
+
+                    <TouchableOpacity
+                    style={styles.icon}
+                    onPress={() => setSecureTextEntry(!secureTextEntry)}
+                    >
+                    <Image
+                        source={secureTextEntry ? require('../../assets/icons/closedeye.png'):require('../../assets/icons/openeye.png') }
+                        // style={styles.iconImage}
+                    />
+                    </TouchableOpacity>
+                </View>
+
+                <View style ={styles.backgroundinput}>
+                    <TextInput
+                        style={styles.input2}
+                        placeholder="Nhập lại mật khẩu"
+                        value={repassword}
+                        onChangeText={setRePassword}
+                        secureTextEntry={secureTextEntry2}
+                    />
+
+                    <TouchableOpacity
+                    style={styles.icon}
+                    onPress={() => setSecureTextEntry2(!secureTextEntry2)}
+                    >
+                    <Image
+                        source={secureTextEntry2 ? require('../../assets/icons/closedeye.png'):require('../../assets/icons/openeye.png') }
+                        // style={styles.iconImage}
+                    />
+                    </TouchableOpacity>
+                </View>
+
+                <View style={styles.checkboxContainer}>
+                    <Checkbox
+                        disabled={false}
+                        value={toggleCheckBox}
+                        onValueChange={handleCheckBox}
+                        style={styles.checkbox}
+                        color ={toggleCheckBox?'#196EEE' : undefined}
+                    />
+                    <TouchableOpacity onPress={handleCheckBox}>
+                        <Text style={styles.checkboxText}>Tôi đồng ý với chính sách</Text>
+                    </TouchableOpacity>
+                </View>
+
                 <TouchableOpacity
-                    style={styles.circleButtonGoogle}
-                    onPress={() => navigation.navigate('main-screen')}
+                    style={styles.signupButton}
+                    onPress={handleSignUp}
                 >
-                    <Image source={require('../../assets/icons/icongoogle.png')} style={styles.buttonIcon} />
+                    <Text style={styles.signupButtonText}>Đăng ký</Text>
                 </TouchableOpacity>
+                <View style={styles.buttonRow}>
+                <Text style={styles.text3}>Bạn đã có tài khoản? </Text>
                 <TouchableOpacity
-                    style={styles.circleButtonFacebook}
-                    onPress={() => navigation.navigate('main-screen')}
+                    style={styles.text4}
+                    onPress={() => navigation.navigate('register')}
                 >
-                    <Image source={require('../../assets/icons/iconfacebook.png')} style={styles.buttonIcon} />
+                    <Text style = {{fontSize:18,fontWeight:'bold',color:'#196EEE'}}> Đăng nhập</Text>
                 </TouchableOpacity>
-            </View>
-            <View style ={styles.backgroundinput}>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Nhập email"
-                    value={email}
-                    onChangeText={setEmail}
-                />
-            </View>
-            
-            <View style ={styles.backgroundinput}>
-                <TextInput
-                    style={styles.input2}
-                    placeholder="Nhập mật khẩu"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry={secureTextEntry}
-                />
+                
+                </View>
 
-                <TouchableOpacity
-                style={styles.icon}
-                onPress={() => setSecureTextEntry(!secureTextEntry)}
-                >
-                <Image
-                    source={secureTextEntry ? require('../../assets/icons/closedeye.png'):require('../../assets/icons/openeye.png') }
-                    // style={styles.iconImage}
-                />
-                </TouchableOpacity>
             </View>
-
-            <View style={styles.checkboxContainer}>
-                <Checkbox
-                    disabled={false}
-                    value={toggleCheckBox}
-                    onValueChange={handleCheckBox}
-                    style={styles.checkbox}
-                    color ={toggleCheckBox?'#196EEE' : undefined}
-                />
-                <TouchableOpacity onPress={handleCheckBox}>
-                    <Text style={styles.checkboxText}>Tôi đồng ý với chính sách</Text>
-                </TouchableOpacity>
-            </View>
-
-            <TouchableOpacity
-                style={styles.signupButton}
-                onPress={handleSignUp}
-            >
-                <Text style={styles.signupButtonText}>Đăng ký</Text>
-            </TouchableOpacity>
-            <View style={styles.buttonRow}>
-            <Text style={styles.text3}>Bạn đã có tài khoản? </Text>
-            <TouchableOpacity
-                style={styles.text4}
-                onPress={() => navigation.navigate('register')}
-            >
-                <Text style = {{fontSize:18,fontWeight:'bold',color:'#196EEE'}}> Đăng nhập</Text>
-            </TouchableOpacity>
-            
-            </View>
-
-        </View>
+        
     )
 }
 
 const styles = StyleSheet.create({
 
     container: {
-        
         flex: 1,
-        
         alignItems: 'center',
         backgroundColor: 'white',
     },
@@ -154,11 +176,11 @@ const styles = StyleSheet.create({
         textAlign:'left',
         width: '100%', 
         left: 30,
-        marginTop:115, 
+        marginTop:30, 
     },
 
     text1:{
-        marginTop:5,
+        
         textAlign:'left',
         width: '90%', 
         fontSize:18,

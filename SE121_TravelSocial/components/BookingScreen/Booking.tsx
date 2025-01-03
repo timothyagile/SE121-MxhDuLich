@@ -45,6 +45,7 @@ const Ticket: React.FC<TicketProps> = ({ title, date, status, onCancel, imageUrl
       });
 
       const result = await response.json();
+      console.log(response.json);
       if (result.isSuccess) {
         alert('Đánh giá đã được gửi!');
         setModalVisible(false); // Đóng modal sau khi gửi thành công
