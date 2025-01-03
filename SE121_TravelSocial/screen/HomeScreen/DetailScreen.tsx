@@ -176,9 +176,9 @@ const facilityIcons: FacilityIcons = {
     };
 
     //Gọi hàm lấy tọa độ khi component được render
-    // useEffect(() => {
-    //     getCoordinatesFromAddress(ADDRESS);
-    // }, []);
+    useEffect(() => {
+        getCoordinatesFromAddress(ADDRESS);
+    }, []);
 
     useEffect(() => {
       console.log(locationDetails?.address)

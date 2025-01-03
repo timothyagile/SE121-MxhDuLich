@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema;
 
 const facilitySchema = new Schema({
+    id: {type: String, default: null},
     name: { type: String, required: true },
     quantity: { type: Number, default: 1},
     icon: { type: String, default: null }, // có thể thay đổi thành type khác nếu cần
