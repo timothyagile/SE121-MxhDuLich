@@ -46,6 +46,11 @@ app.use((req, res, next) => {
     next();
   });
 
+  app.use(cors({
+    origin: 'http://localhost:3001', // Domain của frontend
+    credentials: true, // Cho phép gửi cookie
+  }));
+
 //View engine
 app.set('view engine', 'ejs')
 
