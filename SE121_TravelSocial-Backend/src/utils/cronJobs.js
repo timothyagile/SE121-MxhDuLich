@@ -1,11 +1,11 @@
 const cron = require('node-cron');
-const cloudinary = require('../config/cloudinaryConfig') 
-const Post = require('../models/socialModel/Post'); // Import model bài viết
+const cloudinary = require('../config/cloudinary.config') 
+const Post = require('../models/social/post.model'); // Import model bài viết
 
 const modelsWithImages = [
-    { model: require('../models/socialModel/Post'), field: 'images' },
-    { model: require('../models/generalModel/Location'), field: 'image' },
-    { model: require('../models/bookingModel/Room'), field: 'image' },
+    { model: require('../models/social/post.model'), field: 'images' },
+    { model: require('../models/general/location.model'), field: 'image' },
+    { model: require('../models/booking/room.model'), field: 'image' },
 ];
 
 const getAllUsedImages = async () => {
