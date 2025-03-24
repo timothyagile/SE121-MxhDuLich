@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const {db: {uri}} = require('../config/config.mongodb')
+const {db: {uri}} = require('../config/mongodb.config')
 const mongoURL = `mongodb+srv://${uri}`;
 
 
