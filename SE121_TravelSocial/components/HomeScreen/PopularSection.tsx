@@ -68,10 +68,14 @@ const fetchPopularLocations = async (id: string) => {
         console.log('Device IP Address:', ipAddress);
         const response = await fetch(`${API_BASE_URL}/locationbycategory/${id}`);
         const data = await response.json();
+        
         if (data.isSuccess) {
+
             setLocations(data.data);
+            console.log('popular:',data.data);
         } else {
-            console.error("Error fetching popular locations:", data.error);
+            setLocations([]);
+            // console.error("Error fetching popular locations:", data.error);
         }
     } catch (error) {
         console.error("Fetch error:", error);
@@ -131,9 +135,14 @@ const fetchPopularLocations = async (id: string) => {
         <TouchableOpacity onPress={() => navigation.navigate('detail-screen', { id: item._id })}>
           <View style={styles.imageBox}>
             <Image
-              source={require('@/assets/images/bai-truoc-20.jpg')}
+            source={
+              item?.image?.[0]?.url
+                  ? { uri: item.image[0].url }
+                  : require('@/assets/images/bai-truoc-20.jpg') // Hình ảnh mặc định
+              }
+              
               style={styles.image}
-            />
+            /> 
           </View>
           <View style={styles.titleBox}>
             <View style = {styles.textBox}>
@@ -142,7 +151,7 @@ const fetchPopularLocations = async (id: string) => {
             <View style={{flexDirection:'row', marginTop: 2}}>
                 <View style={styles.textBox}>
                 <Image
-                    source={require('@/assets/icons/star.png')}
+                    source={require('../../assets/icons/star.png')}
                     style={styles.star}
                 />
                 <Text style={[styles.textStyle, { fontSize: 12 }]}>{item.rating}</Text>
@@ -168,7 +177,7 @@ const fetchPopularLocations = async (id: string) => {
 
   return (
     <View style={{height:CARD_HEIGHT+70}}>
-      <Text style={styles.titleText}>Phổ biến</Text>
+      <Text style={styles.titleText}>Danh mục</Text>
       <Animated.FlatList
         data={locations}
         horizontal

@@ -18,7 +18,7 @@ interface Room {
     bedType: string;
     area: number; 
     quantity: number; 
-    price: number;
+    pricePerNight: number;
     nights:number;
     image: string[]; 
     description: string;
@@ -134,6 +134,7 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                   const isBooked = bookings.some((booking: any) => {
                     const bookingCheckin = new Date(booking.checkInDate).getTime();
                     const bookingCheckout = new Date(booking.checkOutDate).getTime();
+                    
                     const userCheckin = new Date(checkinDate).getTime();
                     const userCheckout = new Date(checkoutDate).getTime();
                     console.log('booking checkin: ',bookingCheckin);
@@ -142,9 +143,9 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                     console.log('user checkout: ',userCheckout);
                     
                     return (
-                      room._id === booking.roomId &&
+                      room._id === booking?.items?.roomId && 
                       ((userCheckin >= bookingCheckin && userCheckin <= bookingCheckout) ||
-                        (userCheckout >= bookingCheckin && userCheckout <= bookingCheckout))
+                        (userCheckout >= bookingCheckin && userCheckout <= bookingCheckout))  
                     );
                   });
       
@@ -223,7 +224,7 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
               count: selectedRoomCounts[roomId],
               roomDetails: {
                 name: room?.name || '',
-                price: room?.price || 0,
+                price: room?.pricePerNight || 0,
                 checkinDate: date1,
                 checkoutDate: date2
               },
@@ -383,7 +384,7 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                         <View style={styles.endcontainer}>
                             <View style={{ flex: 4 }}>
                                 <Text style={styles.area2}>Giá</Text>
-                                <Text style={styles.pricetext}>{room.price} VND</Text>
+                                <Text style={styles.pricetext}>{room.pricePerNight} VND</Text>
                             </View>
                             <View style={{ flex: 6, justifyContent: 'center', alignItems: 'center' }}>    
                                 <TouchableOpacity style={styles.choosebutton} onPress={() => toggleModal(room._id)}>

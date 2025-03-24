@@ -82,6 +82,7 @@ module.exports.createBooking = async (req, res, next) => {
         checkoutDate,
         items, //Item nhap data gom: id phong, so luong (default: 1), so dem
         services, //Service nhap data gom: id phong, so luong (default: 1), so dem
+        amountPaid,
     } = req.body
     
     try {
@@ -91,7 +92,8 @@ module.exports.createBooking = async (req, res, next) => {
             checkinDate,
             checkoutDate,
             items,
-            services,             
+            services,      
+            amountPaid,       
         })
         console.log(bookingData)    
         const result = await bookingSvc.createBooking(bookingData)
