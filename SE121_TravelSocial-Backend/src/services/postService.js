@@ -31,7 +31,7 @@ const create = async (postData) => {
 
     console.log("Post::", post);
 
-    const posts = await postRepository.create(post)
+    const savedPost = await postRepository.create(post)
 
     if(!savedPost) {
         throw new BadRequest();
