@@ -5,12 +5,18 @@ const postService = require('../../services/social/post.service')
 
 module.exports.createPost = async (req, res, next) => {
     try {
-        const {content, images, videos, locationId, privacyLevel, tripType, travelSeason, userTagIds, bannedUsers } = req.body;
+        const {content, images, videos, 
+            locationId, privacyLevel, tripType, 
+            travelSeason, userTagIds, bannedUsers, hashTags } = req.body;
         
         const authorId = res.locals.user._id;
         
         //Embbeding author, location, userTag
-        const postData = {authorId, content, locationId, images, videos, tripType, travelSeason, privacyLevel, userTagIds, bannedUsers}
+        const postData = {
+            authorId, content, locationId, 
+            images, videos, tripType, 
+            travelSeason, privacyLevel, 
+            userTagIds, bannedUsers, hashTags}
 
         console.log("Post data::", postData);
 
@@ -63,6 +69,17 @@ module.exports.getByLocationId = async (req, res) => {
 module.exports.getByAuthorId = async (req, res) => {
     const authorId = req.params.authorId
     const posts = await postService.getByAuthorId(authorId);
+
+    res.status(OK).json({
+        isSuccess: true,
+        data: posts,    
+        error: null
+    })
+}
+
+module.exports.getByHashTag = async (req, res) => {
+    const hashtag = req.params.hashtag
+    const posts = await postService.getByHashTag(hashtag);
 
     res.status(OK).json({
         isSuccess: true,

@@ -13,7 +13,10 @@ const populateOptions = [
 
 const create = async (postData) => {
 
-    const { authorId, content, locationId, images, videos, tripType, travelSeason, privacyLevel, userTagIds, bannedUsers } = postData;
+    const { authorId, content, locationId,
+         images, videos, tripType, 
+         travelSeason, privacyLevel, 
+         userTagIds, bannedUsers, hashTags } = postData;
 
     const [location, author] = await Promise.all([
         Location.findById(locationId).select('name'),
@@ -26,7 +29,7 @@ const create = async (postData) => {
         authorId, content, slug, 
         locationId, images, videos, 
         tripType, travelSeason, privacyLevel, 
-        userTagIds, bannedUsers
+        userTagIds, bannedUsers, hashTags
     })
 
     console.log("Post::", post);
@@ -85,13 +88,10 @@ const getByLocationId = async (locationId) => {
 // }
 
 
-// const getByHashTag = async (hashtag) => {
-//     const posts = await Post.find()
-//     if(posts.length === 0) {
-//         throw new NotFoundException();
-//     } 
-//     return posts;
-// }
+const getByHashTag = async (hashtag) => {
+    const posts = await postRepository.findPostByHashTag(hashtag)
+    return posts;
+}
 
 const getByAuthorId = async (authorId) => {
     const posts = await postRepository.findAll({authorId, isDeleted:false}, populateOptions)
@@ -134,6 +134,7 @@ module.exports = {
     getById,
     getByLocationId,
     getByAuthorId,
+    getByHashTag,
     update,
     deletePost
 }

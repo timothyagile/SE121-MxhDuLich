@@ -15,6 +15,7 @@ const VNPayRoute = require('./booking/vnpay.route')
 //Social route
 
 const postRoute = require('./social/post.route')
+const hashTagRoute = require('../routes/social/hashtag.route')
 
 //General
 
@@ -46,6 +47,7 @@ router.use('/', uploadImageRoute)
 router.use('/', conversationRoute)
 router.use('/', messageRoute)
 router.use('/', executeCronJobRoute)
+router.use('/', hashTagRoute)
 
 module.exports = router
 
