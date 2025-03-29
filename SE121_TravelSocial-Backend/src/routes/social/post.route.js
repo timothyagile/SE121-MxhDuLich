@@ -28,6 +28,8 @@ router.get('/posts/location/:locationId', asyncHandler(postController.getByLocat
 
 router.get('/posts/author/:authorId', asyncHandler(postController.getByAuthorId));
 
+router.get('/posts/hashtag/:hashtag', asyncHandler(postController.getByHashTag));
+
 router.put('/posts/:id', asyncHandler(postController.updatePost));
 
 /* Soft delete */

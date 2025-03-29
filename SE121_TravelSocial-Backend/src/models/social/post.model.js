@@ -79,6 +79,9 @@ var postSchema = new mongoose.Schema({
         ref: USER_REF,
         default: []
     },
+    hashTags: {
+        type: [String]
+    },
     stat: {
         viewCount: {
             type: Number,

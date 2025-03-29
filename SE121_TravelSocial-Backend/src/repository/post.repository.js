@@ -17,6 +17,16 @@ class PostRepository extends BaseRepository{
 
         return await post.save()
     }
+
+    async findPostByHashTag(hashtag) {
+        const posts = await Post
+        .find({hashTags: hashtag})
+        .sort({createdAt: -1})
+
+        if (posts.length === 0) { throw new NotFoundException() }
+
+        return posts
+    }
     
 }
 

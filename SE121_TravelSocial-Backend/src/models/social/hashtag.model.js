@@ -26,7 +26,7 @@ var hashTagSchema = new mongoose.Schema({
             default: 0
         },
     },
-    isTrendig: {
+    isTrending: {
         type: Boolean,
         default: false
     }

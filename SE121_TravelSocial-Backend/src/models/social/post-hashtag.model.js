@@ -11,7 +11,7 @@ var postHashTagSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: POST_REF
     },
-    hasgTagId: {
+    hashTagId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: HASHTAG_REF
     }
