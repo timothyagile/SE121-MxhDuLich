@@ -123,6 +123,11 @@ const update = async (id, updatePost) => {
     return post;
 }
 
+const updateStat = async (postId, attribute, increment) => {
+    const updatedPost = await postRepository.updateStat(postId, attribute, increment)
+    return updatedPost;
+}
+
 const deletePost = async (id) => {
     const post = await postRepository.deletePost(id)
     return post;
@@ -136,5 +141,6 @@ module.exports = {
     getByAuthorId,
     getByHashTag,
     update,
+    updateStat,
     deletePost
 }

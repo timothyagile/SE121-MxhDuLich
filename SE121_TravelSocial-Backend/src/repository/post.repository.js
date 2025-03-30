@@ -28,6 +28,23 @@ class PostRepository extends BaseRepository{
         return posts
     }
     
+    async updateStat(postId, attribute ,increment) {
+
+        const post = await Post
+        .findByIdAndUpdate(postId, 
+            {
+                $inc: {
+                    [`stat.${attribute}`]: increment,
+                },
+                "stat.lastInteraction": new Date()
+            }
+        )
+        .select("_id stat")
+
+        if(!post) { throw new NotFoundException()}
+
+        return post
+    }
 }
 
 module.exports = new PostRepository();

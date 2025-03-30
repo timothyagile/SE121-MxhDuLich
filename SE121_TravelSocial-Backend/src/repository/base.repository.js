@@ -1,3 +1,5 @@
+const { NotFoundException } = require("../errors/exception");
+
 class BaseRepository {
 
     constructor(model) {
@@ -19,26 +21,32 @@ class BaseRepository {
   
     async findById(id, populateOptions = null) {
         let query = this.model.findById(id);
-
         query = this.applyPopulateOptions(query, populateOptions)
-
-        return await query.exec();
+        const result = await query.exec();
+        if (!result) { throw new NotFoundException()}
+        return result
     }
   
     async findAll(query = {}, populateOptions = null) {
         let dbQuery = this.model.find(query);
         
         dbQuery = this.applyPopulateOptions(dbQuery, populateOptions)
-
-        return await dbQuery.exec();
+        
+        const result = await dbQuery.exec();
+        if (!result || result.length === 0) { throw new NotFoundException()}
+        return result
     }
   
     async update(id, data) {
-        return await this.model.findByIdAndUpdate(id, data, { new: true });
+        const result = await this.model.findByIdAndUpdate(id, data, { new: true, runValidators: true });
+        if (!result) { throw new NotFoundException()}
+        return result
     }
   
     async delete(id) {
-        return await this.model.findByIdAndDelete(id);
+        const result = await this.model.findByIdAndDelete(id);
+        if (!result) { throw new NotFoundException()}
+        return result
     }
   }
   
