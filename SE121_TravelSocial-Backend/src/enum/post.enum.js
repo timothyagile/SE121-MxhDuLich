@@ -20,8 +20,16 @@ const TRAVEL_SEASON = Object.freeze({
     WINTER: "winter"   // Mùa đông
 });
 
+const INTERACTION = {
+    VIEW_COUNT: "viewCount",
+    REACT_COUNT: "reactCount",
+    COMMENTS_COUNT: "commentsCount",
+    SHARECOUNT: "shareCount",
+}
+
 module.exports = {
     PRIVACY_LEVEL,
     TRIP_TYPE, 
-    TRAVEL_SEASON
+    TRAVEL_SEASON,
+    INTERACTION
 }

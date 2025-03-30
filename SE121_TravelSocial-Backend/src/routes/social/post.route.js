@@ -7,14 +7,7 @@ const router = Router();
 
 /*
 - partition 
-- get by hashtag
-
-    *this is post content*
-    #abc #cdb #dck  
-
 - get by word
-- update
-- delete: hard delete, soft delete
 - new feed algorithms
 */
 
