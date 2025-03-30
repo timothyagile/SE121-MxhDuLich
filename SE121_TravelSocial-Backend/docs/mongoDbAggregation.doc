@@ -1,0 +1,84 @@
+**LƯU Ý**
+KHI DÙNG AGGREGATION ĐỂ $MATCH CÁC DỮ LIỆU ID, CẦN CHUYỂN THỦ CÔNG VỀ DẠNG OBJECTID
+
+2.1. $match – Lọc dữ liệu (tương tự find())
+Dùng để lọc dữ liệu dựa trên điều kiện nhất định, giúp giảm số lượng dữ liệu cần xử lý ở các stage sau.
+
+db.orders.aggregate([
+  { $match: { status: "completed" } }
+])
+
+2.2. $group – Nhóm dữ liệu và tính toán
+Dùng để nhóm dữ liệu dựa trên một trường cụ thể và thực hiện các phép tính như sum, avg, min, max,...
+
+Ví dụ: Tính tổng doanh thu theo từng khách hàng
+
+db.orders.aggregate([
+  {
+    $group: {
+      _id: "$customerId",
+      totalSpent: { $sum: "$amount" }
+    }
+  }
+])
+
+2.3. $project – Chọn và định dạng dữ liệu
+Dùng để chỉ định các trường cần hiển thị hoặc tạo các trường mới.
+
+Ví dụ: Chỉ lấy name và price, đồng thời tạo một trường mới discountPrice
+
+db.products.aggregate([
+  {
+    $project: {
+      name: 1,
+      price: 1,
+      discountPrice: { $multiply: ["$price", 0.9] }
+    }
+  }
+])
+
+2.4. $sort – Sắp xếp kết quả
+Dùng để sắp xếp kết quả theo một trường nào đó, tương tự sort().
+
+Ví dụ: Sắp xếp sản phẩm theo giá giảm dần
+
+db.products.aggregate([
+  { $sort: { price: -1 } }
+])
+
+2.5. $limit và $skip – Phân trang dữ liệu
+$limit: Giới hạn số lượng kết quả.
+
+$skip: Bỏ qua một số lượng bản ghi.
+
+Ví dụ: Lấy 10 sản phẩm đầu tiên sau khi bỏ qua 5 sản phẩm
+
+db.products.aggregate([
+  { $skip: 5 },
+  { $limit: 10 }
+])
+
+2.6. $lookup – Kết hợp dữ liệu từ nhiều collection (JOIN)
+Dùng để nối dữ liệu từ một collection khác.
+
+Ví dụ: Kết hợp orders với customers
+
+db.orders.aggregate([
+  {
+    $lookup: {
+      from: "customers",
+      localField: "customerId",
+      foreignField: "_id",
+      as: "customerDetails"
+    }
+  }
+])
+
+2.7. $unwind – Giải mảng thành nhiều bản ghi
+Dùng để "phẳng hóa" một mảng trong document.
+
+Ví dụ: Mỗi phần tử trong mảng tags sẽ trở thành một document riêng biệt
+
+db.articles.aggregate([
+  { $unwind: "$tags" }
+])

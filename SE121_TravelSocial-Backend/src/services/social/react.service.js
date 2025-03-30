@@ -1,5 +1,6 @@
 'use strict'
 
+const { countReacts } = require("../../controllers/social/react.controller")
 const { INTERACTION } = require("../../enum/post.enum")
 const reactRepository = require("../../repository/react.repository")
 const postService = require('../social/post.service')
@@ -40,10 +41,21 @@ const create = async (reactData) => {
     }
 }  
 
-const getByPostId = (postId) => {
+const getByPostId = async(postId, type) => {
+    //Get post's react by type (default getAll react), 
+    //populate to user select userName, userAvatar
+    const reacts = await reactRepository.getByPostId(postId, type)
     
+    return reacts
+}
+
+const countReactionByType = async(postId) => {
+    const countReacts = await reactRepository.countReactionByType(postId);
+    return countReacts;
 }
 
 module.exports = {
-    create
+    create,
+    getByPostId,
+    countReactionByType,
 }

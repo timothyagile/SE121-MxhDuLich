@@ -8,4 +8,8 @@ const { checkUser } = require('../../middleware/auth.middleware');
 
 router.post('/react', checkUser ,asyncHandler(reactController.create))
 
+router.get('/react', asyncHandler(reactController.getByPostId));
+
+router.get('/react/:postId', asyncHandler(reactController.countReacts))
+
 module.exports = router 
