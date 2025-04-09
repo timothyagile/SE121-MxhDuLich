@@ -27,6 +27,8 @@ import { UserProvider } from '@/context/UserContext'
 import { RootStackParamList } from '@/types/navigation'
 import DetailBookingScreen from '@/screen/DetailBookingScreen';
 import TicketScreen from '@/screen/TicketScreen';
+import LuckyWheelScreen from '@/screen/LuckyWheelScreen';
+import SearchLocationScreen from '@/screen/SearchLocationScreen';
 
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -158,6 +160,18 @@ export default function App() {
             <Stack.Screen
             name = 'booking-screen'
             component={TicketScreen}
+            options={{
+              headerShown: false}}/>
+
+            <Stack.Screen
+            name = 'lucky-wheel-screen'
+            component={LuckyWheelScreen}
+            options={{
+              headerShown: false}}/>
+
+            <Stack.Screen
+            name = 'search-location-screen'
+            component={SearchLocationScreen}
             options={{
               headerShown: false}}/>
 

@@ -47,10 +47,10 @@ module.exports.signin_post =  async (req, res) => { //Check login
     try {
         const user = await User.login(userEmail, userPassword);
         const token = createToken(user._id);
-        res.cookie('jwt', token, {httpOnly: true ,maxAge: maxAge * 1000})
+        res.cookie('jwt', token, {httpOnly: true ,maxAge: maxAge * 1000,secure: false,sameSite: 'None'})
         res.status(200).json({
             isSucess: true,
-            data: user._id,
+            data: user,
             error: null
         })
     }
@@ -86,6 +86,20 @@ module.exports.getUserById = async (req, res, next) => {
     const userId = req.params.id
     try {
         const result = await authServices.getUserById(userId)
+        res.status(201).json({
+            isSuccess: true,
+            data: result,
+            error: null
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+module.exports.getUserByUserRole = async (req, res, next) => {
+    const userRole = 'location-owner'
+    try {
+        const result = await authServices.getByUserRole(userRole)
         res.status(201).json({
             isSuccess: true,
             data: result,

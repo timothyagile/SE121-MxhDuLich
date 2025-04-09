@@ -31,5 +31,9 @@ export type SelectedRoom = {
     'detail-screen': { id: string };
     'detail-booking-screen': {bookingId: string; title: string; status: string};
     'booking-screen': undefined;
+    'lucky-wheel-screen': undefined;
+    'search-location-screen': undefined;
+
+    
   };
   
