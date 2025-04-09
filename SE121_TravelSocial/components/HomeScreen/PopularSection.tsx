@@ -16,7 +16,7 @@ import locationData from '@/constants/location';
 import CustomModal from '../CollectionScreen/AddIntoCollection';
 import * as Network from 'expo-network';
 import { NetworkInfo } from 'react-native-network-info';
-import {API_BASE_URL} from '../../constants/config';
+import { API_BASE_URL } from '../../constants/config';
 
 const { width, height } = Dimensions.get('window');
 const CARD_WIDTH = 245;
@@ -36,9 +36,12 @@ export default function PopularSection({ categoryId, navigation }: PopularSectio
   const [likedItems, setLikedItems] = useState<LikedItems>({});
   const [locations, setLocations] = useState<any[]>([]);
 
-    const [loading, setLoading] = useState(true);
-    const [modalVisible, setModalVisible] = useState(false);
-    const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
 
   const scrollX = useRef(new Animated.Value(0)).current;
 
@@ -48,59 +51,76 @@ export default function PopularSection({ categoryId, navigation }: PopularSectio
       [id]: !prevState[id],
     }));
     setSelectedLocationId(id);
-    setModalVisible(true); 
+    setModalVisible(true);
   };
 
   useEffect(() => {
-    console.log('category: ',categoryId)
     if (categoryId === "all") {
-      getAllLocations();
+      getAllLocations(1);
       return;
     }
     if (categoryId) {
-      fetchPopularLocations(categoryId);
+      fetchPopularLocations(categoryId, 1);
     }
-}, [categoryId]);  
+  }, [categoryId]);
 
-const fetchPopularLocations = async (id: string) => {
+  const fetchPopularLocations = async (id: string, pageNumber: number) => {
+    if (isFetchingMore || !hasMore) return;
+  
+    setIsFetchingMore(true);
     try {
-        const ipAddress = await Network.getIpAddressAsync();
-        console.log('Device IP Address:', ipAddress);
-        const response = await fetch(`${API_BASE_URL}/locationbycategory/${id}`);
-        const data = await response.json();
-        
-        if (data.isSuccess) {
-
-            setLocations(data.data);
-            console.log('popular:',data.data);
+      const response = await fetch(`${API_BASE_URL}/locationbycategory/${id}?page=${pageNumber}&limit=10`);
+      const data = await response.json();
+  
+      if (data.isSuccess) {
+        if (pageNumber === 1) {
+          setLocations(data.data.data);
         } else {
-            setLocations([]);
-            // console.error("Error fetching popular locations:", data.error);
+          setLocations(prev => [...prev, ...data.data.data]);
         }
+  
+        setHasMore(data.data.data.length > 0);
+        setPage(pageNumber + 1);
+      } else {
+        setHasMore(false);
+      }
     } catch (error) {
-        console.error("Fetch error:", error);
-    } 
-}; 
+      console.error("Fetch error:", error);
+    } finally {
+      setIsFetchingMore(false);
+      setLoading(false);
+    }
+  };
 
-    const getAllLocations = async () => {
-        try {
-            const ipAddress = await Network.getIpAddressAsync();
-            console.log('Device IP Address:', ipAddress);
-            const response = await fetch(`${API_BASE_URL}/alllocation`); 
-            
-            const data = await response.json();
-
-            if (data.isSuccess) {
-                setLocations(data.data); 
-            } else {
-                console.error(data.error);
-            }
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
+  const getAllLocations = async (pageNumber: number) => {
+    try {
+      if (isFetchingMore || !hasMore) return;
+  
+      setIsFetchingMore(true);
+  
+      const response = await fetch(`${API_BASE_URL}/alllocation?page=${pageNumber}&limit=10`);
+      const data = await response.json();
+  
+      if (data.isSuccess) {
+        if (pageNumber === 1) {
+          setLocations(data.data.data);
+          console.log('all location: ', data.data);
+        } else {
+          setLocations(prev => [...prev, ...data.data.data]);
         }
-    };
+  
+        setHasMore(data.data.data.length > 0);
+        setPage(pageNumber + 1); 
+      } else {
+        console.error(data.error);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsFetchingMore(false);
+      setLoading(false);
+    }
+  };
 
 
   const renderItem = ({ item, index }: { item: any; index: number }) => {
@@ -112,15 +132,15 @@ const fetchPopularLocations = async (id: string) => {
 
     const scale = scrollX.interpolate({
       inputRange,
-      outputRange: [0.8, 1, 0.8], 
+      outputRange: [0.8, 1, 0.8],
       extrapolate: 'clamp',
     });
 
     const shadowOpacity = scrollX.interpolate({
       inputRange,
-      outputRange: [0.1, 0.3, 0.1], 
+      outputRange: [0.1, 0.3, 0.1],
       extrapolate: 'clamp',
-    });   
+    });
 
     return (
       <Animated.View
@@ -135,39 +155,39 @@ const fetchPopularLocations = async (id: string) => {
         <TouchableOpacity onPress={() => navigation.navigate('detail-screen', { id: item._id })}>
           <View style={styles.imageBox}>
             <Image
-            source={
-              item?.image?.[0]?.url
+              source={
+                item?.image?.[0]?.url
                   ? { uri: item.image[0].url }
                   : require('@/assets/images/bai-truoc-20.jpg') // Hình ảnh mặc định
               }
-              
+
               style={styles.image}
-            /> 
+            />
           </View>
           <View style={styles.titleBox}>
-            <View style = {styles.textBox}>
-                <Text style={[styles.textStyle, { fontSize: 12 }]}>{item.name}</Text>
+            <View style={styles.textBox}>
+              <Text style={[styles.textStyle, { fontSize: 12 }]}>{item.name}</Text>
             </View>
-            <View style={{flexDirection:'row', marginTop: 2}}>
-                <View style={styles.textBox}>
+            <View style={{ flexDirection: 'row', marginTop: 2 }}>
+              <View style={styles.textBox}>
                 <Image
-                    source={require('../../assets/icons/star.png')}
-                    style={styles.star}
+                  source={require('../../assets/icons/star.png')}
+                  style={styles.star}
                 />
                 <Text style={[styles.textStyle, { fontSize: 12 }]}>{item.rating}</Text>
-                </View>
-                <TouchableOpacity
+              </View>
+              <TouchableOpacity
                 onPress={() => handlePress(item._id.toString())}
-                style={{ position:'absolute', right: 0, }}
-                >
+                style={{ position: 'absolute', right: 0, }}
+              >
                 <Image
-                    source={require('@/assets/icons/heart.png')}
-                    style={[
+                  source={require('@/assets/icons/heart.png')}
+                  style={[
                     styles.heart,
                     { tintColor: likedItems[item._id] ? 'red' : 'white' },
-                    ]}
+                  ]}
                 />
-                </TouchableOpacity>
+              </TouchableOpacity>
             </View>
           </View>
         </TouchableOpacity>
@@ -176,8 +196,14 @@ const fetchPopularLocations = async (id: string) => {
   };
 
   return (
-    <View style={{height:CARD_HEIGHT+70}}>
-      <Text style={styles.titleText}>Danh mục</Text>
+    <View style={{ height: CARD_HEIGHT + 70 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginTop: 10 }}>
+        <Text style={styles.titleText}>Danh mục</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('search-location-screen')} style={{ marginRight: 20, top: 10 }}>
+          <Text style={{ fontSize: 14, color: '#196EEE' }}>Xem tất cả</Text>
+        </TouchableOpacity>
+
+      </View>
       <Animated.FlatList
         data={locations}
         horizontal
@@ -191,8 +217,20 @@ const fetchPopularLocations = async (id: string) => {
         scrollEventThrottle={16}
         keyExtractor={(item, index) => item._id}
         renderItem={renderItem}
+        onEndReached={() => {
+          if (categoryId === 'all') {
+            getAllLocations(page);
+          } else {
+            fetchPopularLocations(categoryId!, page);
+          }
+        }}
+        onEndReachedThreshold={0.5}
       />
-      <CustomModal visible={modalVisible} onClose={() => setModalVisible(false)} onSelectCollection={(collectionId:any)=>console.log('selected:', collectionId)} selectedLocationId={selectedLocationId}></CustomModal>
+      {isFetchingMore && (
+  <Text style={{ textAlign: 'center', marginTop: 10 }}>Đang tải thêm...</Text>
+)}
+      
+      <CustomModal visible={modalVisible} onClose={() => setModalVisible(false)} onSelectCollection={(collectionId: any) => console.log('selected:', collectionId)} selectedLocationId={selectedLocationId}></CustomModal>
     </View>
   );
 }
@@ -214,7 +252,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.1,
     shadowRadius: 10,
-    elevation: 5, 
+    elevation: 5,
   },
   imageBox: {
     width: CARD_WIDTH,
@@ -255,7 +293,7 @@ const styles = StyleSheet.create({
     width: 16,
     height: 16,
     marginRight: 2,
-    left:5,
+    left: 5,
   },
   heart: {
     width: 30,

@@ -12,6 +12,7 @@ import {iconMapping} from '../../constants/icon';
 import CustomModal from '@/components/CollectionScreen/AddIntoCollection';
 import ImageCarousel from '@/components/HomeScreen/ImageCarousel';
 import Recommendation from '@/components/DetailScreen/Recommendation';
+import ServiceOption from '@/components/DetailScreen/ServiceOption';
 
 
 const { width, height } = Dimensions.get('window');
@@ -157,6 +158,11 @@ const facilityIcons: FacilityIcons = {
 
     const [latitude, setLatitude] = useState<number | null>(null);
     const [longitude, setLongitude] = useState<number | null>(null);
+    const [visibleCount, setVisibleCount] = useState(5); // Hiển thị 3 phản hồi đầu tiên
+
+    const handleLoadMore = () => {
+      setVisibleCount((prev) => prev + 5); // Mỗi lần load thêm 3 phản hồi
+    };
 
     const getCoordinatesFromAddress = async (address: string) => {
         const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${GOOGLE_MAPS_API_KEY}`;
@@ -311,6 +317,14 @@ const facilityIcons: FacilityIcons = {
         style={styles.image}
       />
     )
+
+    const servicesoption = [
+      { icon: 'bicycle', text: 'Thuê xe đạp giá rẻ' },
+      { icon: 'car', text: 'Xe đưa rước tận nơi' },
+      { icon: 'tshirt', text: 'Dịch vụ giặt là giá rẻ' },
+      { icon: 'camera', text: 'Thuê máy ảnh giá rẻ' },
+      // ... thêm các dịch vụ cần thiết
+    ];
   
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#f0f4f8' }}>
@@ -377,7 +391,7 @@ const facilityIcons: FacilityIcons = {
                 </Text>
                 <TouchableOpacity onPress={toggleExpanded}>
                     <Text style={styles.readMore}>
-                        {isExpanded ? 'Show Less' : 'Read More'}
+                        {isExpanded ? 'Thu gọn' : 'Xem thêm'}
                     </Text>
                 </TouchableOpacity>
 
@@ -470,6 +484,8 @@ const facilityIcons: FacilityIcons = {
             </TouchableOpacity>
           </View>
 
+          <ServiceOption services={servicesoption}></ServiceOption>
+
           {/* Feedback Section */}
           <View style={styles.section}>
             <Text style={styles.title2}>Phản hồi từ người dùng</Text>
@@ -477,7 +493,8 @@ const facilityIcons: FacilityIcons = {
             {loadingReviews ? (
               <Text>Đang tải phản hồi...</Text>
             ) : reviews.length > 0 ? (
-              reviews.map((review, index) => (
+              <>
+              {reviews.slice(0, visibleCount).map((review, index) => (
                 <View style={styles.reviewframe} key={index}>
                   <View style={styles.feedbackContainer}>
                     <View style={styles.avatarContainer}>
@@ -504,7 +521,15 @@ const facilityIcons: FacilityIcons = {
 
                 </View>
                 
-              ))
+              ))}
+               {/* Hiện nút "Xem thêm" nếu còn review chưa hiển thị */}
+          {visibleCount < reviews.length && (
+            <TouchableOpacity onPress={handleLoadMore} style={{ alignSelf: 'center', marginTop: 10 }}>
+              <Text style={{ color: '#007bff' }}>Xem thêm phản hồi</Text>
+            </TouchableOpacity>
+          )}
+              </>
+              
             ) : (
               <Text>Không có phản hồi nào cho địa điểm này.</Text>
             )}
@@ -517,7 +542,7 @@ const facilityIcons: FacilityIcons = {
             <View style={styles.bookingSection}>
                 <View>
                     <Text style={styles.priceLabel}>Giá chỉ từ</Text>
-                    <Text style={styles.price}>{minPrice} VND</Text>
+                    <Text style={styles.price}>{minPrice.toLocaleString('vi-VN')} VND</Text>
                 </View>
               
               <TouchableOpacity onPress={()=> navigation.navigate('available-room-screen', {

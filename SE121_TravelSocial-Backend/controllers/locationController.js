@@ -95,7 +95,9 @@ module.exports.createLocation = async (req, res, next) => {
 //--GET ALL LOCATION DATA--\\
 module.exports.getAllLocation = async (req, res, next) => {
     try {
-        const result = await locationSvc.getAllLocation()
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const result = await locationSvc.getAllLocation(page, limit); // Lấy tất cả địa điểm từ cơ sở dữ liệu
         res.status(200).json({
             isSuccess: true,
             data: result,
@@ -110,8 +112,10 @@ module.exports.getAllLocation = async (req, res, next) => {
 //--GET LOCATION DATA BY CATEGORY--\\
 module.exports.getLocationByCategory = async (req, res, next) => {
     const { categoryId } = req.params; // Lấy categoryId từ URL
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
     try {
-        const locations = await locationSvc.getLocationByCategory(categoryId); // Tìm theo category
+        const locations = await locationSvc.getLocationByCategory(categoryId, page, limit); // Tìm theo category
         res.status(200).json({
             isSuccess: true,
             data: locations,
@@ -223,3 +227,93 @@ module.exports.sendApproveEmail = async (req, res, next) => {
         next(error)
     }
 }
+
+module.exports.searchLocationsAndRooms = async (req, res) => {
+    try {
+        const { rating, costMin, costMax, category, province, services } = req.query;
+
+        // Tạo các điều kiện lọc động
+        const locationQuery = {};
+        if (rating) locationQuery['rating'] = { $gte: parseFloat(rating) };
+        if (category) locationQuery['category.id'] = category;
+        if (province) {
+            const provinceArray = Array.isArray(province) ? province : province.split(',');
+            locationQuery['province'] = { $in: provinceArray };
+        }
+        if (services) {
+            const servicesArray = Array.isArray(services) ? services : services.split(',');
+            locationQuery['services'] = { $all: servicesArray };
+        }
+        const roomPriceQuery = {};
+        if (costMin) roomPriceQuery.$gte = parseFloat(costMin);
+        if (costMax) roomPriceQuery.$lte = parseFloat(costMax);
+
+        const aggregatePipeline = [
+            // Kết nối với Rooms
+            {
+                $lookup: {
+                    from: 'Room',
+                    localField: '_id',
+                    foreignField: 'locationId',
+                    as: 'rooms',
+                },
+            },
+            // {
+            //     $project: {
+            //         _id: 1,
+            //         location: '$name',
+            //         rating: 1,
+            //         rooms: 1, // Kiểm tra xem `rooms` có dữ liệu không
+            //     },
+            // },
+            // Áp dụng điều kiện lọc cho Location
+            {
+                $match: locationQuery,
+            },
+            // Nếu có điều kiện lọc giá, lọc các phòng theo `pricePerNight`
+            ...(costMin || costMax
+                ? [
+                    {
+                        $addFields: {
+                            matchingRooms: {
+                                $filter: {
+                                    input: '$rooms',
+                                    as: 'room',
+                                    cond: {
+                                        $and: [
+                                            { $gte: ['$$room.pricePerNight', roomPriceQuery.$gte || 0] },
+                                            { $lte: ['$$room.pricePerNight', roomPriceQuery.$lte || Infinity] },
+                                        ],
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    {
+                        $match: {
+                            'matchingRooms.0': { $exists: true }, // Chỉ giữ các Location có ít nhất 1 phòng thỏa mãn
+                        },
+                    },
+                ]
+                : []),
+            // Dự án kết quả trả về
+            {
+                $project: {
+                    _id: 1,
+                    location: '$name',
+                    rating: 1,
+                    category: 1,
+                    province: 1,
+                    services: 1,
+                    matchingRooms: 1,
+                },
+            },
+        ];
+
+        const locations = await Location.aggregate(aggregatePipeline);
+
+        res.json(locations);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};

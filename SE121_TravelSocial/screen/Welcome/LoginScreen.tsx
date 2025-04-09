@@ -39,11 +39,10 @@ export default function LoginScreen ({navigation}: {navigation: NativeStackNavig
             console.log(data);
             if (response.ok) {
                 const userId = data.data;  // Giả sử API trả về userId trong đối tượng data
-                setUserId(userId);  // Cập nhật userId vào state hoặc context
+                setUserId(userId?._id);  // Cập nhật userId vào state hoặc context
                 console.log('User ID:', userId);
                 navigation.navigate('main-screen');
             } else {
-                
                 Alert.alert('Login Failed', data.error || 'Please try again.');
             }
         } catch (error) {
