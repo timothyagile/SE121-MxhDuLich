@@ -5,6 +5,7 @@ const { INTERACTION } = require("../../enum/post.enum")
 const reactRepository = require("../../repository/react.repository")
 const postService = require('../social/post.service')
 
+
 const create = async (reactData) => {
 
     const {userId, type, postId} = reactData
@@ -18,7 +19,7 @@ const create = async (reactData) => {
     }
     */
     console.log("ReactService::", reactData)
-    let existReact = await reactRepository.findOneReact(postId, userId)
+    var existReact = await reactRepository.findOneReact(postId, userId)
     
     if(existReact) {
         console.log("Existing react::", existReact)

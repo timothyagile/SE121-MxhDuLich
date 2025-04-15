@@ -28,7 +28,8 @@ const uploadImageRoute = require('./general/upload-image.route')
 const conversationRoute = require('./general/conversation.route')
 const messageRoute = require('./general//message.route')
 const executeCronJobRoute = require('./general/execute-cronjob.route')
-
+const commentRoute = require('./social/comment.route')
+const reactCommentRoute = require('./social/react-comment.route')
 const router = express.Router();
 
 router.use('/', roomRoute)
@@ -50,6 +51,8 @@ router.use('/', messageRoute)
 router.use('/', executeCronJobRoute)
 router.use('/', hashTagRoute)
 router.use('/', reactRoute)
+router.use('/', commentRoute)
+router.use('/', reactCommentRoute)
 
 module.exports = router
 

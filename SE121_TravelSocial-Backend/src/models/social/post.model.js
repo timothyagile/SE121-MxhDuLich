@@ -58,7 +58,7 @@ var postSchema = new mongoose.Schema({
     } ,
     images: {
         type: [imageSchema],
-        default: []
+        default: []  
     },
     videos: {
         type: [videoSchema], 
