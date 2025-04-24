@@ -47,6 +47,7 @@ module.exports.signin_post =  async (req, res) => { //Check login
     try {
         const user = await User.login(userEmail, userPassword);
         const token = createToken(user._id);
+        console.log("Access token::", token)
         res.cookie('jwt', token, {httpOnly: true ,maxAge: maxAge * 1000})
         res.status(200).json({
             isSucess: true,
@@ -126,37 +127,16 @@ module.exports.deleteUser = async (req, res, next) => {
     }
 }
 
-module.exports.updateAvata = async (req, res, next) => {
-    const userId = req.params.id
-    try {
-        if(!req.file) {
-            console.log('No file uploaded')
-        }
-        const image = ({
-            url: req.file.path,
-            publicId: req.file.filename
-        })
-        console.log(image)
-        const result = await authServices.updateAvata(userId, image)
-        res.status(201).json({
-            isSuccess: true,
-            data: result,
-            error: null
-        })
-    }
-    catch (error) {
-        try {
-            console.log('No file')
-            await cloudinary.uploader.destroy(req.file.filename);
-            console.log('deleted');
-            res.status(404).json({
-                isSuccess: true,
-                data: 'upload fail',
-                error: null,
-            });
-        } 
-        catch (err) {
-            next(err)
-        }
-    }
+module.exports.updateAvata = async (req, res) => {
+    const userId = res.locals.user._id
+    const userAvatar = req.body
+    console.log("Update avt::" + userAvatar)
+
+    const result = await authServices.updateAvata(userId, userAvatar)
+    res.status(201).json({
+        isSuccess: true,
+        data: result,
+        error: null
+    })
+    
 }

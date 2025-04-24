@@ -11,13 +11,15 @@ const cookieParser = require('cookie-parser')
 const http = require('http');
 const path = require('path');
 const cors = require('cors');
-const {Server} = require('socket.io')
+const server = http.createServer(app);
+const socketIO = require('socket.io');
 
 const routes = require('./routes/index')
 
-const {requireAuth, checkUser} = require('./middleware/auth.middleware');
+const {requireAuth, checkUser, verifyConnectSocket} = require('./middleware/auth.middleware');
 const {errorHandler} = require('./middleware/error.middleware')
-const socketHandler = require('./socket/socketHandler');
+//const socketHandler = require('./socket/socketHandler');
+const {setupSocket, initSocket} = require('./socket/index')
 const compression = require('compression');
 
 //Init middleware
@@ -27,17 +29,35 @@ app.use(cookieParser());
 app.use(morgan('dev'));
 app.use(helmet());
 app.use(compression());
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'http://localhost:3001');
-    res.header('Access-Control-Allow-Origin', 'http://localhost:3002');
-    res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    next();
-  });
+// app.use((req, res, next) => {
+//     res.header('Access-Control-Allow-Origin', 'http://localhost:3001');
+//     res.header('Access-Control-Allow-Origin', 'http://localhost:3002');
+//     res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+//     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+//     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+//     next();
+// });
+app.use(cors({
+    origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
+}));
+
+const io = socketIO(server, {
+    cors: {
+        origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002'],
+        methods: ['GET', 'POST'],
+        credentials: true,
+        allowEIO3: true // Allow Engine.IO version 3
+    },
+    transports: ['websocket', 'polling']
+});
+
+initSocket(io)
+verifyConnectSocket(io)
+app.set('io', io);
 
 //Init dbs
-
 require('./databases/init.mongodb');
 const {countConnect, checkOverload} = require('./helpers/check.connect'); 
 countConnect()
@@ -49,9 +69,9 @@ app.get('/', (req, res) => res.render('signin'))
 app.get('/signup', (req, res) => {res.render('signup')})
 app.get('/signin', (req, res) => {res.render('signin')})
 
-app.use('', routes)
+app.use('', (req, res, next) => {req.io = app.get('io'); next();}, routes)
 
 //Handle error
 app.use(errorHandler);
 
-module.exports = app;
+module.exports = {app, server, io};

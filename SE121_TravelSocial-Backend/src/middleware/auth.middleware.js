@@ -2,6 +2,59 @@ const jwt = require('jsonwebtoken');
 const JWT_SECRET = 'your_jwt_secret'; // Phải giống với secret ở trên
 const User = require('../models/general/user.model')
 
+// const verifyToken = (req, res, next) => {
+//   const authHeader = req.headers.authorization;
+    
+//   if (!authHeader || !authHeader.startsWith('Bearer ')) {
+//     return res.status(401).json({
+//       isSuccess: false,
+//       error: 'No token provided or invalid format',
+//     });
+//   }
+
+//   const token = authHeader.split(' ')[1];
+//   if (!token) {
+//     return res.status(401).json({
+//         isSuccess: false,
+//         message: 'Token không hợp lệ hoặc không tồn tại.',
+//         data: null
+//     });
+//   }
+
+// // Giải mã token
+//   jwt.verify(token, 'travel', async (err, decoded) => {
+//     if (err) {
+//         return res.status(403).json({
+//             isSuccess: false,
+//             message: 'Token không hợp lệ.',
+//             data: null
+//         });
+//     }
+//     let user = await User.findById(decoded.id);
+//     res.locals.user = user;
+//     next();
+//   });
+// }
+
+const verifyConnectSocket = (io) => {
+  io.use((socket, next) => {
+    const token = socket.handshake.auth.token;
+  
+    if (!token || !token.startsWith('Bearer ')) {
+      return next(new Error('No token'));
+    }
+  
+    try {
+      const decoded = jwt.verify(token.split(' ')[1], 'travel');
+      socket.user = decoded;
+      next();
+    } catch (err) {
+      next(new Error('Invalid token'));
+    }
+});
+}
+
+
 const requireAuth = (req, res, next) => {
     const token = req.cookies.jwt;
     if(token) {
@@ -102,4 +155,4 @@ const checkLocationOwner = (req, res, next) => {
     next();
   });
 };
-module.exports = {requireAuth, checkUser, checkLocationOwner};
+module.exports = {requireAuth, checkUser, checkLocationOwner, verifyConnectSocket};

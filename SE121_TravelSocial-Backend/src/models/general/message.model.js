@@ -2,6 +2,16 @@ const mongoose = require('mongoose')
 
 const Schema = mongoose.Schema;
 
+const mediaSchema = new mongoose.Schema({
+    url: {
+        type: String,
+        required: true
+    },
+    publicId: {
+        type: String,
+        required: true
+    }
+}, { _id: false })
 
 const MessageSchema = new Schema({
     conversationId: {
@@ -14,16 +24,17 @@ const MessageSchema = new Schema({
         ref: "User",
         require: true,
     }, 
-    date: {
-        type: Date,
-        require: true,
-        default: Date.now
-    },
     message: {
         type: String,
         require: true,
+    }, 
+    images: {
+        type: [mediaSchema],
+    }, 
+    videos: {
+        type: [mediaSchema]
     }
-}, {collection: 'Message'})
+}, {collection: 'Message', timestamps: true})
 
 const Message = mongoose.model('Message', MessageSchema)
 module.exports = Message

@@ -1,11 +1,11 @@
 'use strict'
-const mongoose = require('mongoose')
 const postModel = require("../../models/social/post.model");
 const userModel = require("../../models/general/user.model");
 const commentModel = require("../../models/social/comment.model");
 const reactCommentModel = require("../../models/social/react-comment.model")
 const commentRepository = require("../../repository/comment.repository")
 const { NotFoundException } = require("../../errors/exception");
+
 const create = async (commentData) => {
     const { content, postId, userId, 
         parentId, mention, images, videos } = commentData;

@@ -1,0 +1,62 @@
+@startuml
+participant Client
+participant SocketClient
+participant REST_API
+participant MessageService
+participant ConversationService
+participant DB
+participant SocketServer
+
+== User mở app ==
+Client -> SocketClient : Kết nối WebSocket
+SocketClient -> SocketServer : socket.connect()
+SocketServer -> SocketServer : socket.id được gán
+SocketServer -> SocketClient : emit 'connected'
+
+== User vào hội thoại ==
+Client -> REST_API: POST /join-room
+REST_API -> SocketServer: socket.join(conversationId)
+SocketServer -> REST_API: Trả kết quả
+REST_API -> Client: Trả kết quả
+Client -> REST_API : GET /conversations/:id
+REST_API -> ConversationService : getConversationById()
+ConversationService -> DB : Tìm conversation
+DB --> ConversationService : Trả về dữ liệu hội thoại
+ConversationService --> REST_API : Trả về conversation
+REST_API --> Client : Conversation + messages
+Client -> REST_API: POST /leave-room
+REST_API -> SocketServer: socket.leave(conversationId)
+
+== User gửi tin nhắn ==
+Client -> REST_API : POST /messages (message + conversationId)
+REST_API -> MessageService : createMessage()
+MessageService -> DB : Lưu tin nhắn vào MongoDB
+DB --> MessageService : Trả về tin nhắn đã lưu
+
+note right of MessageService
+  Kiểm tra các user thuộc conversation
+  Ai đang online => emit
+  Ai offline => bỏ qua
+end note
+
+MessageService -> SocketServer : io.to(conversationId).emit('new-message', message)
+SocketServer -> SocketClient : emit 'new-message'
+
+REST_API --> Client : Trả về message đã gửi
+
+== User khác nhận tin (nếu online) ==
+SocketServer -> SocketClient : emit 'new-message'
+
+== User khác nhận tin (nếu offline) ==
+Client -> REST_API : GET /conversations/:id
+REST_API -> ConversationService : getConversationById()
+ConversationService -> DB : Tìm conversation
+DB --> ConversationService : Trả về dữ liệu hội thoại
+ConversationService --> REST_API : Trả về conversation
+note right of SocketServer
+  Người dùng không nhận real-time
+  Khi mở lại app:
+  => gọi GET /conversations/:id/messages
+end note
+
+@enduml

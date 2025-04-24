@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Socket.IO Test - Private Messages</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+    body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+    .container { display: flex; }
+    .left-panel { width: 300px; margin-right: 20px; }
+    .right-panel { flex-grow: 1; }
+    #messages { height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+    #user-list { height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+    .user-item { padding: 5px; cursor: pointer; }
+    .user-item:hover { background-color: #f0f0f0; }
+    .user-item.selected { background-color: #e0e0e0; }
+    .message-form { display: flex; margin-bottom: 10px; }
+    .message-input { flex-grow: 1; padding: 8px; margin-right: 10px; }
+    button { padding: 8px 16px; }
+    .status { color: #666; font-style: italic; }
+    .message { margin: 5px 0; padding: 5px; }
+    .system { color: #888; }
+    .self { color: blue; background-color: #f0f0ff; }
+    .other { color: green; background-color: #f0fff0; }
+    .private { color: purple; background-color: #fff0ff; }
+    .broadcast { color: #d9534f; background-color: #fff0f0; }
+    .message-mode { margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Socket.IO Test - Private Messages</h1>
+  <p>ID của bạn: <span id="my-id">Đang kết nối...</span></p>
+  
+  <div class="container">
+    <div class="left-panel">
+      <h3>Danh sách người dùng</h3>
+      <div id="user-list"></div>
+    </div>
+    
+    <div class="right-panel">
+      <div class="message-mode">
+        <label>
+          <input type="radio" name="message-mode" value="private" checked> Tin nhắn riêng
+        </label>
+        <label>
+          <input type="radio" name="message-mode" value="broadcast"> Broadcast tới tất cả
+        </label>
+      </div>
+      
+      <div id="messages"></div>
+      
+      <form id="message-form" class="message-form">
+        <input id="message-input" class="message-input" autocomplete="off" placeholder="Nhập tin nhắn..."/>
+        <button type="submit">Gửi</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const socket = io();
+    const messageForm = document.getElementById('message-form');
+    const messageInput = document.getElementById('message-input');
+    const messagesDiv = document.getElementById('messages');
+    const userListDiv = document.getElementById('user-list');
+    const myIdSpan = document.getElementById('my-id');
+    
+    let selectedUserId = null;
+    
+    // Khi kết nối thành công
+    socket.on('connect', () => {
+      myIdSpan.textContent = socket.id;
+      addMessage('Đã kết nối đến server', 'system');
+    });
+
+    // Nhận danh sách user khi kết nối
+    socket.on('user list', (userList) => {
+      updateUserList(userList);
+    });
+
+    // Khi có người dùng mới kết nối
+    socket.on('user connected', (data) => {
+      addMessage(`${data.message}`, 'system');
+      updateUserList(data.userList);
+    });
+
+    // Khi nhận tin nhắn riêng
+    socket.on('private message', (data) => {
+      addMessage(`Tin nhắn riêng từ ${data.from}: ${data.message}`, 'private');
+    });
+    
+    // Khi nhận tin nhắn broadcast
+    socket.on('broadcast message', (data) => {
+      addMessage(`Broadcast từ ${data.from}: ${data.message}`, 'broadcast');
+    });
+
+    // Khi nhận trạng thái gửi tin nhắn
+    socket.on('message sent', (data) => {
+      if (data.status === 'delivered') {
+        addMessage(`Đã gửi đến ${data.to}: ${data.message}`, 'self');
+      } else {
+        addMessage(`Lỗi gửi tin nhắn đến ${data.to}: ${data.error}`, 'system');
+      }
+    });
+
+    // Khi có người dùng ngắt kết nối
+    socket.on('user disconnected', (data) => {
+      addMessage(`${data.message}`, 'system');
+      updateUserList(data.userList);
+      
+      // Nếu đang chọn user vừa ngắt kết nối, bỏ chọn
+      if (selectedUserId === data.id) {
+        selectedUserId = null;
+      }
+    });
+
+    // Khi mất kết nối
+    socket.on('disconnect', () => {
+      addMessage('Mất kết nối với server', 'system');
+    });
+
+    // Gửi tin nhắn
+    messageForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (messageInput.value) {
+        const messageMode = document.querySelector('input[name="message-mode"]:checked').value;
+        
+        if (messageMode === 'private') {
+          // Kiểm tra xem đã chọn user chưa
+          if (!selectedUserId) {
+            addMessage('Vui lòng chọn một người dùng để gửi tin nhắn riêng', 'system');
+            return;
+          }
+          
+          // Gửi tin nhắn riêng
+          socket.emit('private message', {
+            targetId: selectedUserId,
+            message: messageInput.value
+          });
+        } else {
+          // Gửi broadcast
+          socket.emit('broadcast message', messageInput.value);
+          addMessage(`Broadcast đến tất cả: ${messageInput.value}`, 'self');
+        }
+        
+        messageInput.value = '';
+      }
+    });
+
+    // Hiển thị tin nhắn
+    function addMessage(text, type) {
+      const messageElement = document.createElement('div');
+      messageElement.textContent = text;
+      messageElement.className = `message ${type}`;
+      messagesDiv.appendChild(messageElement);
+      // Cuộn xuống tin nhắn mới nhất
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+    
+    // Cập nhật danh sách user
+    function updateUserList(userList) {
+      userListDiv.innerHTML = '';
+      
+      userList.forEach(userId => {
+        // Không hiển thị chính mình trong danh sách
+        if (userId === socket.id) return;
+        
+        const userItem = document.createElement('div');
+        userItem.textContent = userId;
+        userItem.className = 'user-item';
+        if (userId === selectedUserId) {
+          userItem.classList.add('selected');
+        }
+        
+        userItem.addEventListener('click', () => {
+          // Bỏ chọn user trước đó
+          const previouslySelected = userListDiv.querySelector('.selected');
+          if (previouslySelected) {
+            previouslySelected.classList.remove('selected');
+          }
+          
+          // Chọn user mới
+          selectedUserId = userId;
+          userItem.classList.add('selected');
+          
+          addMessage(`Đã chọn ${userId} để gửi tin nhắn riêng`, 'system');
+        });
+        
+        userListDiv.appendChild(userItem);
+      });
+    }
+  </script>
+</body>
+</html>
