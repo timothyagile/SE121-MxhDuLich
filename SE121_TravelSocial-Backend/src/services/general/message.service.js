@@ -21,6 +21,7 @@ const createMessage = async (messageData) => {
     
     const result = await messageObj.save()
     conv.lastMessage = message
+    await conv.save()
 
     if(result)
         return result

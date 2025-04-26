@@ -30,7 +30,7 @@ const ConversationSchema = new Schema({
     }, 
     avatar: {
         type: imageSchema, 
-        default: ""
+        default: null
     }, 
     lastMessage: {
         type: String,

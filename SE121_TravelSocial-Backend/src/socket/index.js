@@ -1,7 +1,8 @@
 'use strict'
 const EVENTS = require('./events')
-const { listenPrivateChatHandler, listenBroadcastChatHandler } = require('./handlers/chat.handler');
+
 const { emitUserListHandler, emitUserConnectedHandler, emitUserDisconnectedHandler } = require('./handlers/user.handler');
+const { listenJoinUserRoomHandler, listenJoinConversationRoomHandler } = require('./handlers/room.handler');
 
 const initSocket = (io) => {
     io.on(EVENTS.CONNECTION, (socket) => {
@@ -11,9 +12,9 @@ const initSocket = (io) => {
         // Gửi danh sách user hiện tại cho client mới kết nối
         //emitUserListHandler(io, socket, userList)
         // Thông báo cho tất cả client khi có người dùng mới kết nối
-        emitUserConnectedHandler(io, socket)
-        listenJoinUserRoomHandler(io)
-        listenJoinConversationRoomHandler(io)
+        
+        listenJoinUserRoomHandler(io, socket)
+        //listenJoinConversationRoomHandler(io, socket)
         // Xử lý gửi tin nhắn đến một user cụ thể
         // listenPrivateChatHandler(io, socket, connectedUsers)
         // Xử lý gửi tin nhắn đến tất cả

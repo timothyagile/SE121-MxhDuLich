@@ -4,10 +4,11 @@ const EVENTS = require("../events");
 
 
 const emitUserConnectedHandler = (io, socket) => {
-    io.emit(EVENTS.USER.USER_CONNECTED, {
+    socket.emit(EVENTS.USER.USER_CONNECTED, {
         socketId: socket.id,
         message: `Client ${socket.id} connected successfully`,
     });
+    console.log('emit success');
 }
 
 const emitUserListHandler = (io, socket) => {

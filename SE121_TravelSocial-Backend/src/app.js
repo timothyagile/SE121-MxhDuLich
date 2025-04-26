@@ -50,11 +50,12 @@ const io = socketIO(server, {
         credentials: true,
         allowEIO3: true // Allow Engine.IO version 3
     },
-    transports: ['websocket', 'polling']
+    transports: ['websocket']
 });
 
-initSocket(io)
 verifyConnectSocket(io)
+initSocket(io)
+
 app.set('io', io);
 
 //Init dbs

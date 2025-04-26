@@ -7,25 +7,36 @@ participant ConversationService
 participant DB
 participant SocketServer
 
-== User mở app ==
+== User mở trang nhắn tin ==
 Client -> SocketClient : Kết nối WebSocket
 SocketClient -> SocketServer : socket.connect()
 SocketServer -> SocketServer : socket.id được gán
 SocketServer -> SocketClient : emit 'connected'
 
+SocketClient -> SocketServer: Emit join user room
+SocketServer -> SocketClient: Emit result 'connected'
+
+REST_API -> ConversationService: getConversations(userId)
+ConversationService -> DB : Tìm tất cả hội thoại
+DB --> ConversationService : Trả về danh sách hội thoại
+ConversationService --> REST_API : Trả về danh sách hội thoại
+REST_API --> Client : Trả về danh sách hội thoại
+
+SockerClient -> SocketServer: emit 'leave conversation room'
+
 == User vào hội thoại ==
-Client -> REST_API: POST /join-room
-REST_API -> SocketServer: socket.join(conversationId)
-SocketServer -> REST_API: Trả kết quả
-REST_API -> Client: Trả kết quả
-Client -> REST_API : GET /conversations/:id
-REST_API -> ConversationService : getConversationById()
-ConversationService -> DB : Tìm conversation
-DB --> ConversationService : Trả về dữ liệu hội thoại
-ConversationService --> REST_API : Trả về conversation
-REST_API --> Client : Conversation + messages
-Client -> REST_API: POST /leave-room
-REST_API -> SocketServer: socket.leave(conversationId)
+SocketClient -> SocketServer: emit 'join conversation room'
+SocketServer -> SocketServer: Listen 'join conversation room'\n &join conversation room
+
+Client -> REST_API : GET /messages/:id
+REST_API -> MessageService : getMessageByUserId()
+MessageService -> DB : Tìm Ds tin nhắn trong hội thoại 
+DB --> MessageService : Trả về dữ liệu tin nhắn
+MessageService --> REST_API : Trả về tin nhắn
+REST_API --> Client : Trả về tin nhắn
+
+SocketClient -> SocketServer: emit 'leave conversation room'
+
 
 == User gửi tin nhắn ==
 Client -> REST_API : POST /messages (message + conversationId)
@@ -39,7 +50,8 @@ note right of MessageService
   Ai offline => bỏ qua
 end note
 
-MessageService -> SocketServer : io.to(conversationId).emit('new-message', message)
+MessageService -> SocketServer : io.to(user-room).emit('new-message', message)
+MessageService -> SocketServer : io.to(conversation-room).emit('new-message', message)
 SocketServer -> SocketClient : emit 'new-message'
 
 REST_API --> Client : Trả về message đã gửi

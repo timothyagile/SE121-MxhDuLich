@@ -3,20 +3,42 @@
 const { NotFoundException } = require("../../errors/exception");
 const EVENTS = require("../events");
 
-const listenJoinConversationRoomHandler = async (io) => {
-    io.on(EVENTS.ROOM.JOIN_CONVERSATION, (socket, data) => {
+const listenJoinConversationRoomHandler =  (io, socket) => {
+    socket.on(EVENTS.ROOM.JOIN_CONVERSATION, (data) => {
+        // Đảm bảo join room thành công
+        console.log('Join conv-room::' + socket.id)
+        socket.emit(EVENTS.ROOM.JOIN_CONVERSATION, {
+            isSuccess: true,
+            socket: socket.id,
+        })
+
         const { conversationId } = data
+
+        const roomId = `conv_${conversationId}`
         socket.join(roomId)
+        
         io.on(EVENTS.ROOM.LEAVE_CONVERSATION, () => {
             console.log('Leave conv-room::'  + socket.id)
         })
     })
 }   
 
-const listenJoinUserRoomHandler = async (io) => {
-    io.on(EVENTS.ROOM.JOIN_USER, (socket) => {
+const listenJoinUserRoomHandler =  (io, socket) => {
+    socket.on(EVENTS.ROOM.JOIN_USER, () => {
+        const userId = socket.userId
 
+        // Đảm bảo join room thành công
+        console.log('Join user-room::' + userId)
+        socket.emit(EVENTS.ROOM.JOIN_USER, {
+            isSuccess: true,
+            socket: socket.id,
+        })
 
+        const roomId = `user_${userId}`
+        socket.join(roomId)
+
+        listenJoinConversationRoomHandler(io, socket)
+        
         io.on(EVENTS.ROOM.LEAVE_USER, () => {
             console.log('Leave conv-room::'  + socket.id)
         })
@@ -76,6 +98,8 @@ const leaveConversationRomm = (io, data) => {
 }
 
 module.exports = {
+    listenJoinUserRoomHandler,
+    listenJoinConversationRoomHandler,
     joinUserRoom,
     leaveUserRoom,
     joinConversationRoom,

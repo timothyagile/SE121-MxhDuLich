@@ -38,7 +38,8 @@ const User = require('../models/general/user.model')
 
 const verifyConnectSocket = (io) => {
   io.use((socket, next) => {
-    const token = socket.handshake.auth.token;
+    const token = socket.handshake.query.token;
+    console.log('Token::', token)
   
     if (!token || !token.startsWith('Bearer ')) {
       return next(new Error('No token'));
@@ -46,7 +47,7 @@ const verifyConnectSocket = (io) => {
   
     try {
       const decoded = jwt.verify(token.split(' ')[1], 'travel');
-      socket.user = decoded;
+      socket.userId = decoded.id;
       next();
     } catch (err) {
       next(new Error('Invalid token'));
