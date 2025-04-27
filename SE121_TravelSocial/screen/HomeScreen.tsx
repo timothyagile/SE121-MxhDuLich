@@ -118,7 +118,7 @@ export default function HomeScreen ({navigation} : {navigation : NativeStackNavi
                     <PopularSection categoryId={selectedCategory?.id} navigation = {navigation}/>
                     <RecommendedSection categoryId={selectedCategory?.id} navigation = {navigation}/>
                     <NewEventSection categoryId={selectedCategory?.id} navigation = {navigation}/>
-                    {/* <DailySection categoryId={selectedCategory?.id} navigation={navigation}/> */}
+                    <DailySection categoryId={selectedCategory?.id} navigation={navigation}/>
                     <Image style={{width:'100%', height:200}} source={require('../assets/images/banner.png')}/>
             </ScrollView>
             

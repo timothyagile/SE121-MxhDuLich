@@ -23,7 +23,7 @@ function CommentCard() {
             justifyContent: "center",
           }}
         >
-          <Text style={{ fontWeight: "bold", fontSize: 14, color: "white" }}>
+          <Text style={{ fontWeight: "bold", fontSize: 14, color: "black" }}>
             John Doe asdlaksm aslkdmsdksad as
             aaksjdlmakjndsmlasknjdlmlskcnmsalmcksacansldsakdalsdlnsdksadm;samdas;dm;
           </Text>

@@ -101,7 +101,7 @@ export default function DailySection({ categoryId}: DailySectionProps) {
     //     }
     // };
 
-  const getAllLocations = async (pageNumber: number) => {
+  const getAllLocations = async (pageNumber: number, isLoadMore = false) => {
     try {
       if (isFetchingMore || !hasMore) return;
   
@@ -115,7 +115,12 @@ export default function DailySection({ categoryId}: DailySectionProps) {
           setLocations(data.data.data);
           console.log('all location: ', data.data);
         } else {
-          setLocations(prev => [...prev, ...data.data.data]);
+            const newLocations = data.data.data;
+            setLocations(prev => {
+                const existingIds = new Set(prev.map(item => item._id));
+                const uniqueNewLocations = newLocations.filter((item: { _id: any; }) => !existingIds.has(item._id));
+                return isLoadMore ? [...prev, ...uniqueNewLocations] : newLocations;
+            });
         }
   
         setHasMore(data.data.data.length > 0);
@@ -169,6 +174,11 @@ export default function DailySection({ categoryId}: DailySectionProps) {
                                     {item?.name || 'Khách sạn mới'}
                                 </Text>
                             </View>
+                            <View style={styles.footer}>
+                                <Text style={[styles.textStyle, { fontSize: 12 }]}>
+                                    {item?.province || 'Tỉnh/Thành phố'}
+                                </Text>
+                            </View>
                         </View>
                     </TouchableOpacity>
                 )}
@@ -176,7 +186,7 @@ export default function DailySection({ categoryId}: DailySectionProps) {
                 onEndReached={() => {
                     // if (isPageReady.current) {
                         if (categoryId === 'all') {
-                            getAllLocations(page);
+                            getAllLocations(page, true);
                         } else if (categoryId) {
                             fetchPopularLocations(categoryId, page);
                         }

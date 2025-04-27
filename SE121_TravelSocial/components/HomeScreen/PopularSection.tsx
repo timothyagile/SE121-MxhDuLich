@@ -165,6 +165,9 @@ export default function PopularSection({ categoryId, navigation }: PopularSectio
             />
           </View>
           <View style={styles.titleBox}>
+          <View style={styles.textBoxProvince}>
+              <Text style={[styles.textStyle, { fontSize: 12, marginBottom: 10 }]}>{item?.province}</Text>
+            </View>
             <View style={styles.textBox}>
               <Text style={[styles.textStyle, { fontSize: 12 }]}>{item.name}</Text>
             </View>
@@ -277,6 +280,15 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'space-evenly',
+  },
+  textBoxProvince: {
+    flexDirection: 'row',
+    backgroundColor: '#4D5652',
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 5,
+
   },
   textStyle: {
     fontWeight: 'bold',

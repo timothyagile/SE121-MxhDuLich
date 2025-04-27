@@ -8,7 +8,24 @@ import Checkbox from 'expo-checkbox';
 import { withDecay } from 'react-native-reanimated';
 import category from '@/constants/category';
 
-const services = ['WiFi miễn phí', 'Giặt là', 'Đưa đón sân bay', 'Cho thuê xe hơi'];
+const services = [
+    'Dọn dẹp phòng', 
+    'Bữa sáng buffet', 
+    'Xe đưa đón sân bay', 
+    'Massage toàn thân',
+    'Dịch vụ giặt ủi',
+    'Thuê xe đạp',
+    'Tour tham quan địa phương',
+    'Dịch vụ ăn tối tại phòng',
+    'Spa chăm sóc da',
+    'Yoga buổi sáng',
+];
+
+const categories = [
+    { label: 'Khách sạn', value: 'hotel' },
+    { label: 'Nhà nghỉ', value: 'guesthome' },
+    { label: 'Homestay', value: 'homestay' },
+];
 
 const FilterButton = ({ onApplyFilter }: any) => {
     const [modalVisible, setModalVisible] = useState(false);
@@ -21,7 +38,9 @@ const FilterButton = ({ onApplyFilter }: any) => {
     const [provinceDropdownOpen, setProvinceDropdownOpen] = useState(false);
     const [provinceModalVisible, setProvinceModalVisible] = useState(false);
     const [serviceModalVisible, setServiceModalVisible] = useState(false);
-
+    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+    const [categoryModalVisible, setCategoryModalVisible] = useState(false);
+    
 
     //const [selectedProvinces, setSelectedProvinces] = useState<string[]>([]);
 
@@ -65,13 +84,21 @@ const FilterButton = ({ onApplyFilter }: any) => {
         );
     };
 
+    const toggleCategory = (cat: string) => {
+        setSelectedCategories(prev =>
+            prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+        );
+    };
+
     const handleApply = () => {
         onApplyFilter({
+            province: selectedProvinces, // mảng các ID tỉnh được chọn
+            services: selectedServices,
             //selectedProvinces,
             rating,
             costMin: Number(costMin),
             costMax: Number(costMax),
-            //category,
+            category: selectedCategories,
         });
         setModalVisible(false);
     };
@@ -107,7 +134,7 @@ const FilterButton = ({ onApplyFilter }: any) => {
                                         {selectedProvinces.length === 0
                                             ? 'Khu vực'
                                             : selectedProvinces.length === 1
-                                                ? provinces.find(p => p.value === selectedProvinces[0])?.label
+                                                ? `${selectedProvinces.length} tỉnh`
                                                 : `${selectedProvinces.length} tỉnh`}
                                     </Text>
                                     <Text style={{ color: 'purple' }}>▼</Text>
@@ -123,6 +150,17 @@ const FilterButton = ({ onApplyFilter }: any) => {
                                             : selectedServices.length === 1
                                                 ? selectedServices[0]
                                                 : `${selectedServices.length} dịch vụ`}
+                                    </Text>
+                                    <Text style={{ color: 'purple' }}>▼</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.dropdownButton, { flex: 1 }]}
+                                    onPress={() => setCategoryModalVisible(true)}
+                                >
+                                    <Text style={styles.dropdownText}>
+                                        {selectedCategories.length === 0
+                                            ? 'Loại hình'
+                                            : `${selectedCategories.length} loại`}
                                     </Text>
                                     <Text style={{ color: 'purple' }}>▼</Text>
                                 </TouchableOpacity>
@@ -145,12 +183,12 @@ const FilterButton = ({ onApplyFilter }: any) => {
                                                 <TouchableOpacity
                                                     key={idx}
                                                     style={styles.checkboxContainer}
-                                                    onPress={() => toggleProvince(province.value)}
+                                                    onPress={() => toggleProvince(province.label)}
                                                 >
                                                     <Checkbox
-                                                        value={selectedProvinces.includes(province.value)}
-                                                        onValueChange={() => toggleProvince(province.value)}
-                                                        color={selectedProvinces.includes(province.value) ? '#007bff' : undefined}
+                                                        value={selectedProvinces.includes(province.label)}
+                                                        onValueChange={() => toggleProvince(province.label)}
+                                                        color={selectedProvinces.includes(province.label) ? '#007bff' : undefined}
                                                     />
                                                     <View style={{ width: '100%' }}>
                                                         <Text style={{ fontSize: 16, fontWeight: '500', marginLeft: 5, marginTop: 5 }}>{province.label}</Text>
@@ -219,6 +257,58 @@ const FilterButton = ({ onApplyFilter }: any) => {
                                     </View>
                                 </View>
                             </Modal>
+
+                            <Modal transparent={true} visible={categoryModalVisible} animationType="slide">
+                                <View style={styles.modalOverlay}>
+                                    <View style={styles.modalBoxService}>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <Text style={styles.title}>Chọn loại hình</Text>
+                                            <TouchableOpacity
+                                                style={{
+                                                    backgroundColor: '#196EEE',
+                                                    width: 30,
+                                                    height: 30,
+                                                    marginBottom: 18,
+                                                    borderRadius: 5,
+                                                    justifyContent: 'center',
+                                                    alignItems: 'center',
+                                                }}
+                                                onPress={() => setCategoryModalVisible(false)}
+                                            >
+                                                <Text style={{ color: 'white', fontSize: 18 }}>X</Text>
+                                            </TouchableOpacity>
+                                        </View>
+
+                                        <ScrollView style={styles.modalContent}>
+                                            {categories.map((cat, idx) => (
+                                                <TouchableOpacity
+                                                    key={idx}
+                                                    style={styles.checkboxContainer}
+                                                    onPress={() => toggleCategory(cat.value)}
+                                                >
+                                                    <Checkbox
+                                                        
+                                                        value={selectedCategories.includes(cat.value)}
+                                                        onValueChange={() => toggleCategory(cat.value)}
+                                                        color={selectedCategories.includes(cat.value) ? '#007bff' : undefined}
+                                                    />
+                                                    <Text style={{ fontSize: 20, fontWeight: '500', marginLeft: 5, marginTop: 5, marginBottom: 5 }}>
+                                                        {cat.label}
+                                                    </Text>
+                                                </TouchableOpacity>
+                                            ))}
+
+                                            <TouchableOpacity
+                                                style={[styles.applyButton, { marginTop: 20, marginBottom: 30 }]}
+                                                onPress={() => setCategoryModalVisible(false)}
+                                            >
+                                                <Text style={styles.applyButtonText}>Xong</Text>
+                                            </TouchableOpacity>
+                                        </ScrollView>
+                                    </View>
+                                </View>
+                            </Modal>
+
                             {/* Rating */}
                             <Text style={styles.sectionTitle}>Đánh giá tối thiểu</Text>
                             <View style={styles.ratingRow}>
@@ -284,6 +374,14 @@ const styles = StyleSheet.create({
     modalBox: {
         width: '90%',
         height: 400,
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        padding: 10,
+    },
+
+    modalBoxService: {
+        width: '90%',
+        height: 300,
         backgroundColor: '#fff',
         borderRadius: 10,
         padding: 10,

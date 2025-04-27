@@ -44,9 +44,24 @@ export default function CollectionScreen ()
     const [collections, setCollections] = useState<any[]>([]);
     const [selectedCollectionLocations, setSelectedCollectionLocations] = useState<any[]>([]);
     const [loading, setLoading] = useState(true); 
+    const [reloadTrigger, setReloadTrigger] = useState(false);
+
       useEffect(() => {
         setModalVisible(false);
       }, []);
+
+      useEffect(() => {
+        fetchCollections();
+      }, [reloadTrigger]);
+
+      const onRefresh = async () => {
+        setReloadTrigger(!reloadTrigger);  // Đổi trạng thái trigger để reload danh sách
+      };
+
+      useEffect(() => {
+        fetchCollections();
+      }, [reloadTrigger]);
+      
 
       const getRandomImage = () => {
         const randomIndex = Math.floor(Math.random() * images.length);
@@ -73,6 +88,7 @@ export default function CollectionScreen ()
           if (result.isSuccess) {
             // Thêm collection vừa tạo vào danh sách
             setCollections((prevCollections) => [...prevCollections, result.data]);
+            setReloadTrigger(prev => !prev);
           } else {
             console.error("Error adding new collection:", result.error);
           }
@@ -88,7 +104,17 @@ export default function CollectionScreen ()
           const result = await response.json();
     
           if (result.isSuccess) {
-            setCollections(result.data);
+            //setCollections(result.data);
+            const updatedCollections = result.data.map((collection: any) => {
+              const firstLocation = collection.item?.[0];
+              const previewImageUrl = firstLocation?.image?.[0]?.url || null;
+              return {
+                ...collection,
+                previewImageUrl,
+              };
+            });
+            console.log('updatedCollections: ', updatedCollections);
+            setCollections(updatedCollections);
           } else {
             //console.error('Error fetching collections:', result.error);
           }
@@ -164,16 +190,23 @@ export default function CollectionScreen ()
                       // Giao diện collections thông thường
                       <View style={{ width: '50%', alignItems: 'center', marginVertical: 10 }}>
                         <TouchableOpacity style={styles.square} onPress={() => handleCollectionClick(item._id)}>
-                          <Image
-                            source={images[index % images.length]}
-                            style={{width:150, height:150, borderRadius:20}}
-                          />
+                        <Image
+                          source={
+                            item.previewImageUrl
+                              ? { uri: item.previewImageUrl }
+                              : require('../assets/images/defaultlocation.png') // fallback image nếu không có ảnh
+                          }
+                          style={{ width: 150, height: 150, borderRadius: 20 }}
+                        />
+
                         </TouchableOpacity>
                         <Text style={{ marginTop: 10, fontSize: 20 }}>{item.name}</Text>
                       </View>
                     )
                   }
                   numColumns={2} 
+                  refreshing={false} // Nếu muốn thêm loading indicator khi đang refreshing
+                  onRefresh={onRefresh}
                 />
             </View>
 
@@ -226,6 +259,8 @@ export default function CollectionScreen ()
                                 imageUrl={item.image?.[0]?.url || "https://via.placeholder.com/150"}
                                 name={item.name}
                                 rating={item.rating || 1.0}
+                                province={item.province || ""}
+                                minPrice={item.minPrice || 0}
                                 cancellation="Hủy miễn phí trong 24h"
                                 onPress={() => { 
                                   navigation.navigate('detail-screen', { id: item._id });

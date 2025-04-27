@@ -213,8 +213,12 @@ export default function TicketScreen() {
         {loading && <ActivityIndicator size="large" color="#0000ff"  />}
       </View>
     </ScrollView> */}
-      <Image source={require('../assets/icons/logo.png')} style={styles.logo} />
+      <View style ={{ flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center', marginRight: 20}}>
       <Text style={styles.collections}>Tất cả Booking</Text>
+      <Image source={require('../assets/icons/logo.png')} style={styles.logo} />
+
+      </View>
+      
 
         <FlatList
             data={tickets}

@@ -12,9 +12,9 @@ import Animated, {
 } from "react-native-reanimated";
 import HeaderSvg from "../components/home/head/HeaderSVG";
 import StorySvg from "../components/home/head/StorySvg";
+import FloatingButton from "../components/home/FloatingButton";
 import { StatusBar } from "react-native";
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
-
 
 export default function SocialScreen({ navigation }: {navigation: NativeStackNavigatorProps}) {
   const [followings, setFollowings] = React.useState({ data: [], list: [] });
@@ -42,7 +42,7 @@ export default function SocialScreen({ navigation }: {navigation: NativeStackNav
     };
   });
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       {/* <StatusBar backgroundColor={GlobalStyles.colors.primary300} /> */}
       <View>
         <Animated.View style={storySvgAnimatedStyles}>
@@ -78,7 +78,8 @@ export default function SocialScreen({ navigation }: {navigation: NativeStackNav
         </Animated.View>
       </View>
       <Body StoryTranslate={StoryTranslate} />
-    </SafeAreaView>
+      <FloatingButton navigation={navigation} />
+    </View>
   );
 };
 
