@@ -175,7 +175,7 @@ import {
         color?: any;
       };
   
-      function FooterButton({ icon, number, onPress, color = "white" } : FooterButtonProps) {
+      function FooterButton({ icon, number, onPress, color = "black" } : FooterButtonProps) {
         return (
           <View>
             <Pressable style={[styles.footerIcon]} onPress={onPress}>
@@ -184,7 +184,7 @@ import {
               </PressEffect>
               <Text
                 style={{
-                  color: "white",
+                  color: "black",
                   fontWeight: "600",
                 }}
               >
@@ -234,7 +234,7 @@ import {
               onPress={() => setShowCaptions(!showCaptions)}
               numberOfLines={showCaptions ? undefined : 1}
               style={{
-                color: "white",
+                color: "black",
                 paddingHorizontal: 5,
                 paddingTop: 15,
                 textAlign: "center",

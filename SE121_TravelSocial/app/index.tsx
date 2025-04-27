@@ -1,9 +1,9 @@
-import {View, Text} from 'react-native'
+import { View, Text } from 'react-native'
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
 (Text as any).defaultProps = (Text as any).defaultProps || {};
-(Text as any).defaultProps.style = { fontFamily: 'UTMTimesBold'};
+(Text as any).defaultProps.style = { fontFamily: 'UTMTimesBold' };
 
 import WelcomeScreen1 from '@/screen/Welcome/WelcomeScreen1'
 import LoginScreen from '@/screen/Welcome/LoginScreen'
@@ -29,156 +29,205 @@ import DetailBookingScreen from '@/screen/DetailBookingScreen';
 import TicketScreen from '@/screen/TicketScreen';
 import LuckyWheelScreen from '@/screen/LuckyWheelScreen';
 import SearchLocationScreen from '@/screen/SearchLocationScreen';
-
+import ProfileSocialScreen from '@/screen/ProfileSocialScreen';
+import SearchFriendScreen from '@/screen/SearchFriendScreen';
+import NotificationsSocialScreen from '@/screen/NotificationsSocialScreen';
+import NewPostScreen from '@/screen/NewPostScreen';
+import ViewMapScreen from '@/screen/ViewMapScreen';
+import VoucherScreen from '@/screen/VoucherScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
 export default function App() {
   return (
-    
-      <NavigationContainer independent={true}>
-        <UserProvider>
-          <Stack.Navigator
+
+    <NavigationContainer independent={true}>
+      <UserProvider>
+        <Stack.Navigator
           initialRouteName='login'>
-            <Stack.Screen 
-            name = "welcome1" 
+          <Stack.Screen
+            name="welcome1"
             component={WelcomeScreen1}
             options={{
               headerShown: false,
-              headerTransparent:true,
-            }}/>
+              headerTransparent: true,
+            }} />
 
-            <Stack.Screen 
-            name = "login" 
+          <Stack.Screen
+            name="login"
             component={LoginScreen}
             options={{
               headerShown: false
-            }}/>
+            }} />
 
-            <Stack.Screen 
-            name = "register" 
+          <Stack.Screen
+            name="register"
             component={RegisterScreen}
             options={{
               headerShown: false
-            }}/>
+            }} />
 
-            <Stack.Screen 
-            name = "register2" 
+          <Stack.Screen
+            name="register2"
             component={RegisterScreen2}
             options={{
               headerShown: false
-            }}/>
+            }} />
 
-            <Stack.Screen 
-            name = "collection-screen"
+          <Stack.Screen
+            name="collection-screen"
             component={CollectionScreen}
             options={{
               headerShown: false
-            }}/>
+            }} />
 
-            <Stack.Screen 
-            name = "add-new-collection-screen"
+          <Stack.Screen
+            name="add-new-collection-screen"
             component={AddNewCollectionScreen}
             options={{
               headerShown: false
-            }}/>
+            }} />
 
-            <Stack.Screen 
-            name = "personal-information-screen"
+          <Stack.Screen
+            name="personal-information-screen"
             component={PersonalInformationScreen}
             options={{
               headerShown: false
-            }}/>
+            }} />
 
-            <Stack.Screen 
-            name = "notifications-screen"
+          <Stack.Screen
+            name="notifications-screen"
             component={NotificationsScreen}
             options={{
               headerShown: false
-            }}/>
+            }} />
 
-            <Stack.Screen 
-            name = "chat-board-screen"
+          <Stack.Screen
+            name="chat-board-screen"
             component={ChatBoardScreen}
             options={{
               headerShown: false
-            }}/>
+            }} />
 
-            <Stack.Screen 
-            name = "chat-screen"
+          <Stack.Screen
+            name="chat-screen"
             component={ChatScreen}
             options={{
               headerShown: false
-            }}/>
+            }} />
 
-            <Stack.Screen 
-            name = "main-screen"
+          <Stack.Screen
+            name="main-screen"
             component={MainScreen}
             options={{
               headerShown: false
-            }}/>
+            }} />
 
-            <Stack.Screen 
-            name = "payment-method-screen"
+          <Stack.Screen
+            name="payment-method-screen"
             component={PaymentMethodScreen}
             options={{
               headerShown: false
-            }}/>
+            }} />
 
-            <Stack.Screen 
-            name = "add-new-payment-method-screen"
+          <Stack.Screen
+            name="add-new-payment-method-screen"
             component={AddNewPaymentMethodScreen}
             options={{
               headerShown: false
-            }}/>
+            }} />
 
-            <Stack.Screen 
-            name = "reservation-required-screen"
+          <Stack.Screen
+            name="reservation-required-screen"
             component={ReservationRequiredScreen}
             options={{
               headerShown: false
-            }}/>
+            }} />
 
-            <Stack.Screen 
-            name = "available-room-screen"
+          <Stack.Screen
+            name="available-room-screen"
             component={AvailableRoomScreen}
             options={{
               headerShown: false
-            }}/>
-            <Stack.Screen
-            name = 'detail-screen'
+            }} />
+          <Stack.Screen
+            name='detail-screen'
             component={DetailScreen}
             options={{
-              headerShown: false}}/>
+              headerShown: false
+            }} />
 
-            <Stack.Screen
-            name = "detail-booking-screen"
+          <Stack.Screen
+            name="detail-booking-screen"
             component={DetailBookingScreen}
             options={{
-              headerShown: false}}/>
+              headerShown: false
+            }} />
 
-            <Stack.Screen
-            name = 'booking-screen'
+          <Stack.Screen
+            name='booking-screen'
             component={TicketScreen}
             options={{
-              headerShown: false}}/>
+              headerShown: false
+            }} />
 
-            <Stack.Screen
-            name = 'lucky-wheel-screen'
+          <Stack.Screen
+            name='lucky-wheel-screen'
             component={LuckyWheelScreen}
             options={{
-              headerShown: false}}/>
+              headerShown: false
+            }} />
 
-            <Stack.Screen
-            name = 'search-location-screen'
+          <Stack.Screen
+            name='search-location-screen'
             component={SearchLocationScreen}
             options={{
-              headerShown: false}}/>
+              headerShown: false
+            }} />
 
-          </Stack.Navigator>
-        </UserProvider>
-      </NavigationContainer>
-    
-   
+          <Stack.Screen
+            name='profile-social-screen'
+            component={ProfileSocialScreen}
+            options={{
+              headerShown: false
+            }} />
+          <Stack.Screen
+            name='search-friend-screen'
+            component={SearchFriendScreen}
+            options={{
+              headerShown: false
+            }} />
+
+          <Stack.Screen
+            name='notifications-social-screen'
+            component={NotificationsSocialScreen}
+            options={{
+              headerShown: false
+            }} />
+
+          <Stack.Screen
+            name='new-post-screen'
+            component={NewPostScreen}
+            options={{
+              headerShown: false
+            }} />
+          <Stack.Screen
+            name='view-map-screen'
+            component={ViewMapScreen}
+            options={{
+              headerShown: false
+            }} />
+          <Stack.Screen
+            name='voucher-screen'
+            component={VoucherScreen}
+            options={{
+              headerShown: false
+            }} />
+
+        </Stack.Navigator>
+      </UserProvider>
+    </NavigationContainer>
+
+
   );
 }

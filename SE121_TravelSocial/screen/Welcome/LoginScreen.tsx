@@ -6,6 +6,8 @@ import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/n
 import { Ionicons, FontAwesome6 } from '@expo/vector-icons';
 import { useUser } from '@/context/UserContext';
 import {API_BASE_URL} from '../../constants/config';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 
 export default function LoginScreen ({navigation}: {navigation: NativeStackNavigatorProps}) {
@@ -38,9 +40,9 @@ export default function LoginScreen ({navigation}: {navigation: NativeStackNavig
             const data = await response.json(); 
             console.log(data);
             if (response.ok) {
-                const userId = data.data;  // Giả sử API trả về userId trong đối tượng data
-                setUserId(userId?._id);  // Cập nhật userId vào state hoặc context
-                console.log('User ID:', userId);
+                const userId = data.data;  
+                setUserId(userId?._id);  
+                await AsyncStorage.setItem('userData', JSON.stringify(userId));                console.log('User ID:', userId);
                 navigation.navigate('main-screen');
             } else {
                 Alert.alert('Login Failed', data.error || 'Please try again.');

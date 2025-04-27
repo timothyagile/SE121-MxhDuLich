@@ -66,6 +66,7 @@ export default function ProfileScreen({ navigation }: { navigation: NativeStackN
                 if (response.ok) {
                     const data = await response.json();
                     setUserData(data.data); 
+                    setImage(data.data?.userAvatar.url);
                     console.log(data.data);
                 } else {
                     console.error('Failed to fetch user data:', response.statusText);
@@ -119,10 +120,15 @@ export default function ProfileScreen({ navigation }: { navigation: NativeStackN
                         <Text style={styles.personalInfoText}>Thông báo</Text>
                         <Image source={require('../assets/icons/arrowright.png')} style={styles.arrowIcon} />
                     </TouchableOpacity>
+                    <TouchableOpacity style={styles.personalInfoContainer} onPress={()=>navigation.navigate('voucher-screen')}>
+                        <Text style={styles.personalInfoText}>Voucher cho bạn</Text>
+                        <Image source={require('../assets/icons/arrowright.png')} style={styles.arrowIcon} />
+                    </TouchableOpacity>
                     <TouchableOpacity style={styles.personalInfoContainer} onPress={()=>navigation.navigate('Booking')}>
                         <Text style={styles.personalInfoText}>Lịch sử booking</Text>
                         <Image source={require('../assets/icons/arrowright.png')} style={styles.arrowIcon} />
                     </TouchableOpacity>
+
                 </View>
 
                 <View>

@@ -100,13 +100,13 @@ import {
                 color={GlobalStyles.colors.gray}
               />
               <Text
-                style={{ color: GlobalStyles.colors.gray, paddingHorizontal: 5 }}
+                style={{ color: 'black', paddingHorizontal: 5 }}
               >
                 Lahore, Pakistan
               </Text>
             </View>
             <Text
-              style={{ color: GlobalStyles.colors.gray, paddingHorizontal: 5 }}
+              style={{ color: 'black', paddingHorizontal: 5 }}
             >
               25 July, 2024
             </Text>
@@ -115,7 +115,7 @@ import {
             onPress={() => setShowCaptions(!showCaptions)}
             numberOfLines={showCaptions ? undefined : 1}
             style={{
-              color: "white",
+              color: "black",
               padding: 5,
               paddingBottom: 10,
               width: showCaptions ? undefined : "90%",
@@ -216,7 +216,7 @@ import {
               <PressEffect>
                 <View
                   style={{
-                    backgroundColor: GlobalStyles.colors.primary,
+                    backgroundColor: 'GlobalStyles.colors.primary',
                     padding: 10,
                     borderRadius: 50,
                     flexDirection: "row",

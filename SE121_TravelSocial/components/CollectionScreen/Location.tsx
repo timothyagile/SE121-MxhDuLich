@@ -4,6 +4,8 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 interface CollectionItemProps {
   imageUrl: string;       // URL của hình ảnh location
   name: string;           // Tên của location
+  province?: string;  
+  minPrice?: number;     // Tên tỉnh (không sử dụng trong CollectionItem)
   rating?: number;        // Đánh giá sao   
   cancellation?: string;  // Chính sách hủy phòng
   onPress?: () => void;   // Hàm gọi khi nhấn vào
@@ -12,6 +14,8 @@ interface CollectionItemProps {
 const CollectionItem: React.FC<CollectionItemProps> = ({
   imageUrl,
   name,
+  province,
+  minPrice,
   rating,
   cancellation,
   onPress,
@@ -20,9 +24,18 @@ const CollectionItem: React.FC<CollectionItemProps> = ({
     <TouchableOpacity onPress={onPress} style={styles.container}>
       <Image source={{ uri: imageUrl }} style={styles.image} />
       <View style={styles.detailsContainer}>
-        <Text style={styles.name} numberOfLines={1}>
-          {name}
-        </Text>
+        <View style={{  alignItems: "flex-start" }}>
+          <Text style={styles.name} numberOfLines={1}>
+            {name}
+          </Text>
+          <Text style={styles.province} numberOfLines={1}>
+            {province}
+          </Text>
+          <Text style={styles.province} numberOfLines={1}>
+            Giá tham khảo: {minPrice?.toLocaleString('vi-VN')} VND
+          </Text>
+        </View>
+      
         <View style={styles.ratingContainer}>
           <Image
             source={require("../../assets/icons/star.png")} // Icon sao
@@ -62,6 +75,11 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
     fontWeight: "bold",
+    color: "#333",
+  },
+  province: {
+    fontSize: 13,
+    fontWeight: "400",
     color: "#333",
   },
   ratingContainer: {

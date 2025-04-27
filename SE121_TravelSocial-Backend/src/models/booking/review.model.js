@@ -27,7 +27,8 @@ const ReviewSchema = new Schema({
     review: {
         type: String,
         require: true,
-    }
+    },
+    image: { type: [String], default: []},
 }, {collection: 'Review'})
 
 const reCaculateRating = async (oldRating, numberOfRating, newRating) => {

@@ -14,7 +14,9 @@ const iconMapping: Record<string, any> = {
   spa: require('../../assets/services/spa.png'),
   carSide: require('../../assets/services/carside.png'),
   ship: require('../../assets/services/ship.png'),
-
+  cleanroom: require('../../assets/services/clean-room.png'),
+  massage: require('../../assets/services/massage.png'),
+  washingmachine: require('../../assets/services/washing-machine.png'),
 };
 
 // Mảng chứa các dịch vụ
@@ -32,7 +34,10 @@ const services = [
 
 interface Service {
   icon: string;
-  text: string;
+  name: string;
+  description?: string;
+  price: number;
+  unit?: string;
 }
 
 interface ServiceOptionProps {
@@ -53,11 +58,12 @@ const ServiceOption: React.FC<ServiceOptionProps> = ({ services }) => {
     <View style={styles.container}>
       <Text style={styles.header}>Dịch vụ kèm theo (tùy chọn)</Text>
       <View style={styles.services}>
-        {services.map((service, index) => (
+        {services?.map((service, index) => (
           <TouchableOpacity onPress={() => handlePress(service)} key={index} style={styles.service}>
             {/* Sử dụng đối tượng ánh xạ để lấy icon */}
             <Image source={iconMapping[service.icon]} style={styles.icon} />
-            <Text style={styles.serviceText}>{service.text}</Text>
+            <Text style={styles.serviceText}>{service.name}</Text>
+            {/* <Text style={styles.serviceText}>{service.description}</Text> */}
           </TouchableOpacity>
         ))}
       </View>
@@ -76,7 +82,11 @@ const ServiceOption: React.FC<ServiceOptionProps> = ({ services }) => {
                   source={iconMapping[selectedService.icon]}
                   style={{ width: 50, height: 50, marginBottom: 10 }}
                 />
-                <Text style={styles.modalText}>{selectedService.text}</Text>
+                <Text style={styles.modalText}>{selectedService.name}</Text>
+                <View>
+                  <Text style={{color: "green", fontSize: 20, fontWeight:"600", marginBottom: 20}}>Giá: {selectedService.price.toLocaleString('vi-VN')}đ/{selectedService.unit}</Text>
+                </View>
+                <Text style={styles.modalText}>{selectedService.description}</Text>
               </>
             )}
             <Pressable style={styles.closeButton} onPress={() => setModalVisible(false)}>

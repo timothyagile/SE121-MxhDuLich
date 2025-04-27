@@ -13,14 +13,14 @@ const Body = ({ StoryTranslate }: any) => {
       <TopTab.Navigator
       //   tabBar={(props) => <TopTabBar {...props} />}
       screenOptions={{
-        tabBarActiveTintColor: "white",
+        tabBarActiveTintColor: "black",
         tabBarLabelStyle: {
           textTransform: "none",
           fontSize: 18,
           padding: 0,
           margin: 0,
         },
-        tabBarInactiveTintColor: "rgb(241, 234, 234)",
+        tabBarInactiveTintColor: "rgb(129, 128, 128)",
         tabBarIndicatorStyle: {
           height: 3,
           width: "10%",

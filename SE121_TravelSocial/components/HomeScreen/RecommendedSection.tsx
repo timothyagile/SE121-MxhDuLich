@@ -109,7 +109,7 @@ export default function RecommendedSection({ categoryId, navigation }: PopularSe
                                     <View style = {[styles.textBox, {top: 10, width: 70}]}>
                                         <Image source={require('@/assets/icons/star.png')}
                                         style = {styles.star}></Image>
-                                        <Text style = {[styles.textrating, {fontSize: 15}]}>{item.rating}</Text>
+                                        <Text style = {[styles.textrating, {fontSize: 15,}]}>{item.rating}</Text>
                                     </View>
                                     
                                     <TouchableOpacity onPress={()=>handlePress(item._id.toString())} style= {[styles.textBox2,{ bottom: 25,}]}>
@@ -124,7 +124,11 @@ export default function RecommendedSection({ categoryId, navigation }: PopularSe
                             <View style = {styles.footer}>
                                 <View>
                                     <Text style = {[styles.textStyle, {fontSize: 14}]}>{item.name}</Text>
+                                    <View>
+                                        <Text style = {[styles.textStyle, {fontSize: 14}]}>{item?.province}</Text>
+                                    </View>
                                 </View>
+                                
                                 <View style = {[styles.textBox,{borderWidth:3, borderColor:'white'}]}>
                                     <Text style = {[styles.textStyle2, {marginHorizontal: 5, color: 'white'}]}>hot deal</Text>
                                 </View>
@@ -157,7 +161,7 @@ const styles = StyleSheet.create({
         shadowRadius: 10, // Bán kính bóng
         elevation: 5, // Đổ bóng trên Android
         backgroundColor: 'white', // Nền trắng
-        height: CARD_HEIGHT-20,
+        height: CARD_HEIGHT-10,
       },
     
     titleText: {
@@ -232,7 +236,7 @@ const styles = StyleSheet.create({
         color: 'white',
         marginLeft: 5,
         left:7,
-        top:2,
+        top:0,
         marginVertical: 2,
     },
     textStyle2: {

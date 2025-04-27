@@ -13,7 +13,7 @@ import CustomModal from '@/components/CollectionScreen/AddIntoCollection';
 import ImageCarousel from '@/components/HomeScreen/ImageCarousel';
 import Recommendation from '@/components/DetailScreen/Recommendation';
 import ServiceOption from '@/components/DetailScreen/ServiceOption';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
@@ -76,7 +76,8 @@ const facilityIcons: FacilityIcons = {
 };
   
   const [services, setServices] = useState<Service[]>([]);  // Khai báo rõ ràng kiểu dữ liệu
-  
+  const [servicesOfLocation, setServicesOfLocation] = useState([]);  // Khai báo rõ ràng kiểu dữ liệu
+
   
     const [isExpanded, setIsExpanded] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
@@ -194,12 +195,13 @@ const facilityIcons: FacilityIcons = {
   }, [locationDetails]);
 
     const openMap = () => {
-        if (latitude && longitude) {
-            const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
-            Linking.openURL(url).catch(err => console.error("Không thể mở Google Maps", err));
-        } else {
-            console.log('Tọa độ không khả dụng');
-        }
+      navigation.navigate('view-map-screen')
+        // if (latitude && longitude) {
+        //     const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+        //     Linking.openURL(url).catch(err => console.error("Không thể mở Google Maps", err));
+        // } else {
+        //     console.log('Tọa độ không khả dụng');
+        // }
     };
 
     useEffect(() => {
@@ -210,9 +212,21 @@ const facilityIcons: FacilityIcons = {
 
     useEffect(() => {
       if (locationDetails?._id) {
-        fetchRoomServices(locationDetails._id); // Gọi API lấy danh sách dịch vụ
+        fetchRoomServices(locationDetails._id); 
+        fetchservices (locationDetails._id); // Gọi API lấy dịch vụ của địa điểm
       }
     }, [locationDetails]);
+
+    // Hàm lưu vào localStorage (AsyncStorage)
+const storeLocationDetails = async (data: any) => {
+  try {
+    const jsonValue = JSON.stringify(data);
+    await AsyncStorage.setItem('@location_details', jsonValue);
+    console.log('Location details saved to local storage.');
+  } catch (e) {
+    console.error('Error saving location details:', e);
+  }
+};
 
     const fetchLocationDetails = async (id: string) => {
       try {
@@ -221,6 +235,7 @@ const facilityIcons: FacilityIcons = {
         if (data.isSuccess) {
           console.log('Location details:', data.data);
           setLocationDetails(data.data);
+          await storeLocationDetails(data.data);
         } else {
           console.error('API error:', data.error);
         }
@@ -309,6 +324,22 @@ const facilityIcons: FacilityIcons = {
       fetchReviews();
     }, [id]);
 
+    const fetchservices = async (id : any) => {
+      
+      try {
+        const response = await fetch(`${API_BASE_URL}/service/location/${id}`);
+        const result = await response.json();
+        if (response.ok && result.isSuccess) {
+          
+          setServicesOfLocation(result.data);
+        } else {
+        }
+      } catch (error) {
+        console.error('Error fetching reviews:', error);
+        Alert.alert('Lỗi', 'Không thể kết nối với máy chủ.');
+      } 
+    };
+
     const renderImage = ({ item }: { item: { _id: string; url: string } }) => (
       console.log('image:', item.url),
       <Image
@@ -332,27 +363,7 @@ const facilityIcons: FacilityIcons = {
         <ScrollView >
           {/* Hình ảnh và nút quay lại */}
           <View style={styles.imageContainer}>
-          {/* <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={true}
-          >
-            {locationDetails.image?.map((img:any) => (
-              <Image
-                key={img._id}
-                source={{ uri: img.url }}
-                style={styles.image}
-              />
-            ))}
-          </ScrollView> */}
-          {/* <Image
-            source={
-              locationDetails.image[0].url
-                  ? { uri:locationDetails.image[0].url }
-                  : require('@/assets/images/bai-truoc-20.jpg') // Hình ảnh mặc định
-              }
-              
-              style={styles.image}
-            />  */}
+
 
           <ImageCarousel images={locationDetails?.image} />
 
@@ -466,25 +477,20 @@ const facilityIcons: FacilityIcons = {
               <FontAwesome name="chevron-down" size={20} color="gray" style={styles.iconRight} />
             </View>
 
-            {/* Availability State */}
-            {/* <View style={styles.stateContainer}>
-              <Text style={styles.stateText}>Trang thái:</Text>
-              <Text style={styles.stateBadge}>{roomsStatus}</Text>
-            </View> */}
-
-            {/* Search Button */}
             <TouchableOpacity onPress={()=> {
               console.log('Navigating with ID: ', locationDetails._id);
+              console.log('servicesOfLocation:', servicesOfLocation);
               navigation.navigate('available-room-screen', {
                 id: locationDetails._id,
                 checkinDate: date1, // Gửi ngày checkin
                 checkoutDate: date2, // Gửi ngày checkout
+                serviceOfLocation: servicesOfLocation, // Gửi dịch vụ của địa điểm
               });}} style={styles.searchButton}>
               <Text style={styles.searchButtonText}>Tìm kiếm</Text>
             </TouchableOpacity>
           </View>
 
-          <ServiceOption services={servicesoption}></ServiceOption>
+          <ServiceOption services={servicesOfLocation}></ServiceOption>
 
           {/* Feedback Section */}
           <View style={styles.section}>
@@ -548,7 +554,8 @@ const facilityIcons: FacilityIcons = {
               <TouchableOpacity onPress={()=> navigation.navigate('available-room-screen', {
                 id: locationDetails._id,
                 checkinDate: date1, // Gửi ngày checkin
-                checkoutDate: date2, // Gửi ngày checkout
+                checkoutDate: date2,
+                serviceOfLocation: servicesOfLocation // Gửi ngày checkout
               })} style={styles.bookNowButton}>
                 <Text style={styles.bookNowText}>Đặt ngay</Text>
                 <FontAwesome size={20} name='arrow-right' style={styles.iconBookNow}></FontAwesome>

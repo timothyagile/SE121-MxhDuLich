@@ -242,11 +242,12 @@ module.exports.searchLocationsAndRooms = async (req, res) => {
         }
         if (services) {
             const servicesArray = Array.isArray(services) ? services : services.split(',');
-            locationQuery['services'] = { $all: servicesArray };
+           // locationQuery['services'] = { $all: servicesArray };
         }
         const roomPriceQuery = {};
         if (costMin) roomPriceQuery.$gte = parseFloat(costMin);
         if (costMax) roomPriceQuery.$lte = parseFloat(costMax);
+        const servicesArray = Array.isArray(services) ? services : services.split(',');
 
         const aggregatePipeline = [
             // Kết nối với Rooms
@@ -256,6 +257,14 @@ module.exports.searchLocationsAndRooms = async (req, res) => {
                     localField: '_id',
                     foreignField: 'locationId',
                     as: 'rooms',
+                },
+            },
+            {
+                $lookup: {
+                    from: 'Service', // tên collection chứa dịch vụ
+                    localField: '_id',
+                    foreignField: 'locationId',
+                    as: 'locationServices',
                 },
             },
             // {
@@ -270,6 +279,40 @@ module.exports.searchLocationsAndRooms = async (req, res) => {
             {
                 $match: locationQuery,
             },
+
+            
+            ...(services ? [
+                {
+                  $addFields: {
+                    matchedServices: {
+                      $filter: {
+                        input: '$locationServices',
+                        as: 'service',
+                        cond: {
+                          $in: ['$$service.name', servicesArray]
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  $match: {
+                    'matchedServices.0': { $exists: true }
+                  }
+                }
+              ] : []),
+            // Nếu có điều kiện lọc dịch vụ, lọc các phòng theo `services`
+            // ...(services ? [
+            //     {
+            //       $match: {
+            //         'locationServices.name': {
+            //           $in: Array.isArray(services) ? services : services.split(',')
+            //         }
+            //       }
+            //     }
+            //   ] : []),
+                
+            
             // Nếu có điều kiện lọc giá, lọc các phòng theo `pricePerNight`
             ...(costMin || costMax
                 ? [
@@ -296,6 +339,7 @@ module.exports.searchLocationsAndRooms = async (req, res) => {
                     },
                 ]
                 : []),
+                
             // Dự án kết quả trả về
             {
                 $project: {
@@ -305,10 +349,19 @@ module.exports.searchLocationsAndRooms = async (req, res) => {
                     category: 1,
                     province: 1,
                     services: 1,
+                    locationServices: 1,
                     matchingRooms: 1,
+                    image: 1,
+                    name: 1,
+                    minPrice: 1,
                 },
             },
         ];
+
+
+
+
+        console.log('[🔍 AGGREGATE PIPELINE]', JSON.stringify(aggregatePipeline, null, 2));
 
         const locations = await Location.aggregate(aggregatePipeline);
 

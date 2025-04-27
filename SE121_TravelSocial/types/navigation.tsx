@@ -27,13 +27,18 @@ export type SelectedRoom = {
     'payment-method-screen': {locationId: string, totalPrice: string, selectedRoomsData: SelectedRoom[]};
     'add-new-payment-method-screen': undefined;
     'reservation-required-screen': { selectedRoomsData: SelectedRoom[] ,locationId: string};
-    'available-room-screen': { id: string; checkinDate: Date; checkoutDate: Date };
+    'available-room-screen': { id: string; checkinDate: Date; checkoutDate: Date; serviceOfLocation: any };
     'detail-screen': { id: string };
     'detail-booking-screen': {bookingId: string; title: string; status: string};
     'booking-screen': undefined;
     'lucky-wheel-screen': undefined;
     'search-location-screen': undefined;
-
+    'profile-social-screen': undefined;
+    'search-friend-screen': undefined;
+    'notifications-social-screen': undefined;
+    'new-post-screen': undefined;
+    'view-map-screen': undefined;
+    'voucher-screen': undefined;
     
   };
   
