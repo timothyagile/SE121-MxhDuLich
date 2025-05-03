@@ -58,6 +58,7 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
     const [roomCount, setRoomCount] = useState(0);
     const [selectedRooms, setSelectedRooms] = useState(0);
     const [selectedRoomCounts, setSelectedRoomCounts] = useState<Record<string, number>>({});
+    const [selectedServiceCounts, setSelectedServiceCounts] = useState(0);
     const [currentRoomId, setCurrentRoomId] = useState<string | null>(null);
     const [buttonText, setButtonText] = useState("Chọn");
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -172,6 +173,11 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
         {selectedRoomCounts[currentRoomId!] ? `Đã chọn ${selectedRoomCounts[currentRoomId!]} phòng` : "Chọn"}
         setModalVisible(false);
     };
+
+    const handleApplyService = () => {
+        {selectedRoomCounts[currentRoomId!] ? `Đã chọn ${selectedRoomCounts[currentRoomId!]} phòng` : "Chọn"}
+        setModalServiceVisible(false);
+    };
     
     const toggleModal = (roomId?: string) => {
         setCurrentRoomId(roomId || null);
@@ -224,7 +230,7 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
           checkinDate: Date;
           checkoutDate: Date;
         };
-      };
+    };
 
     const handleConfirm = () => {
         const selectedRoomsData = Object.keys(selectedRoomCounts).map((roomId) => {
@@ -240,12 +246,21 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
               },
               nights: Math.abs((date1.getTime() - date2.getTime()) / (1000 * 60 * 60 * 24)),
             };
-          });
+        });
+
+        if (selectedRoomsData.length === 0) {
+            Alert.alert("Thông báo", "Vui lòng chọn ít nhất 1 phòng trước khi tiếp tục.");
+            return;
+        }
+        const selectedServicesData = selectedServices.filter((service: any) => service.quantity > 0);
+
+        console.log('selectedServicesDataaaaa: ', selectedServicesData);
         navigation.navigate('reservation-required-screen', {
           selectedRoomsData,
+          selectedServicesData: selectedServicesData,
           locationId: id,
         });
-      };
+    };
 
     
     return (
@@ -349,7 +364,7 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                             </View>
                         </View>
                         
-                        <Text style={styles.chosedate}>Chọn ngày</Text>
+                        {/* <Text style={styles.chosedate}>Chọn ngày</Text>
                         <View style={{flexDirection:'row', justifyContent:'space-between'}}>
                             <View style={[styles.inputContainer, {width:'44%', marginLeft: 13,}]}>
                                 <TouchableOpacity onPress={showDatePicker1}>
@@ -389,7 +404,7 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                                 />
                                 )}
                             </View>
-                            </View>
+                            </View> */}
 
                         <View style={styles.endcontainer}>
                             <View style={{ flex: 4 }}>
@@ -406,9 +421,11 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                         </View>
                         <View style={{  justifyContent: 'center', alignItems: 'center' }}>    
                                 <TouchableOpacity style={[styles.choosebutton, {width: '90%', marginBottom: 20}]} onPress={() => toggleModalService(room._id)}>
-                                    <Text style={styles.choosetext}>
-                                        {selectedRoomCounts[room._id] ? `Đã chọn ${selectedRoomCounts[room._id]} dịch vụ` : "Dịch vụ kèm theo (tùy chọn)"}
-                                    </Text>
+                                <Text style={styles.choosetext}>
+                                    {selectedServices.length > 0
+                                    ? `Đã chọn ${selectedServices.reduce((total: any, item:any) => total + item.quantity, 0)} dịch vụ`
+                                    : 'Dịch vụ kèm theo (tùy chọn)'}
+                                </Text>
                                 </TouchableOpacity>
                         </View>
                     </View>
@@ -454,9 +471,9 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                         </TouchableOpacity>
                         <Text style={styles.modalTitle}>Chọn dịch vụ kèm theo</Text>
                         <ScrollView>
-                            <ServiceOption2 services={serviceOfLocation} onChangeSelectedServices={setSelectedServices} />
+                            <ServiceOption2 services={serviceOfLocation} selectedServicess={selectedServices} onChangeSelectedServices={setSelectedServices} />
                         </ScrollView>
-                        <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
+                        <TouchableOpacity style={styles.applyButton} onPress={handleApplyService}>
                             <Text style={styles.applyButtonText}>Xác nhận</Text>
                         </TouchableOpacity>
                         
@@ -598,7 +615,7 @@ const styles = StyleSheet.create({
           },
           shadowOpacity: 2,
           shadowRadius: 4,
-          elevation: 20,
+          elevation: 10,
     },
 
     inputContainer: {

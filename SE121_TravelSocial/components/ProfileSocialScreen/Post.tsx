@@ -8,6 +8,7 @@ import MainPost from "../home/body/Post";
 const { height, width } = Dimensions.get("window");
 
 export default function Post ({ postData }:any) {
+  console.log("Postt", postData);
   const navigation = useNavigation();
   const [showPost, setShowPost] = useState(false);
   return (
@@ -41,7 +42,7 @@ export default function Post ({ postData }:any) {
         }}
         style={{ margin: 5 }}
       >
-        <RemoteImage imageUri={postData.picturePath} />
+        <RemoteImage imageUri={postData?.[0]?.images?.[0].url || postData?.picturePath } />
       </Pressable>
     </View>
   );

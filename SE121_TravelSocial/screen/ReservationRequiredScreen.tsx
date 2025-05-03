@@ -27,7 +27,7 @@ interface SelectedRoomData {
 
 export default function ReservationRequiredScreen({ navigation }: {navigation: NativeStackNavigatorProps}) {
     const route = useRoute<ReservationRouteProp>();
-    const { selectedRoomsData, locationId } = route.params;
+    const { selectedRoomsData,selectedServicesData ,locationId } = route.params;
 
     const formatRoomDate = (date: Date): string => {
         const day = date.getDate().toString().padStart(2, '0');
@@ -44,7 +44,7 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
         checkoutDate: room.roomDetails.checkoutDate,
         count: room.count,
     }));
-    console.log('selected room dataa: ',selectedRoomsData);
+    //console.log('selected room dataa: ',selectedRoomsData);
 
     const [isEditing, setIsEditing] = useState<string | null>(null);
     const [name, setName] = useState({ firstName: '', lastName: '' });
@@ -64,10 +64,19 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
         0
       );
 
+      const calculateTotal = () => {
+        //console.log('selectedServicesData:', selectedServicesData);
+        return selectedServicesData?.reduce((total: any, item: any) => {
+          return total + item.quantity * item.service.price;
+        }, 0);
+      };
+
+    
+    const servicePrice = calculateTotal();
     //   const cleaningFee = 15000.0;
     //   const serviceFee = roomPrice * 0.01;
       const tax = roomPrice * 0.08;
-      const totalPrice = roomPrice+  tax;
+      const totalPrice = roomPrice +  tax + servicePrice;
 
       const [displayedTotalPrice, setDisplayedTotalPrice] = useState(totalPrice);
     
@@ -120,6 +129,8 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
     const handlePhoneNumberChange = (text: string) => {
         setPhoneNumber(text);
     };
+
+
 
     const renderField = (field: string) => {
         switch (field) {
@@ -180,7 +191,7 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
             <ScrollView>
             <View style={{flexDirection:'row'}}>
                 <View style={styles.imageContainer}>
-                    <Image source={require('../assets/images/camping-ho-coc.png')} style={styles.image} />
+                    <Image source={{ uri: locationDetails?.image?.[0].url }} style={styles.image} />
                 </View>
                 <View style ={styles.textContainer}>
                     <Text style= {styles.title}>{locationDetails?.name || 'Tên địa điểm'}</Text>
@@ -222,6 +233,16 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                     <Text style={styles.secondtext}>{room.count}   phòng</Text>
                 </View>
                 ))}
+                <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
+                    <Text style={styles.firsttext}>Số dịch vụ</Text>
+                    <Text style={styles.secondtext}>{selectedServicesData.reduce((total: any, item:any) => total + item.quantity, 0)}</Text>
+                </View>
+                {selectedServicesData.map((service : any, index: any) => (
+                <View key={index} style={{flexDirection:'row', marginTop: 10 }}>
+                    <Text style={styles.firsttext}>         {service.service?.name}</Text>
+                    <Text style={styles.secondtext}>{service.quantity}   {service.service.unit}</Text>
+                </View>
+                ))}
             </View>
 
             <View style ={{width:'100%', height:10, backgroundColor:'#E0DCDC', marginVertical:10, }}></View>
@@ -231,7 +252,7 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                     {/* <Text style={styles.firsttext}>$50 x 2</Text>
                     <Text style={styles.secondtext1}>$100.00</Text> */}
                     <Text style={styles.firsttext}>Phòng ({totalRooms} phòng)</Text>
-                    <Text style={styles.secondtext1}>{roomPrice.toFixed(0)} VND</Text>
+                    <Text style={styles.secondtext1}>{roomPrice.toLocaleString('vi-VN')} VND</Text>
                 </View>
                 {/* <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>Phí dọn dẹp</Text>
@@ -242,17 +263,20 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                     <Text style={styles.secondtext1}>{serviceFee.toFixed(0)} VND</Text>
                 </View> */}
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
+                    <Text style={styles.firsttext}>Dịch vụ kèm theo</Text>
+                    <Text style={styles.secondtext1}>{calculateTotal()?.toLocaleString('vi-VN')} VND</Text>
+                </View>
+                <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>Thuế</Text>
-                    <Text style={styles.secondtext1}>{tax.toFixed(0)} VND</Text>
+                    <Text style={styles.secondtext1}>{tax.toLocaleString('vi-VN')} VND</Text>
                 </View>
 
                 <View style ={{width:'100%', height:1, backgroundColor:'#E0DCDC', marginVertical:10, }}></View>
                 
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>Tổng cộng</Text>
-                    <Text style={styles.secondtext1}>{totalPrice.toFixed(0)} VND</Text>
+                    <Text style={styles.secondtext1}>{totalPrice.toLocaleString('vi-VN')} VND</Text>
                 </View>
-
             </View>
 
             <View style ={{width:'100%', height:10, backgroundColor:'#E0DCDC', marginVertical:10, }}></View>
@@ -263,7 +287,7 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                 </View>
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>Trả hết</Text>
-                    <Text style={styles.secondtext}>({totalPrice.toFixed(0)} VND)</Text>
+                    <Text style={styles.secondtext}>({totalPrice.toLocaleString('vi-VN')} VND)</Text>
                     <View style={{position:'absolute', right:0,}}>
                         <RadioButton
                         value="first"
@@ -275,7 +299,7 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                 </View>
                 <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
                     <Text style={styles.firsttext}>Trả một nửa</Text>
-                    <Text style={styles.secondtext}>{(totalPrice / 2).toFixed(0)} VND</Text>
+                    <Text style={styles.secondtext}>{(totalPrice / 2).toLocaleString('vi-VN')} VND</Text>
                     <View style={{position:'absolute', right:0,}}>
                         <RadioButton
                         value="second"
@@ -285,7 +309,7 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                     </View>
                     
                 </View>
-                <Text style={{width:'60%',}}>Cần trả {(totalPrice / 2).toFixed(0)} VND hôm nay và còn lại vào ngày 25</Text>
+                <Text style={{width:'60%',}}>Cần trả {(totalPrice / 2).toLocaleString('vi-VN')} VND hôm nay và còn lại vào ngày {formatRoomDate(selectedRoomsData[0].roomDetails.checkinDate)}</Text>
                 
             </View>
 

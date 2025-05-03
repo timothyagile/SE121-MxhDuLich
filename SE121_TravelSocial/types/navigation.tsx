@@ -26,7 +26,7 @@ export type SelectedRoom = {
     'main-screen': undefined;
     'payment-method-screen': {locationId: string, totalPrice: string, selectedRoomsData: SelectedRoom[]};
     'add-new-payment-method-screen': undefined;
-    'reservation-required-screen': { selectedRoomsData: SelectedRoom[] ,locationId: string};
+    'reservation-required-screen': { selectedRoomsData: SelectedRoom[], selectedServicesData: any,locationId: string};
     'available-room-screen': { id: string; checkinDate: Date; checkoutDate: Date; serviceOfLocation: any };
     'detail-screen': { id: string };
     'detail-booking-screen': {bookingId: string; title: string; status: string};
@@ -39,6 +39,5 @@ export type SelectedRoom = {
     'new-post-screen': undefined;
     'view-map-screen': undefined;
     'voucher-screen': undefined;
-    
   };
   
