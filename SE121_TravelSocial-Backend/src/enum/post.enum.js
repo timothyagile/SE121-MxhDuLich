@@ -27,9 +27,20 @@ const INTERACTION = {
     SHARECOUNT: "shareCount",
 }
 
+const SHARE_TARGET = {
+    USER: 'user',
+    GROUP: 'group',
+}
+
+const POST_TYPE = {
+    SHARED: 'shared',
+    ORIGINAL: 'original'
+}
 module.exports = {
     PRIVACY_LEVEL,
     TRIP_TYPE, 
     TRAVEL_SEASON,
-    INTERACTION
+    INTERACTION,
+    SHARE_TARGET,
+    POST_TYPE
 }

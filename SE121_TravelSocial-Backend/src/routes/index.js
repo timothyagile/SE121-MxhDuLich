@@ -1,5 +1,6 @@
 const express = require('express')
-
+const app = express()
+//const {io} = require('../app')
 //Booking route
 
 
@@ -28,8 +29,13 @@ const uploadImageRoute = require('./general/upload-image.route')
 const conversationRoute = require('./general/conversation.route')
 const messageRoute = require('./general//message.route')
 const executeCronJobRoute = require('./general/execute-cronjob.route')
+const commentRoute = require('./social/comment.route')
+const reactCommentRoute = require('./social/react-comment.route')
+const relationRoute = require('./social/relation.route')
+const socketRoute = require('./general/socket.route')
 
 const router = express.Router();
+//const io = app.get('io')
 
 router.use('/', roomRoute)
 router.use('/', bookingRoute)
@@ -50,6 +56,10 @@ router.use('/', messageRoute)
 router.use('/', executeCronJobRoute)
 router.use('/', hashTagRoute)
 router.use('/', reactRoute)
+router.use('/', commentRoute)
+router.use('/', reactCommentRoute)
+router.use('/', relationRoute)
+router.use('/', socketRoute)
 
 module.exports = router
 

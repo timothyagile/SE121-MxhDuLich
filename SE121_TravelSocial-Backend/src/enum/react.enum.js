@@ -7,4 +7,9 @@ const REACT_TYPE = {
     ANGRY: 'angry'
 }
 
-module.exports = { REACT_TYPE }
+const TARGET_TYPE = {
+    POST: 'post',
+    COMMENT: 'comment'
+}
+
+module.exports = { REACT_TYPE, TARGET_TYPE }

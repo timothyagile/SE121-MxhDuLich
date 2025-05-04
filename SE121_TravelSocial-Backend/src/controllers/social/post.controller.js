@@ -1,4 +1,5 @@
 const { CREATED, OK } = require("../../constants/httpStatusCode");
+const { POST_TYPE } = require("../../enum/post.enum");
 const Post = require('../../models/social/post.model')
 const postService = require('../../services/social/post.service')
 
@@ -110,3 +111,25 @@ module.exports.deletePost = async (req, res) => {
     })
 }
 
+module.exports.sharePostController = async (req, res) => {
+    console.log("Share post::" + req.body) 
+
+    const userId = res.locals.user._id;
+    const { originalPostId, content, userTagIds, shareTo } = req.body;
+
+    const type = POST_TYPE.SHARED
+    const sharedPost = await postService.sharePost({
+        originalPostId,
+        userId,
+        content,
+        userTagIds,
+        shareTo,
+        type
+    });
+
+    return res.status(CREATED).json({
+        isSuccess: true,
+        data: sharedPost,
+        error: null
+    });
+}
