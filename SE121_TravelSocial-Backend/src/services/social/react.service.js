@@ -17,27 +17,43 @@ const create = async (reactData) => {
         update stat
     }
     */
-    console.log("ReactService::", reactData)
+    console.log("ReactService::create", reactData)
     let existReact = await reactRepository.findOneReact(postId, userId)
     
     if(existReact) {
-        console.log("Existing react::", existReact)
+        console.log("Found existing react:", existReact)
         if(existReact.type === type) {
-            await reactRepository.delete(existReact._id)
-            await postService.updateStat(postId, INTERACTION.REACT_COUNT, -1)
+            console.log("Same reaction type, removing reaction")
+            try {
+                await reactRepository.delete(existReact._id)
+                console.log("Successfully deleted reaction, now updating post stats")
+                await postService.updateStat(postId, INTERACTION.REACT_COUNT, -1)
+                console.log("Successfully updated post stats after removing reaction")
+            } catch (error) {
+                console.error("Error while removing reaction:", error)
+                throw error
+            }
         }
         else {
+            console.log("Different reaction type, updating reaction")
             existReact = await reactRepository.update(existReact._id, {type: type})
         }
 
         return existReact
     }
     else {
-        const updatedPost = await postService.updateStat(
-            postId, INTERACTION.REACT_COUNT, 1)
-        const savedReact = await reactRepository.create(reactData)
-        
-        return savedReact;
+        console.log("No existing reaction, creating new one")
+        try {
+            const updatedPost = await postService.updateStat(
+                postId, INTERACTION.REACT_COUNT, 1)
+            console.log("Updated post stats for new reaction:", updatedPost)
+            const savedReact = await reactRepository.create(reactData)
+            console.log("Created new reaction:", savedReact)
+            return savedReact;
+        } catch (error) {
+            console.error("Error creating new reaction:", error)
+            throw error
+        }
     }
 }  
 
@@ -54,8 +70,22 @@ const countReactionByType = async(postId) => {
     return countReacts;
 }
 
+const checkUserReacted = async (postId, userId) => {
+    try {
+        const react = await reactRepository.findOneReact(postId, userId);
+        return { 
+            hasReacted: !!react, 
+            reactType: react ? react.type : null 
+        };
+    } catch (error) {
+        console.error("Error checking user reaction:", error);
+        return { hasReacted: false, reactType: null };
+    }
+}
+
 module.exports = {
     create,
     getByPostId,
     countReactionByType,
+    checkUserReacted
 }

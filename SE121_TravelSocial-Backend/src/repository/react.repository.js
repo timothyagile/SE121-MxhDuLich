@@ -47,8 +47,10 @@ class ReactRepository extends BaseRepository{
             { $group: { _id: "$type", count: { $sum: 1 } } }
         ])
 
-        if(countReacts.length === 0) { throw new NotFoundException() }
-
+        // Trước đây nếu không có phản ứng nào, sẽ ném lỗi
+        // Bây giờ trả về mảng rỗng để cho biết không có phản ứng
+        // if(countReacts.length === 0) { throw new NotFoundException() }
+        
         return countReacts
     }
 }

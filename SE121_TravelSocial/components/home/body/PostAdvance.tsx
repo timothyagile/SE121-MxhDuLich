@@ -17,6 +17,8 @@ import {
   //import { AuthContext } from "../../../store/auth-context";
   import PressEffect from "../../UI/PressEffect";
   import { LinearGradient } from "expo-linear-gradient";
+  import AsyncStorage from '@react-native-async-storage/async-storage';
+  import { API_BASE_URL } from "@/constants/config";
   const { height, width } = Dimensions.get("window");
   
   function PostAdvance({ post } : any) {
@@ -195,10 +197,73 @@ import {
   
       const [totalLikes, setTotalLikes] = useState(post.likes.length);
       const [showComments, setShowComments] = useState(false);
+      const [isLoading, setIsLoading] = useState(false);
+      
+      // Kiểm tra trạng thái like của người dùng khi component load
+      useEffect(() => {
+        const checkReactionStatus = async () => {
+          try {
+            // Lấy userId từ AsyncStorage
+            const userId = await AsyncStorage.getItem('userId');
+            if (!userId || !post?._id) return;
+
+            const response = await fetch(`${API_BASE_URL}/react/check?postId=${post._id}&userId=${userId}`, {
+              method: 'GET',
+              credentials: 'include',
+            });
+            
+            const data = await response.json();
+            if (data.isSuccess && data.data.hasReacted) {
+              setLiked(true);
+            }
+          } catch (error) {
+            console.error('Error checking reaction status:', error);
+          }
+        };
+        
+        checkReactionStatus();
+      }, [post?._id]);
+      
       async function handleLike() {
-        setTotalLikes((prevData: number) => (liked ? prevData - 1 : prevData + 1));
-  
-        setLiked(!liked);
+        if (isLoading) return;
+        setIsLoading(true);
+
+        try {
+          // Cập nhật UI trước để có trải nghiệm mượt mà
+          setTotalLikes((prevData: number) => (liked ? prevData - 1 : prevData + 1));
+          setLiked(!liked);
+
+          // Gọi API để tương tác với bài đăng
+          const response = await fetch(`${API_BASE_URL}/react`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+              postId: post?._id,
+              type: "love"
+            })
+          });
+
+          const data = await response.json();
+          
+          if (!data.isSuccess) {
+            // Nếu API thất bại, hoàn tác thay đổi UI
+            setTotalLikes((prevData: number) => (liked ? prevData + 1 : prevData - 1));
+            setLiked(!liked);
+            console.log('Lỗi khi tương tác với bài viết:', data.error);
+          } else {
+            console.log('Đã tương tác với bài viết thành công:', data.data);
+          }
+        } catch (error) {
+          // Hoàn tác thay đổi UI nếu có lỗi
+          setTotalLikes((prevData: number) => (liked ? prevData + 1 : prevData - 1));
+          setLiked(!liked);
+          console.log('Lỗi khi gọi API:', error);
+        } finally {
+          setIsLoading(false);
+        }
       }
   
 
@@ -316,4 +381,3 @@ import {
 
     }
   });
-  
