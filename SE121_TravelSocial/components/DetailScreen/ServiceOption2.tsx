@@ -47,16 +47,21 @@ interface SelectedService {
 
 interface ServiceOptionProps {
   services: Service[];
+  selectedServicess: SelectedService[];
   onChangeSelectedServices?: (selected: SelectedService[]) => void;
 }
 
-const ServiceOption2: React.FC<ServiceOptionProps> = ({ services, onChangeSelectedServices }) => {
+const ServiceOption2: React.FC<ServiceOptionProps> = ({ services, selectedServicess, onChangeSelectedServices }) => {
 
   const [selectedService, setSelectedService] = useState<Service | null>(null);
-  const [selectedServices, setSelectedServices] = useState<SelectedService[]>([]);
+  const [selectedServices, setSelectedServices] = useState<SelectedService[]>(selectedServicess || []);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [quantities, setQuantities] = useState<{ [serviceName: string]: number }>({});
+
+  useEffect(() => {
+    setSelectedServices(selectedServicess);
+  }, [selectedServicess]);
 
   useEffect(() => {
     if (onChangeSelectedServices) {
@@ -101,17 +106,25 @@ const ServiceOption2: React.FC<ServiceOptionProps> = ({ services, onChangeSelect
     });
   };
 
+  const calculateTotal = () => {
+    return selectedServices.reduce((total, item) => {
+      return total + item.quantity * item.service.price;
+    }, 0);
+  };
+
 
   const handlePressService = (service: Service) => {
     setSelectedService(service);
     setModalVisible(true);
   };
+
+
   
   return (
     <View style={styles.container}>
       <View style={styles.services}>
         {services.map((service, index) => (
-          <View key={index} style={styles.serviceRow}>
+          <TouchableOpacity onPress={() => handlePressService(service)} key={index} style={styles.serviceRow}>
             {/* Cột bên trái */}
             <View style={styles.serviceInfo}>
               <Image source={iconMapping[service.icon]} style={styles.icon} />
@@ -130,8 +143,11 @@ const ServiceOption2: React.FC<ServiceOptionProps> = ({ services, onChangeSelect
                 <Text style={styles.buttonText}>+</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
+        <Text style={{ fontSize: 22, color: 'green', marginTop: 10, textAlign: 'center', fontWeight: 'bold' }}>
+          Tổng tiền: {calculateTotal().toLocaleString('vi-VN')}đ
+        </Text>
       </View>
 
       <Modal

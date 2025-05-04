@@ -82,8 +82,8 @@ const facilityIcons: FacilityIcons = {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
 
-    const [date1, setDate1] = useState(new Date());
-    const [date2, setDate2] = useState(new Date());
+    const [date1, setDate1] = useState<Date | null>(null);
+    const [date2, setDate2] = useState<Date | null>(null);
     const [showPicker1, setShowPicker1] = useState(false);
     const [showPicker2, setShowPicker2] = useState(false);
     const [selectedDate1, setSelectedDate1] = useState('');
@@ -114,7 +114,7 @@ const facilityIcons: FacilityIcons = {
     const onDateChange1 = (_: any, selected: Date | undefined) => {
       setShowPicker1(false);
       if (selected) {
-        if (selected > date2) {
+        if (date2 && selected > date2) {
           Alert.alert("Lỗi", "Ngày checkin phải nhỏ hơn hoặc bằng ngày checkout.");
         } else {
           setDate1(selected);
@@ -123,12 +123,11 @@ const facilityIcons: FacilityIcons = {
         }
       }
     };
-
+    
     const onDateChange2 = (_: any, selected: Date | undefined) => {
       setShowPicker2(false);
       if (selected) {
-        // Kiểm tra nếu ngày checkout nhỏ hơn ngày checkin
-        if (selected < date1) {
+        if (date1 && selected < date1) {
           Alert.alert("Lỗi", "Ngày checkout phải lớn hơn hoặc bằng ngày checkin.");
         } else {
           setDate2(selected);
@@ -438,7 +437,7 @@ const storeLocationDetails = async (data: any) => {
                 />
                 {showPicker1 && (
                   <DateTimePicker
-                    value={date1}
+                    value={date1 || new Date()}
                     mode="date"
                     display="default"
                     onChange={onDateChange1}
@@ -457,8 +456,7 @@ const storeLocationDetails = async (data: any) => {
                 />
                 {showPicker2 && (
                   <DateTimePicker
-                    value={date2}
-                    mode="date"
+                    value={date2 || new Date()}                    mode="date"
                     display="default"
                     onChange={onDateChange2}
                   />
@@ -551,12 +549,17 @@ const storeLocationDetails = async (data: any) => {
                     <Text style={styles.price}>{minPrice.toLocaleString('vi-VN')} VND</Text>
                 </View>
               
-              <TouchableOpacity onPress={()=> navigation.navigate('available-room-screen', {
+              <TouchableOpacity onPress={()=> {
+                if (!date1 || !date2) {
+                  Alert.alert('Thông báo', 'Chọn ngày đặt phòng ở mục tìm phòng');
+                  return;
+                }
+                navigation.navigate('available-room-screen', {
                 id: locationDetails._id,
                 checkinDate: date1, // Gửi ngày checkin
                 checkoutDate: date2,
                 serviceOfLocation: servicesOfLocation // Gửi ngày checkout
-              })} style={styles.bookNowButton}>
+              })}} style={styles.bookNowButton}>
                 <Text style={styles.bookNowText}>Đặt ngay</Text>
                 <FontAwesome size={20} name='arrow-right' style={styles.iconBookNow}></FontAwesome>
               </TouchableOpacity>

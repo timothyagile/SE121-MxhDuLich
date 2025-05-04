@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Dimensions, TouchableOpacity, Text, Image } from 'react-native';
+import { StyleSheet, View, Dimensions, TouchableOpacity, Text, Image, Platform } from 'react-native';
 
 import MapView, {Marker} from 'react-native-maps';
 import Header2 from '@/components/Header2';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import haversine from 'haversine';
+
+const MapComponent = Platform.OS === 'web' ? null : require('react-native-maps');
 
 export default function ViewMapScreen() {
   const navigation = useNavigation();
@@ -67,7 +69,7 @@ export default function ViewMapScreen() {
           longitudeDelta: 0.05,
         }}
       >
-        {/* MARKER */}
+       
         <Marker
           coordinate={{
             latitude: locationDetails?.latitude,
@@ -78,7 +80,7 @@ export default function ViewMapScreen() {
         >
           <Image source={require('../assets/icons/marker.png')} style={styles.markerIcon} />
         </Marker>
-      </MapView>
+            </MapView>
     </View>
   );
 }
