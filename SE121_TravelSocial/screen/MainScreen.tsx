@@ -6,6 +6,7 @@ import TicketScreen from "@/screen/TicketScreen";
 import CollectionScreen from "@/screen/CollectionScreen";
 import ProfileScreen from "@/screen/ProfileScreen";
 import React from 'react';
+import SocialScreen from './SocialScreen';
 
 const Tab = createBottomTabNavigator()
 
@@ -22,7 +23,7 @@ export default function MainScreen() {
         name="Trang chủ" 
         component={HomeScreen}
         options={{ 
-          tabBarIcon: ({ focused }) => (
+          tabBarIcon: ({ focused }: any) => (
             <Image 
               source={require('../assets/icons/home.png')} 
               style={{ tintColor: focused ? "blue" : "gray", width: 22, height: 22 }} 
@@ -34,7 +35,7 @@ export default function MainScreen() {
         name="Booking" 
         component={TicketScreen}
         options={{ 
-          tabBarIcon: ({ focused }) => (
+          tabBarIcon: ({ focused }: any) => (
             <Image 
               source={require('../assets/icons/ticket.png')} 
               style={{ tintColor: focused ? "blue" : "gray", width: 22, height: 22 }} 
@@ -42,11 +43,25 @@ export default function MainScreen() {
           )
         }}
       />
+              <Tab.Screen 
+        name="khám phá" 
+        component={SocialScreen}
+        options={{ 
+          tabBarIcon: ({ focused }: any) => (
+            <Image 
+              source={require('../assets/icons/Profile.png')} 
+              style={{ tintColor: focused ? "blue" : "gray", width: 22, height: 22 }} 
+            />
+          ),
+          headerShown:false,
+
+        }}
+      /> 
         <Tab.Screen 
         name="Yêu thích" 
         component={CollectionScreen}
         options={{ 
-          tabBarIcon: ({ focused }) => (
+          tabBarIcon: ({ focused }: any) => (
             <Image 
               source={require('../assets/icons/collection.png')} 
               style={{ tintColor: focused ? "blue" : "gray", width: 22, height: 22 }} 
@@ -60,7 +75,7 @@ export default function MainScreen() {
         name="trang cá nhân" 
         component={ProfileScreen}
         options={{ 
-          tabBarIcon: ({ focused }) => (
+          tabBarIcon: ({ focused }: any) => (
             <Image 
               source={require('../assets/icons/Profile.png')} 
               style={{ tintColor: focused ? "blue" : "gray", width: 22, height: 22 }} 

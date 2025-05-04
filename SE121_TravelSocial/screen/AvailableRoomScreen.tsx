@@ -8,6 +8,7 @@ import {API_BASE_URL} from '../constants/config';
 import axios from 'axios';
 import { FontAwesome } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import ServiceOption2 from '@/components/DetailScreen/ServiceOption2';
 
 const { width } = Dimensions.get('window');
 
@@ -39,10 +40,11 @@ interface Room {
 
 export default function AvailableRoomScreen({ navigation }: {navigation: NativeStackNavigatorProps}) {
     const route = useRoute<RouteProp<RootStackParamList, 'available-room-screen'>>();
-    const { id, checkinDate, checkoutDate } = route.params;
-    console.log('checkin ddate: ', checkinDate);
+    const { id, checkinDate, checkoutDate, serviceOfLocation } = route.params;
+    console.log('checkin ddate: ', checkinDate, serviceOfLocation);
     const [date1, setDate1] = useState(checkinDate);
     const [date2, setDate2] = useState(checkoutDate);
+    
     const [selectedDate1, setSelectedDate1] = useState('');
     const [selectedDate2, setSelectedDate2] = useState('');
     const [showPicker1, setShowPicker1] = useState(false);
@@ -50,6 +52,9 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
     const [rooms, setRooms] = useState<Room[]>([]);
     const [services, setServices] = useState([]);
     const [isModalVisible, setModalVisible] = useState(false);
+    const [isModalServiceVisible, setModalServiceVisible] = useState(false);
+    const [selectedServices, setSelectedServices] = useState<any>([]);
+
     const [roomCount, setRoomCount] = useState(0);
     const [selectedRooms, setSelectedRooms] = useState(0);
     const [selectedRoomCounts, setSelectedRoomCounts] = useState<Record<string, number>>({});
@@ -137,10 +142,10 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                     
                     const userCheckin = new Date(checkinDate).getTime();
                     const userCheckout = new Date(checkoutDate).getTime();
-                    console.log('booking checkin: ',bookingCheckin);
-                    console.log('booking checkout: ',bookingCheckout);
-                    console.log('user checkin: ',userCheckin);
-                    console.log('user checkout: ',userCheckout);
+                    // console.log('booking checkin: ',bookingCheckin);
+                    // console.log('booking checkout: ',bookingCheckout);
+                    // console.log('user checkin: ',userCheckin);
+                    // console.log('user checkout: ',userCheckout);
                     
                     return (
                       room._id === booking?.items?.roomId && 
@@ -171,6 +176,11 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
     const toggleModal = (roomId?: string) => {
         setCurrentRoomId(roomId || null);
         setModalVisible(!isModalVisible);
+    };
+
+    const toggleModalService = (roomId?: string) => {
+        //setCurrentRoomId(roomId || null);
+        setModalServiceVisible(!isModalServiceVisible);
     };
 
     const incrementRoomCount = (roomId: string) => {
@@ -384,7 +394,7 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                         <View style={styles.endcontainer}>
                             <View style={{ flex: 4 }}>
                                 <Text style={styles.area2}>Giá</Text>
-                                <Text style={styles.pricetext}>{room.pricePerNight} VND</Text>
+                                <Text style={styles.pricetext}>{room.pricePerNight.toLocaleString('vi-VN')} VND</Text>
                             </View>
                             <View style={{ flex: 6, justifyContent: 'center', alignItems: 'center' }}>    
                                 <TouchableOpacity style={styles.choosebutton} onPress={() => toggleModal(room._id)}>
@@ -393,6 +403,13 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                                     </Text>
                                 </TouchableOpacity>
                             </View>
+                        </View>
+                        <View style={{  justifyContent: 'center', alignItems: 'center' }}>    
+                                <TouchableOpacity style={[styles.choosebutton, {width: '90%', marginBottom: 20}]} onPress={() => toggleModalService(room._id)}>
+                                    <Text style={styles.choosetext}>
+                                        {selectedRoomCounts[room._id] ? `Đã chọn ${selectedRoomCounts[room._id]} dịch vụ` : "Dịch vụ kèm theo (tùy chọn)"}
+                                    </Text>
+                                </TouchableOpacity>
                         </View>
                     </View>
                 ))}
@@ -421,6 +438,24 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                                 </TouchableOpacity>
                             </View>
                         </View>
+                        <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
+                            <Text style={styles.applyButtonText}>Xác nhận</Text>
+                        </TouchableOpacity>
+                        
+                    </View>
+                </View>
+            </Modal>
+
+            <Modal visible={isModalServiceVisible} animationType="slide" transparent={true}>
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <TouchableOpacity onPress={()=>toggleModalService()} style={styles.closeButton}>
+                            <Text style={styles.closeButtonText}>X</Text>
+                        </TouchableOpacity>
+                        <Text style={styles.modalTitle}>Chọn dịch vụ kèm theo</Text>
+                        <ScrollView>
+                            <ServiceOption2 services={serviceOfLocation} onChangeSelectedServices={setSelectedServices} />
+                        </ScrollView>
                         <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
                             <Text style={styles.applyButtonText}>Xác nhận</Text>
                         </TouchableOpacity>
@@ -681,6 +716,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     modalContent: {
+        maxHeight: '80%',
         // width: '80%',
         // backgroundColor: 'white',
         // borderRadius: 10,

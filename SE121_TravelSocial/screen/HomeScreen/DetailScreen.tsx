@@ -12,7 +12,8 @@ import {iconMapping} from '../../constants/icon';
 import CustomModal from '@/components/CollectionScreen/AddIntoCollection';
 import ImageCarousel from '@/components/HomeScreen/ImageCarousel';
 import Recommendation from '@/components/DetailScreen/Recommendation';
-
+import ServiceOption from '@/components/DetailScreen/ServiceOption';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
@@ -75,7 +76,8 @@ const facilityIcons: FacilityIcons = {
 };
   
   const [services, setServices] = useState<Service[]>([]);  // Khai báo rõ ràng kiểu dữ liệu
-  
+  const [servicesOfLocation, setServicesOfLocation] = useState([]);  // Khai báo rõ ràng kiểu dữ liệu
+
   
     const [isExpanded, setIsExpanded] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
@@ -157,6 +159,11 @@ const facilityIcons: FacilityIcons = {
 
     const [latitude, setLatitude] = useState<number | null>(null);
     const [longitude, setLongitude] = useState<number | null>(null);
+    const [visibleCount, setVisibleCount] = useState(5); // Hiển thị 3 phản hồi đầu tiên
+
+    const handleLoadMore = () => {
+      setVisibleCount((prev) => prev + 5); // Mỗi lần load thêm 3 phản hồi
+    };
 
     const getCoordinatesFromAddress = async (address: string) => {
         const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${GOOGLE_MAPS_API_KEY}`;
@@ -188,12 +195,13 @@ const facilityIcons: FacilityIcons = {
   }, [locationDetails]);
 
     const openMap = () => {
-        if (latitude && longitude) {
-            const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
-            Linking.openURL(url).catch(err => console.error("Không thể mở Google Maps", err));
-        } else {
-            console.log('Tọa độ không khả dụng');
-        }
+      navigation.navigate('view-map-screen')
+        // if (latitude && longitude) {
+        //     const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+        //     Linking.openURL(url).catch(err => console.error("Không thể mở Google Maps", err));
+        // } else {
+        //     console.log('Tọa độ không khả dụng');
+        // }
     };
 
     useEffect(() => {
@@ -204,9 +212,21 @@ const facilityIcons: FacilityIcons = {
 
     useEffect(() => {
       if (locationDetails?._id) {
-        fetchRoomServices(locationDetails._id); // Gọi API lấy danh sách dịch vụ
+        fetchRoomServices(locationDetails._id); 
+        fetchservices (locationDetails._id); // Gọi API lấy dịch vụ của địa điểm
       }
     }, [locationDetails]);
+
+    // Hàm lưu vào localStorage (AsyncStorage)
+const storeLocationDetails = async (data: any) => {
+  try {
+    const jsonValue = JSON.stringify(data);
+    await AsyncStorage.setItem('@location_details', jsonValue);
+    console.log('Location details saved to local storage.');
+  } catch (e) {
+    console.error('Error saving location details:', e);
+  }
+};
 
     const fetchLocationDetails = async (id: string) => {
       try {
@@ -215,6 +235,7 @@ const facilityIcons: FacilityIcons = {
         if (data.isSuccess) {
           console.log('Location details:', data.data);
           setLocationDetails(data.data);
+          await storeLocationDetails(data.data);
         } else {
           console.error('API error:', data.error);
         }
@@ -303,6 +324,22 @@ const facilityIcons: FacilityIcons = {
       fetchReviews();
     }, [id]);
 
+    const fetchservices = async (id : any) => {
+      
+      try {
+        const response = await fetch(`${API_BASE_URL}/service/location/${id}`);
+        const result = await response.json();
+        if (response.ok && result.isSuccess) {
+          
+          setServicesOfLocation(result.data);
+        } else {
+        }
+      } catch (error) {
+        console.error('Error fetching reviews:', error);
+        Alert.alert('Lỗi', 'Không thể kết nối với máy chủ.');
+      } 
+    };
+
     const renderImage = ({ item }: { item: { _id: string; url: string } }) => (
       console.log('image:', item.url),
       <Image
@@ -311,6 +348,14 @@ const facilityIcons: FacilityIcons = {
         style={styles.image}
       />
     )
+
+    const servicesoption = [
+      { icon: 'bicycle', text: 'Thuê xe đạp giá rẻ' },
+      { icon: 'car', text: 'Xe đưa rước tận nơi' },
+      { icon: 'tshirt', text: 'Dịch vụ giặt là giá rẻ' },
+      { icon: 'camera', text: 'Thuê máy ảnh giá rẻ' },
+      // ... thêm các dịch vụ cần thiết
+    ];
   
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#f0f4f8' }}>
@@ -318,27 +363,7 @@ const facilityIcons: FacilityIcons = {
         <ScrollView >
           {/* Hình ảnh và nút quay lại */}
           <View style={styles.imageContainer}>
-          {/* <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={true}
-          >
-            {locationDetails.image?.map((img:any) => (
-              <Image
-                key={img._id}
-                source={{ uri: img.url }}
-                style={styles.image}
-              />
-            ))}
-          </ScrollView> */}
-          {/* <Image
-            source={
-              locationDetails.image[0].url
-                  ? { uri:locationDetails.image[0].url }
-                  : require('@/assets/images/bai-truoc-20.jpg') // Hình ảnh mặc định
-              }
-              
-              style={styles.image}
-            />  */}
+
 
           <ImageCarousel images={locationDetails?.image} />
 
@@ -377,7 +402,7 @@ const facilityIcons: FacilityIcons = {
                 </Text>
                 <TouchableOpacity onPress={toggleExpanded}>
                     <Text style={styles.readMore}>
-                        {isExpanded ? 'Show Less' : 'Read More'}
+                        {isExpanded ? 'Thu gọn' : 'Xem thêm'}
                     </Text>
                 </TouchableOpacity>
 
@@ -452,23 +477,20 @@ const facilityIcons: FacilityIcons = {
               <FontAwesome name="chevron-down" size={20} color="gray" style={styles.iconRight} />
             </View>
 
-            {/* Availability State */}
-            {/* <View style={styles.stateContainer}>
-              <Text style={styles.stateText}>Trang thái:</Text>
-              <Text style={styles.stateBadge}>{roomsStatus}</Text>
-            </View> */}
-
-            {/* Search Button */}
             <TouchableOpacity onPress={()=> {
               console.log('Navigating with ID: ', locationDetails._id);
+              console.log('servicesOfLocation:', servicesOfLocation);
               navigation.navigate('available-room-screen', {
                 id: locationDetails._id,
                 checkinDate: date1, // Gửi ngày checkin
                 checkoutDate: date2, // Gửi ngày checkout
+                serviceOfLocation: servicesOfLocation, // Gửi dịch vụ của địa điểm
               });}} style={styles.searchButton}>
               <Text style={styles.searchButtonText}>Tìm kiếm</Text>
             </TouchableOpacity>
           </View>
+
+          <ServiceOption services={servicesOfLocation}></ServiceOption>
 
           {/* Feedback Section */}
           <View style={styles.section}>
@@ -477,7 +499,8 @@ const facilityIcons: FacilityIcons = {
             {loadingReviews ? (
               <Text>Đang tải phản hồi...</Text>
             ) : reviews.length > 0 ? (
-              reviews.map((review, index) => (
+              <>
+              {reviews.slice(0, visibleCount).map((review, index) => (
                 <View style={styles.reviewframe} key={index}>
                   <View style={styles.feedbackContainer}>
                     <View style={styles.avatarContainer}>
@@ -504,7 +527,15 @@ const facilityIcons: FacilityIcons = {
 
                 </View>
                 
-              ))
+              ))}
+               {/* Hiện nút "Xem thêm" nếu còn review chưa hiển thị */}
+          {visibleCount < reviews.length && (
+            <TouchableOpacity onPress={handleLoadMore} style={{ alignSelf: 'center', marginTop: 10 }}>
+              <Text style={{ color: '#007bff' }}>Xem thêm phản hồi</Text>
+            </TouchableOpacity>
+          )}
+              </>
+              
             ) : (
               <Text>Không có phản hồi nào cho địa điểm này.</Text>
             )}
@@ -517,13 +548,14 @@ const facilityIcons: FacilityIcons = {
             <View style={styles.bookingSection}>
                 <View>
                     <Text style={styles.priceLabel}>Giá chỉ từ</Text>
-                    <Text style={styles.price}>{minPrice} VND</Text>
+                    <Text style={styles.price}>{minPrice.toLocaleString('vi-VN')} VND</Text>
                 </View>
               
               <TouchableOpacity onPress={()=> navigation.navigate('available-room-screen', {
                 id: locationDetails._id,
                 checkinDate: date1, // Gửi ngày checkin
-                checkoutDate: date2, // Gửi ngày checkout
+                checkoutDate: date2,
+                serviceOfLocation: servicesOfLocation // Gửi ngày checkout
               })} style={styles.bookNowButton}>
                 <Text style={styles.bookNowText}>Đặt ngay</Text>
                 <FontAwesome size={20} name='arrow-right' style={styles.iconBookNow}></FontAwesome>

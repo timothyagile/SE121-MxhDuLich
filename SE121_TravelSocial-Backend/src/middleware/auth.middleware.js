@@ -105,7 +105,7 @@ const checkUser = (req, res, next) => {
           isSuccess: false,
           message: 'Token không hợp lệ hoặc không tồn tại.',
           data: null
-      });
+      }); 
     }
 
   // Giải mã token

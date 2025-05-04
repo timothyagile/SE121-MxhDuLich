@@ -21,6 +21,9 @@ export default function Recommendation({ navigation, locationId }: PopularSectio
     const [likedItems, setLikedItems] = useState<LikedItems>({});
     const [locations, setLocations] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
+      const [page, setPage] = useState(1);
+      const [hasMore, setHasMore] = useState(true);
+      const [isFetchingMore, setIsFetchingMore] = useState(false);
 
     const handlePress = (id: string) => {
         setLikedItems((prevState) => ({
@@ -29,84 +32,38 @@ export default function Recommendation({ navigation, locationId }: PopularSectio
         }));
     };
 
-    // useEffect(() => {
-    //     const fetchRecommendations = async () => {
-    //       try {
-    //         console.log("location: ", locationId);
-      
-    //         // Gửi request để lấy danh sách ID
-    //         const response = await fetch(`${API_BASE_URL}/othermayyoulike`, {
-    //           method: 'POST',
-    //           headers: {
-    //             'Content-Type': 'application/json',
-    //           },
-    //           body: JSON.stringify({
-    //             visitorId: "visitor123",
-    //             userId: "user456",
-    //             productId: locationId,
-    //           }),
-    //         });
-      
-    //         if (!response.ok) {
-    //           throw new Error(`HTTP error! status: ${response.status}`);
-    //         }
-      
-    //         // Parse JSON từ phản hồi
-    //         const data = await response.json();
-    //         console.log('Recommendations IDs:', data.recommendations);
-      
-
-    //                 const locationDetailsPromises = data.recommendations.map(async (location:any) => {
-    //                     console.log('location id:', location.id);
-    //                     const locationResponse = await fetch(`${API_BASE_URL}/locationbyid/${location.id}`);
-    //                     const locationData = await locationResponse.json();
-    //                     console.log('location data: ', locationData);
-    //                     return locationData;
-    //                 }); 
-    //                 const locationsWithDetails = await Promise.all(locationDetailsPromises);
-    //                 console.log('BCCCC: ',locationsWithDetails)
-          
-    //         // Gọi API để lấy chi tiết từng location
-    //         // const locationDetails = await Promise.all(
-    //         //   data.recommendations.map((id: string) =>
-    //         //     fetch(`${API_BASE_URL}/locationbyid/${id}`).then((res) => res.json())
-    //         //   )
-    //         // );
-      
-    //         // console.log('Location details:', locationDetails);
-    //         setLocations(locationsWithDetails);
-    //       } catch (error) {
-    //         console.error('Error fetching recommendations:', error);
-    //       } finally {
-    //         setLoading(false);
-    //       }
-    //     };
-      
-    //     fetchRecommendations();
-    //   }, [locationId]);
-
-     const getAllLocations = async () => {
-            try {
-                const ipAddress = await Network.getIpAddressAsync();
-                console.log('Device IP Address:', ipAddress);
-                const response = await fetch(`${API_BASE_URL}/alllocation`); 
-                
-                const data = await response.json();
-    
-                if (data.isSuccess) {
-                    setLocations(data.data); 
-                } else {
-                    console.error(data.error);
-                }
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
-            }
-        };
+   const getAllLocations = async (pageNumber: number) => {
+     try {
+       if (isFetchingMore || !hasMore) return;
+   
+       setIsFetchingMore(true);
+   
+       const response = await fetch(`${API_BASE_URL}/alllocation?page=${pageNumber}&limit=10`);
+       const data = await response.json();
+   
+       if (data.isSuccess) {
+         if (pageNumber === 1) {
+           setLocations(data.data.data);
+           console.log('all location: ', data.data);
+         } else {
+           setLocations(prev => [...prev, ...data.data.data]);
+         }
+   
+         setHasMore(data.data.data.length > 0);
+         setPage(pageNumber + 1); 
+       } else {
+         console.error(data.error);
+       }
+     } catch (error) {
+       console.error(error);
+     } finally {
+       setIsFetchingMore(false);
+       setLoading(false);
+     }
+   };
 
     useEffect(() => {
-        getAllLocations();
+        getAllLocations(1);
     }, [locationId]);
       
 
@@ -125,6 +82,12 @@ export default function Recommendation({ navigation, locationId }: PopularSectio
             snapToInterval={CARD_WIDTH_SPACING}
             decelerationRate={"fast"}
             keyExtractor={item => item?._id}
+            onEndReached={() => {
+                if (1) {
+                  getAllLocations(page);
+                } 
+              }}
+              onEndReachedThreshold={0.5}
             renderItem={({item, index}) => {
                 return (
                     <TouchableOpacity onPress={() => navigation.navigate('detail-screen', { id: item?._id })} style = {[

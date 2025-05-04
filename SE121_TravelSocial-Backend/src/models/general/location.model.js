@@ -63,6 +63,14 @@ const locationSchema = new Schema({
     },
     latitude: Number,
     longtitude: Number,
+    province: {
+        type: String,
+        //required: true,
+    },
+    minPrice: {
+        type: Number,
+        //required: true,
+    },
 },  
 { collection: 'Location' }
 );
