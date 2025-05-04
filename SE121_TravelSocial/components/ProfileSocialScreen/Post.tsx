@@ -31,7 +31,7 @@ export default function Post ({ postData }:any) {
           }}
         >
           <View>
-            <MainPost post={postData} />
+            <MainPost post={postData} navigation={navigation} />
           </View>
         </Pressable>
       </Modal>
@@ -42,7 +42,7 @@ export default function Post ({ postData }:any) {
         }}
         style={{ margin: 5 }}
       >
-        <RemoteImage imageUri={postData?.[0]?.images?.[0].url || postData?.picturePath } />
+        <RemoteImage imageUri={postData?.images?.[0].url || postData?.picturePath } />
       </Pressable>
     </View>
   );

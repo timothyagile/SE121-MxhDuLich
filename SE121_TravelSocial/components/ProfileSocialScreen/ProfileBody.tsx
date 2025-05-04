@@ -125,14 +125,14 @@ function Posts({userId, navigation, route, refreshing }: any) {
                         <View style={{ flex: 1 }}>
                             {userPosts?.map((item, index) => (
                                 <View key={index}>
-                                    {index % 2 === 0 && <Post postData={userPosts} />}
+                                    {index % 2 === 0 && <Post postData={userPosts[index]} />}
                                 </View>
                             ))}
                         </View>
                         <View style={{ flex: 1 }}>
-                            {posts?.map((item, index) => (
+                            {userPosts?.map((item, index) => (
                                 <View key={index}>
-                                    {index % 2 !== 0 && <Post postData={posts[index]} />}
+                                    {index % 2 !== 0 && <Post postData={userPosts[index]} />}
                                 </View>
                             ))}
                         </View>
