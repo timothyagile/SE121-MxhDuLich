@@ -16,7 +16,8 @@ const create = async (postData) => {
     const { authorId, content, locationId,
          images, videos, tripType, 
          travelSeason, privacyLevel, 
-         userTagIds, bannedUsers, hashTags } = postData;
+         userTagIds, bannedUsers, hashTags,
+        type, sharedFrom, shareTo } = postData;
 
     const [location, author] = await Promise.all([
         Location.findById(locationId).select('name'),
@@ -29,7 +30,8 @@ const create = async (postData) => {
         authorId, content, slug, 
         locationId, images, videos, 
         tripType, travelSeason, privacyLevel, 
-        userTagIds, bannedUsers, hashTags
+        userTagIds, bannedUsers, hashTags,
+        type, sharedFrom, shareTo
     })
 
     console.log("Post::", post);
@@ -133,14 +135,44 @@ const deletePost = async (id) => {
     return post;
 }
 
+const sharePost = async (sharePostData) => {
+    const { originalPostId, userId,
+        shareTo, content = '', 
+        userTagIds = [], type } = sharePostData
+
+    const originalPost = await Post.findOne({ _id: originalPostId, isDeleted: false });
+    
+    if (!originalPost) throw new NotFoundException('Bài viết không tồn tại hoặc đã bị xoá');
+
+    // Tái sử dụng create()
+    const sharedPost = await create({
+        authorId: userId,
+        content,
+        userTagIds,
+        shareTo,
+        type,
+        locationId: originalPost.locationId,
+        images: originalPost.images, // hoặc giữ nguyên tuỳ logic
+        videos: originalPost.videos,
+        bannedUsers: [],
+        tripType: originalPost.tripType,
+        travelSeason: originalPost.travelSeason,
+        privacyLevel: originalPost.privacyLevel,
+        hashTags: originalPost.hashTags,
+        sharedFrom: originalPost._id,
+    });
+
+    await Post.findByIdAndUpdate(originalPostId, {
+        $inc: { 'stat.shareCount': 1 },
+        $set: { 'stat.lastInteraction': new Date() }
+    });
+
+    return sharedPost;
+};
+
 module.exports = {
-    create,
-    getAll,
-    getById,
-    getByLocationId,
-    getByAuthorId,
-    getByHashTag,
-    update,
-    updateStat,
-    deletePost
+    create, getAll, getById,
+    getByLocationId, getByAuthorId, getByHashTag,
+    update, updateStat, deletePost,
+    sharePost
 }

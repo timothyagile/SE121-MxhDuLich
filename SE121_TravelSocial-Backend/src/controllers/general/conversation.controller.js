@@ -1,20 +1,20 @@
 const Conversation = require('../../models/general/conversation.model');
 const conversationSvc = require('../../services/general/conversation.service')
 
-module.exports.findConversations = async (req, res, next) => {
-    const {firstId, secondId} = req.params
-    try {
-        const result = await conversationSvc.getAllConversations({firstId, secondId})
-        res.status(200).json({
-            isSuccess: true,
-            data: result,
-            error: null,
-        });
-    }
-    catch(error) {
-        next(error)
-    }
-}
+// module.exports.findConversations = async (req, res, next) => {
+//     const {firstId, secondId} = req.params
+//     try {
+//         const result = await conversationSvc.getAllConversations({firstId, secondId})
+//         res.status(200).json({
+//             isSuccess: true,
+//             data: result,
+//             error: null,
+//         });
+//     }
+//     catch(error) {
+//         next(error)
+//     }
+// }
 
 module.exports.findUserConversation = async (req, res, next) => {
     try {
@@ -33,12 +33,9 @@ module.exports.findUserConversation = async (req, res, next) => {
 
 module.exports.createConversation = async (req, res, next) => {
     try {
-        const {firstId, secondId} = req.body
-        const conversationData = new Conversation({
-            firstId: firstId,
-            secondId: secondId
-        })
-        const result = await conversationSvc.createConversation(conversationData)
+        const {memberIds, type, name, avatar} = req.body
+        const result = await conversationSvc.createConversation({memberIds, type,
+             name, avatar: avatar || null})
         res.status(200).json({
             isSuccess: true,
             data: result,

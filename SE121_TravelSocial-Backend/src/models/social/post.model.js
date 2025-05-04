@@ -1,5 +1,5 @@
 const mongoose = require('mongoose'); 
-const {PRIVACY_LEVEL, TRAVEL_SEASON, TRIP_TYPE } = require('../../enum/post.enum')
+const {PRIVACY_LEVEL, TRAVEL_SEASON, TRIP_TYPE, SHARE_TARGET, POST_TYPE } = require('../../enum/post.enum')
 
 const COLLECTION_NAME = 'Posts';
 const DOCUMENT_NAME = 'Post'
@@ -58,7 +58,7 @@ var postSchema = new mongoose.Schema({
     } ,
     images: {
         type: [imageSchema],
-        default: []
+        default: []  
     },
     videos: {
         type: [videoSchema], 
@@ -100,6 +100,21 @@ var postSchema = new mongoose.Schema({
             default: 0
         },
         lastInteraction: { type: Date, default: Date.now }
+    },
+    type: {
+        type: String,
+        enum: POST_TYPE,
+        default: POST_TYPE.ORIGINAL
+    },
+    sharedFrom: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: DOCUMENT_NAME,
+        default: null
+    },
+    shareTo: {
+        type: String,
+        enum: SHARE_TARGET,
+        default: null
     },
     isDeleted: { type: Boolean, default: false }, // Đánh dấu bài viết đã xoá
     deletedAt: { type: Date, default: null, index: { expires: '7d' } }, // Lưu thời gian xoá

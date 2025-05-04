@@ -1,7 +1,17 @@
-const mongoose = require('mongoose')
-
+const mongoose = require('mongoose');
+const { CONV_TYPE } = require('../../enum/chat.enum');
 const Schema = mongoose.Schema;
 
+const imageSchema = new mongoose.Schema({
+    url: {
+        type: String,
+        required: true
+    },
+    publicId: {
+        type: String,
+        required: true
+    }
+}, { _id: false })
 
 const ConversationSchema = new Schema({
     member: {
@@ -9,12 +19,28 @@ const ConversationSchema = new Schema({
         ref: "User",
         require: true,
     },
-    timestamp: {
-        type: Date,
-        require: true,
-        default: Date.now
+    type: {
+        type: String, 
+        enum: CONV_TYPE,
+        default: CONV_TYPE.PRIVATE
     },
-}, {collection: 'Conversation'})
+    name: {
+        type: String, 
+        default: null
+    }, 
+    avatar: {
+        type: imageSchema, 
+        default: null
+    }, 
+    lastMessage: {
+        type: String,
+        default: "Hãy gửi lời chào đến bạn bè của bạn"
+    }
+}, 
+{
+    collection: 'Conversation',
+    timestamps: true
+})
 
 const Conversation = mongoose.model('Conversation', ConversationSchema)
 module.exports = Conversation

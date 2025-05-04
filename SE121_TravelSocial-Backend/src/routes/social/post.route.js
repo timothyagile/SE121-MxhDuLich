@@ -24,9 +24,11 @@ router.get('/posts/author/:authorId', asyncHandler(postController.getByAuthorId)
 router.get('/posts/hashtag/:hashtag', asyncHandler(postController.getByHashTag));
 
 router.put('/posts/:id', asyncHandler(postController.updatePost));
-
 /* Soft delete */
 router.delete("/posts/:id", asyncHandler(postController.deletePost));
+
+//Share bài viết
+router.post('/share', checkUser, postController.sharePostController);
 
 
 module.exports = router
