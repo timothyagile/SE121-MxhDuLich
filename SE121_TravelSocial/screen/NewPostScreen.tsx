@@ -5,6 +5,8 @@ import {
     ImageBackground,
     Pressable,
     KeyboardAvoidingView,
+    Alert,
+    Text,
   } from "react-native";
   
   import React, { useContext, useEffect, useState } from "react";
@@ -14,12 +16,14 @@ import {
   import { Ionicons } from "@expo/vector-icons";
   import CameraScreen from "./CameraScreen";
   import { AuthContext } from "../store/auth-context";
-//   import { getFilename } from "../utils/helperFunctions";
   import ProgressOverlay from "../components/ProgressOverlay";
   import ErrorOverlay from "../components/ErrorOverlay";
   import UploadIcon from "../assets/images/UploadIcon";
   import { Platform } from "react-native";
   import { StatusBar } from "expo-status-bar";
+  import { API_BASE_URL } from "../constants/config";
+  import AsyncStorage from "@react-native-async-storage/async-storage";
+  import LocationPicker from "../components/UI/LocationPicker";
   
   const { width, height } = Dimensions.get("window");
   const PLACEHOLDER_IMAGE =
@@ -32,6 +36,11 @@ export default function NewPostScreen({ navigation, route }:any) {
     const [resizeModeCover, setResizeModeCover] = useState(true);
     const [showCamera, setShowCamera] = useState(true);
     const [caption, setCaption] = useState("");
+    const [locationId, setLocationId] = useState("6704f3650722c4f99305dc5d"); // Default locationId
+    const [locationName, setLocationName] = useState(""); // Tên của địa điểm đã chọn
+    const [tripType, setTripType] = useState("solo");
+    const [travelSeason, setTravelSeason] = useState("summer");
+    const [privacyLevel, setPrivacyLevel] = useState("friend");
   
     const [uploading, setUploading] = useState({
       status: false,
@@ -41,46 +50,158 @@ export default function NewPostScreen({ navigation, route }:any) {
   
     useEffect(() => {
       navigation.setOptions({
-        headerShown: true,
-        title: "New Post",
+        headerShown: false,
+        title: "Tạo bài viết",
       });
     }, []);
-  
-    // useEffect(() => {
-    //   if (route?.params?.type) {
-    //     setType(route?.params?.type);
-    //   }
-    // }, [route?.params?.type]);
-    // async function newPostHandler() {
-    //   if (post) {
-    //     const filenameData = getFilename(post);
-  
-    //     const formData = new FormData();
-    //     formData.append("userId", authCtx.userData._id);
-    //     formData.append("description", caption);
-  
-    //     formData.append("picture", {
-    //       uri: post,
-    //       type: "image/" + filenameData.fileType,
-    //       name: filenameData.name,
-    //     });
-    //     formData.append("picturePath", filenameData.name);
-    //     try {
-    //       setUploading((prevData) => {
-    //         return { ...prevData, status: true };
-    //       });
-    //       setTimeout(() => {
-    //         setUploading({ status: false, progress: 0, success: true });
-    //         navigation.goBack();
-    //       }, 3000);
-    //     } catch (error) {
-    //       setUploading((prevData) => {
-    //         return { ...prevData, success: false };
-    //       }),
-    //         console.log(error.message);
-    //     }
-    //   }
-    // }
+
+    // Hàm để lấy thông tin về file từ URI
+    const getFilename = (uri: string) => {
+      const uriParts = uri.split("/");
+      const name = uriParts[uriParts.length - 1];
+      const fileTypeParts = name.split(".");
+      const fileType = fileTypeParts[fileTypeParts.length - 1];
+      return { name, fileType };
+    };
+
+    // Hàm xử lý khi người dùng chọn địa điểm
+    const handleLocationSelect = (id: string, name: string) => {
+      setLocationId(id);
+      setLocationName(name);
+    };
+
+    async function newPostHandler() {
+      if (!caption) {
+        Alert.alert("Thông báo", "Vui lòng nhập nội dung bài viết");
+        return;
+      }
+
+      try {
+        setUploading((prevData) => ({
+          ...prevData,
+          status: true,
+          progress: 0
+        }));
+
+        // Tăng progress để hiển thị đang xử lý
+        const progressInterval = setInterval(() => {
+          setUploading((prev) => {
+            if (prev.progress < 90) {
+              return { ...prev, progress: prev.progress + 10 };
+            }
+            return prev;
+          });
+        }, 300);
+        
+        let imageData = null;
+        
+        // Bước 1: Upload ảnh nếu có
+        if (post) {
+          try {
+            const formData = new FormData();
+            const fileInfo = getFilename(post);
+            
+            formData.append("files", {
+              uri: post,
+              type: `image/${fileInfo.fileType}`,
+              name: fileInfo.name,
+            } as any);
+            
+            // Gọi API để upload ảnh
+            const uploadResponse = await fetch(`${API_BASE_URL}/upload`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'multipart/form-data',
+              },
+              credentials: 'include',
+              body: formData,
+            });
+
+            const uploadResult = await uploadResponse.json();
+            
+            if (!uploadResult.isSuccess) {
+              throw new Error(typeof uploadResult.error === 'string' 
+                ? uploadResult.error 
+                : "Không thể tải lên hình ảnh");
+            }
+            
+            // Lấy data về ảnh đã upload thành công
+            imageData = uploadResult.data;
+            console.log("Upload result:", imageData);
+          } catch (uploadError) {
+            console.error("Error uploading image:", uploadError);
+            clearInterval(progressInterval);
+            setUploading({ status: true, progress: 100, success: false });
+            setTimeout(() => {
+              setUploading({ status: false, progress: 0, success: false });
+              Alert.alert("Lỗi", "Không thể tải lên hình ảnh");
+            }, 1000);
+            return; // Dừng hàm tại đây nếu upload thất bại
+          }
+        }
+
+        // Bước 2: Tạo bài viết với JSON thông thường
+        try {
+          const postData = {
+            content: caption,
+            locationId: locationId,
+            tripType: tripType,
+            travelSeason: travelSeason,
+            privacyLevel: privacyLevel,
+            images: imageData || [] // Sử dụng kết quả từ API upload hoặc mảng rỗng nếu không có ảnh
+          };
+
+          console.log("Sending post data:", JSON.stringify(postData));
+
+          // Gọi API để tạo bài viết
+          const postResponse = await fetch(`${API_BASE_URL}/posts`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify(postData),
+          });
+
+          const postResult = await postResponse.json();
+          
+          clearInterval(progressInterval);
+          
+          if (postResult.isSuccess) {
+            setUploading({ status: true, progress: 100, success: true });
+            setTimeout(() => {
+              setUploading({ status: false, progress: 0, success: true });
+              navigation.goBack();
+            }, 1000);
+          } else {
+            console.error('Error creating post:', postResult.error);
+            setUploading({ status: true, progress: 100, success: false });
+            setTimeout(() => {
+              setUploading({ status: false, progress: 0, success: false });
+              // Đảm bảo message luôn là string
+              Alert.alert("Lỗi", "Không thể đăng bài viết");
+            }, 1000);
+          }
+        } catch (postError) {
+          console.error("Error creating post:", postError);
+          clearInterval(progressInterval);
+          setUploading({ status: true, progress: 100, success: false });
+          setTimeout(() => {
+            setUploading({ status: false, progress: 0, success: false });
+            Alert.alert("Lỗi", "Không thể đăng bài viết");
+          }, 1000);
+        }
+      } catch (error) {
+        console.error("Error in post creation process:", error);
+        setUploading({ status: true, progress: 100, success: false });
+        setTimeout(() => {
+          setUploading({ status: false, progress: 0, success: false });
+          // Đảm bảo message luôn là string
+          Alert.alert("Lỗi", "Đã xảy ra lỗi khi đăng bài viết");
+        }, 1000);
+      }
+    }
+    
     return (
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -173,12 +294,23 @@ export default function NewPostScreen({ navigation, route }:any) {
               <View style={{ marginTop: 10 }}>
                 <InputField
                   containerStyle={{ color: "white" }}
-                  placeholder="What's on your mind?"
+                  placeholder="bạn đang nghĩ gì?"
                   multiline={true}
                   onChangeText={setCaption}
                   value={caption}
                   inValid={true}
                 />
+                
+                {/* Thêm LocationPicker để chọn địa điểm */}
+                <View style={styles.locationPickerContainer}>
+                  <Text style={styles.sectionTitle}>Địa điểm</Text>
+                  <LocationPicker 
+                    selectedLocationId={locationId} 
+                    onLocationSelect={handleLocationSelect} 
+                  />
+                </View>
+                
+                {/* Có thể thêm các tùy chọn khác như tripType, travelSeason, privacyLevel ở đây */}
               </View>
             </View>
           </View>
@@ -188,9 +320,7 @@ export default function NewPostScreen({ navigation, route }:any) {
             padding: 20,
           }}
         >
-          <Button title={"Post"} onPress={function (): void {
-                    throw new Error("Function not implemented.");
-                } }  />
+          <Button title={"Post"} onPress={newPostHandler} />
         </View>
         {uploading.status && (
           <>
@@ -219,5 +349,13 @@ export default function NewPostScreen({ navigation, route }:any) {
       backgroundColor: GlobalStyles.colors.primary,
       flex: 1,
     },
+    locationPickerContainer: {
+      marginTop: 15,
+    },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: GlobalStyles.colors.gray,
+      marginBottom: 8,
+    },
   });
-  

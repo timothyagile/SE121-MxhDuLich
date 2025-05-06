@@ -102,6 +102,42 @@ const unblockUser = async (req, res) => {
 	res.status(200).json({ isSuccess: true, data: data });
 };
 
+const searchFriends = async (req, res, next) => {
+	try {
+		const { searchTerm } = req.query;
+		const userId = res.locals.user._id;
+		
+		if (!searchTerm || searchTerm.trim() === '') {
+			return res.json({
+				isSuccess: true,
+				data: []
+			});
+		}
+		
+		const results = await relationService.searchFriends(userId, searchTerm);
+		
+		res.json({
+			isSuccess: true,
+			data: results
+		});
+	} catch (error) {
+		next(error);
+	}
+};
+
+const cancelFriendRequest = async (req, res) => {
+	console.log("Cancel friend request::" + req.params)
+
+	const requestId = res.locals.user._id;
+	const { recipientId } = req.params;
+
+	const data = await relationService.cancelFriendRequest(requestId, recipientId);
+
+	res.status(OK).json({ 
+		isSuccess: true,
+		data: data 
+	});
+};
 
 module.exports = {
 	sendFriendRequest,
@@ -111,5 +147,7 @@ module.exports = {
 	unfriend,
 	unfollow,
 	blockUser, 
-	unblockUser
+	unblockUser,
+	searchFriends,
+	cancelFriendRequest
 };

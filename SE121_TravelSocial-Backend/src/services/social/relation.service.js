@@ -104,6 +104,34 @@ const unfollow = async (userId, targetId) => {
 	return "Unfollow successfully"
 }
 
+const searchFriends = async (userId, searchTerm) => {
+	// Tìm tất cả mối quan hệ bạn bè của người dùng
+	const friends = await Relation.find({
+		$or: [
+			{ requestId: userId, type: RELATION_TYPE.ACCEPTED },
+			{ recipientId: userId, type: RELATION_TYPE.ACCEPTED }
+		]
+	})
+		.populate('requestId', 'userName userAvatar')
+		.populate('recipientId', 'userName userAvatar');
+
+	if (!friends || friends.length === 0) {
+		return []; // Trả về mảng rỗng nếu không có bạn bè
+	}
+
+	// Lọc bạn bè theo tên
+	const searchResults = friends
+		.map((relation) => {
+			const friend = relation.requestId._id.toString() === userId.toString()
+				? relation.recipientId
+				: relation.requestId;
+			return { userId: friend._id, userName: friend.userName, userAvatar: friend.userAvatar };
+		})
+		.filter(friend => friend.userName.toLowerCase().includes(searchTerm.toLowerCase()));
+
+	return searchResults;
+};
+
 const getFriends = async (userId, type) => {
 	const friends = await Relation.find({
 		$or: [
@@ -184,13 +212,29 @@ const unblockUser = async (userId, targetId) => {
 	return { message: 'User unblocked successfully' };
 };
 
+const cancelFriendRequest = async (requestId, recipientId) => {
+	const relation = await Relation.findOne({
+		requestId,
+		recipientId,
+		type: RELATION_TYPE.PENDING
+	});
+	if (!relation) {
+		throw new NotFoundException('Friend request not found');
+	}
+
+	await relation.deleteOne();
+	return { message: 'Friend request cancelled successfully' };
+};
+
 module.exports = {
 	sendFriendRequest,
 	respondToRequest,
 	followUser,
 	unfollow,
+	searchFriends,
 	getFriends,
 	unfriend,
 	blockUser,
-	unblockUser
+	unblockUser,
+	cancelFriendRequest
 };

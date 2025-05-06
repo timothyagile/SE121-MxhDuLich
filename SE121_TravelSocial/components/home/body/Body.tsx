@@ -1,12 +1,31 @@
 import { StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import Feed from "./Feed";
 import Video from "./Video";
 import { GlobalStyles } from "../../../constants/Styles";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 //import TopTabBar from "./TopTabBar";
 const TopTab = createMaterialTopTabNavigator();
 const Body = ({ StoryTranslate }: any) => {
+  const [userData, setUserData] = useState<any>(null);
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem('userData');
+        if (jsonValue !== null) {
+          const user = JSON.parse(jsonValue);
+          setUserData(user);
+          console.log(user);
+        }
+      } catch (e) {
+        
+      }
+    };
+
+    fetchUserData();
+  }, []);
+  
   return (
 
 
@@ -42,7 +61,7 @@ const Body = ({ StoryTranslate }: any) => {
       }}
     >
       <TopTab.Screen name="Feed">
-        {() => <Feed StoryTranslate={StoryTranslate} />}
+        {() => <Feed StoryTranslate={StoryTranslate} userData={userData} />}
       </TopTab.Screen>
       <TopTab.Screen name="Video">
         {() => <Video StoryTranslate={StoryTranslate} />}

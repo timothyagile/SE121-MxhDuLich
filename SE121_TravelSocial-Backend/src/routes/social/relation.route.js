@@ -14,11 +14,14 @@ router.delete('/unfollow/:targetId', checkUser, asyncHandler(relationController.
 
 router.get('/friends', checkUser, asyncHandler(relationController.getFriends));
 
+router.get('/search', checkUser, asyncHandler(relationController.searchFriends));
+
 router.delete('/unfriend/:targetId', checkUser, asyncHandler(relationController.unfriend));
 
 router.post('/block', checkUser, asyncHandler(relationController.blockUser));
 
 router.delete('/unblock/:targetId', checkUser, asyncHandler(relationController.unblockUser));
 
+router.delete('/cancel-request/:recipientId', checkUser, asyncHandler(relationController.cancelFriendRequest));
 
 module.exports = router;

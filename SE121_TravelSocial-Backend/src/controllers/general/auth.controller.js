@@ -156,3 +156,28 @@ module.exports.updateAvata = async (req, res) => {
     })
     
 }
+
+module.exports.searchUsers = async (req, res, next) => {
+    try {
+        const { searchTerm } = req.query;
+        const userId = res.locals.user._id;
+        
+        if (!searchTerm || searchTerm.trim() === '') {
+            return res.json({
+                isSuccess: true,
+                data: [],
+                error: null
+            });
+        }
+        
+        const results = await authServices.searchUsers(userId, searchTerm);
+        
+        res.json({
+            isSuccess: true,
+            data: results,
+            error: null
+        });
+    } catch (error) {
+        next(error);
+    }
+};
