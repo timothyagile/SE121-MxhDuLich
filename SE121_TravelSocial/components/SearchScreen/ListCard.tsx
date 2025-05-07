@@ -99,13 +99,15 @@ import {
       
       setSending(true);
       try {
+        // Gửi yêu cầu kết bạn đến API
         const response = await fetch(`${API_BASE_URL}/friend-request`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            recipientId: userData._id
+            recipientId: userData._id,
+            createNotification: true // Thêm flag để tạo thông báo
           }),
           credentials: 'include', // Include cookies in the request
         });
@@ -319,7 +321,9 @@ import {
                 borderRadius: 30,
               }}
               source={{
-                uri: !!userData.userAvatar ? userData.userAvatar : DEFAULT_DP,
+                uri: userData.userAvatar && userData.userAvatar.url 
+                  ? userData?.userAvatar?.url 
+                  : DEFAULT_DP,
               }}
             />
             <View style={{ marginLeft: 10 }}>

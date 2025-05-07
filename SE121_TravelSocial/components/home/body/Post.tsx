@@ -63,7 +63,7 @@ import {
 
         useEffect(() => {
           if (post.images) {
-            const fixedUrl = getSafeImageUrl(post.images[0].url);
+            const fixedUrl = getSafeImageUrl(post?.images?.[0]?.url);
             setSafeUri(fixedUrl);
             Image.getSize(fixedUrl, (width, height) => {
               const ratio = width / height;

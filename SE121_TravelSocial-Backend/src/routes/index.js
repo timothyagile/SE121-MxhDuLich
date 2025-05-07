@@ -33,6 +33,7 @@ const commentRoute = require('./social/comment.route')
 const reactCommentRoute = require('./social/react-comment.route')
 const relationRoute = require('./social/relation.route')
 const socketRoute = require('./general/socket.route')
+const notificationRoute = require('./general/notification.route')
 
 const router = express.Router();
 //const io = app.get('io')
@@ -60,6 +61,7 @@ router.use('/', commentRoute)
 router.use('/', reactCommentRoute)
 router.use('/', relationRoute)
 router.use('/', socketRoute)
+router.use('/', notificationRoute)
 
 module.exports = router
 

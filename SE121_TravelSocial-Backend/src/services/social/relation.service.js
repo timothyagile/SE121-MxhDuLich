@@ -3,8 +3,7 @@ const Relation = require('../../models/social/relation.models');
 const User = require('../../models/general/user.model');
 const { NotFoundException, BadRequest } = require('../../errors/exception');
 const { RELATION_TYPE } = require('../../enum/relation.enum');
-
-
+const notificationService = require('../general/notification.service');
 
 const sendFriendRequest = async (userId, recipientId) => {
     if (userId.toString() === recipientId.toString()) {
@@ -26,6 +25,10 @@ const sendFriendRequest = async (userId, recipientId) => {
 		} else if(existing.type === RELATION_TYPE.FOLLOWING) {
 			existing.type = RELATION_TYPE.PENDING
 			savedRelation = await existing.save()
+			
+			// Tạo thông báo cho người nhận lời mời kết bạn
+			await notificationService.createFriendRequestNotification(userId, recipientId);
+			
 			return savedRelation
 		} else if (existing.type === RELATION_TYPE.ACCEPTED || existing.type === RELATION_TYPE.PENDING) {
 			throw new BadRequest("Đã tồn tại mối quan hệ hoặc lời mời");
@@ -35,6 +38,10 @@ const sendFriendRequest = async (userId, recipientId) => {
     savedRelation = await Relation.create(
 		{ requestId: userId, recipientId, type: RELATION_TYPE.PENDING }
 	);
+	
+	// Tạo thông báo cho người nhận lời mời kết bạn
+	await notificationService.createFriendRequestNotification(userId, recipientId);
+	
     return savedRelation;
 }
 
@@ -53,8 +60,49 @@ const respondToRequest = async (requestId, recipientId, accept) => {
 	if (accept) {
 		relation.type = RELATION_TYPE.ACCEPTED;
 		savedRelation = await relation.save();
+		
+		// Tìm và cập nhật thông báo lời mời kết bạn thành accepted
+		try {
+			const notifications = await notificationService.getNotificationsByUserId(recipientId);
+			const friendRequestNotification = notifications.find(
+				n => n.type === 'FRIEND_REQUEST' && 
+				n.sender._id.toString() === requestId.toString() && 
+				n.status === 'pending'
+			);
+			
+			if (friendRequestNotification) {
+				await notificationService.updateFriendRequestNotification(
+					friendRequestNotification._id, 
+					'accepted'
+				);
+			}
+		} catch (error) {
+			console.error('Error updating notification status:', error);
+			// Không throw error vì việc cập nhật thông báo không quan trọng bằng cập nhật mối quan hệ
+		}
+		
 	} else {
 		savedRelation = await relation.deleteOne();
+		
+		// Tìm và cập nhật thông báo lời mời kết bạn thành rejected
+		try {
+			const notifications = await notificationService.getNotificationsByUserId(recipientId);
+			const friendRequestNotification = notifications.find(
+				n => n.type === 'FRIEND_REQUEST' && 
+				n.sender._id.toString() === requestId.toString() && 
+				n.status === 'pending'
+			);
+			
+			if (friendRequestNotification) {
+				await notificationService.updateFriendRequestNotification(
+					friendRequestNotification._id, 
+					'rejected'
+				);
+			}
+		} catch (error) {
+			console.error('Error updating notification status:', error);
+			// Không throw error vì việc cập nhật thông báo không quan trọng bằng cập nhật mối quan hệ
+		}
 	}
     return savedRelation
 };
@@ -80,6 +128,9 @@ const followUser = async (userId, targetId) => {
 		type: RELATION_TYPE.FOLLOWING
 	});
 	const savedRelation = await relation.save();
+	
+	// Tạo thông báo follow cho người được theo dõi
+	await notificationService.createFollowNotification(userId, targetId);
 
 	return savedRelation
 };
@@ -223,6 +274,10 @@ const cancelFriendRequest = async (requestId, recipientId) => {
 	}
 
 	await relation.deleteOne();
+	
+	// Xóa thông báo lời mời kết bạn khi hủy lời mời
+	await notificationService.deleteFriendRequestNotification(requestId, recipientId);
+	
 	return { message: 'Friend request cancelled successfully' };
 };
 
