@@ -133,3 +133,18 @@ module.exports.sharePostController = async (req, res) => {
         error: null
     });
 }
+
+module.exports.getFriendPosts = async (req, res, next) => {
+    try {
+        const userId = res.locals.user._id;
+        const posts = await postService.getFriendPosts(userId);
+        
+        res.status(OK).json({
+            isSuccess: true,
+            data: posts,
+            error: null
+        });
+    } catch (error) {
+        next(error);
+    }
+}

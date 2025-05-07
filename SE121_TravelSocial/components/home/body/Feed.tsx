@@ -12,14 +12,48 @@ import { API_BASE_URL } from "@/constants/config";
 import { useNavigation } from "@react-navigation/native";
 
 const Feed = ({ StoryTranslate, userData } : any) => {
-  const [userPosts, setUserPosts] = useState<[]>([]);
+  const [posts, setPosts] = useState<[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
   const lastScrollY = useSharedValue(0);
   const navigation = useNavigation();
   
-  const getUserPosts = async () => {
+  // Fetch posts from friends (including user's own posts)
+  const getFriendPosts = async () => {
     try {
       setLoading(true);
+      const response = await fetch(`${API_BASE_URL}/posts/friends`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setPosts(data.data);
+        console.log("Friend posts loaded: ", data.data.length);
+      } else {
+        console.error('Failed to fetch friend posts:', response.statusText);
+        // Fallback to user's own posts
+        getUserPosts();
+      }
+    } catch (error) {
+      console.error('Error fetching friend posts:', error);
+      // Fallback to user's own posts
+      getUserPosts();
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  // Fetch user's own posts as a fallback
+  const getUserPosts = async () => {
+    try {
+      if (!userData?._id) return;
+      
       const response = await fetch(`${API_BASE_URL}/posts/author/${userData._id}`, {
         method: 'GET',
         credentials: 'include',
@@ -27,8 +61,8 @@ const Feed = ({ StoryTranslate, userData } : any) => {
 
       if (response.ok) {
         const data = await response.json();
-        setUserPosts(data.data); 
-        console.log("userPost in Feed: ", data);
+        setPosts(data.data);
+        console.log("User posts loaded as fallback: ", data.data.length);
       } else {
         console.error('Failed to fetch user data:', response.statusText);
       }
@@ -36,12 +70,18 @@ const Feed = ({ StoryTranslate, userData } : any) => {
       console.error('Error fetching user data:', error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
+  const handleRefresh = () => {
+    setRefreshing(true);
+    getFriendPosts();
+  };
+
   useEffect(() => {
-    if (userData?._id) {
-      getUserPosts();
+    if (userData) {
+      getFriendPosts();
     }
   }, [userData]);
 
@@ -71,14 +111,13 @@ const Feed = ({ StoryTranslate, userData } : any) => {
         }}
         onMomentumScrollEnd={(event) => {
           const scrollY = event.nativeEvent.contentOffset.y;
-          // if (scrollY < lastScrollY.value) StoryTranslate.value = 0;
           lastScrollY.value = scrollY;
         }}
         refreshControl={
-          <RefreshControl refreshing={false} onRefresh={getUserPosts} />
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
         keyExtractor={(item, index) => index.toString()}
-        data={userPosts}
+        data={posts}
         renderItem={({ item, index } : any) => (
           <View>
             <PostAdvance post={item} navigation={navigation} />
@@ -86,7 +125,7 @@ const Feed = ({ StoryTranslate, userData } : any) => {
         )}
         ListEmptyComponent={() => (
           <View style={{ padding: 20, alignItems: 'center' }}>
-            <Text style={{ color: GlobalStyles.colors.gray }}>Không có bài viết nào</Text>
+            <Text style={{ color: GlobalStyles.colors.gray }}>Không có bài viết nào từ bạn bè</Text>
           </View>
         )}
       />
