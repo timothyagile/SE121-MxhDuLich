@@ -7,6 +7,7 @@ import {
     Pressable,
     ScrollView,
     TouchableOpacity,
+    Share,
   } from "react-native";
   import React, { useContext, useEffect, useState } from "react";
   import Ionicons from "@expo/vector-icons/Ionicons";
@@ -62,7 +63,7 @@ import {
 
         useEffect(() => {
           if (post.images) {
-            const fixedUrl = getSafeImageUrl(post.images[0].url);
+            const fixedUrl = getSafeImageUrl(post?.images?.[0]?.url);
             setSafeUri(fixedUrl);
             Image.getSize(fixedUrl, (width, height) => {
               const ratio = width / height;
@@ -191,36 +192,25 @@ import {
         return url;
       };
   
-          useEffect(() => {
-            if (post.images) {
-              const fixedUrl = getSafeImageUrl(post.images[0].url);
-              setSafeUri(fixedUrl);
-              Image.getSize(fixedUrl, (width, height) => {
-                const ratio = width / height;
-                if (ratio < 0.7) {
-                  setRatio(0.7);
-                } else {
-                  setRatio(ratio);
-                }
-              });
+      useEffect(() => {
+        if (post.images) {
+          const fixedUrl = getSafeImageUrl(post.images[0].url);
+          setSafeUri(fixedUrl);
+          Image.getSize(fixedUrl, (width, height) => {
+            const ratio = width / height;
+            if (ratio < 0.7) {
+              setRatio(0.7);
+            } else {
+              setRatio(ratio);
             }
-          }, [post]);
-  
-      // useEffect(() => {
-      //   Image.getSize(post?.images?.[0].url, (width, height) => {
-      //     const imageRatio = width / height;
-      //     if (imageRatio < 0.9) {
-      //       setRatio(1);
-      //     } else {
-      //       setRatio(imageRatio);
-      //     }
-      //   });
-      // }, [post]);
+          });
+        }
+      }, [post]);
   
       return (
         <Pressable
           onPress={() => {
-            setResizeModeCover(!resizeModeCover);
+            navigation.navigate('post-detail-screen', { postId: post._id });
           }}
           style={{}}
         >
@@ -314,6 +304,35 @@ import {
         }
       }
 
+      // Thêm hàm xử lý chia sẻ bài viết
+      const handleSharePost = async () => {
+        try {
+          const postUrl = `${API_BASE_URL.replace('/api/v1', '')}/post/${post._id}`;
+          const shareOptions = {
+            title: 'Chia sẻ bài viết',
+            message: `${post?.content?.substring(0, 100)}${post?.content?.length > 100 ? '...' : ''}\n\nXem bài viết tại: ${postUrl}`,
+            url: post?.images?.[0]?.url,
+          };
+
+          const result = await Share.share(shareOptions);
+
+          if (result.action === Share.sharedAction) {
+            if (result.activityType) {
+              // Đã chia sẻ qua activity type cụ thể
+              console.log(`Shared via ${result.activityType}`);
+            } else {
+              // Đã chia sẻ nhưng không xác định được activity type
+              console.log('Shared successfully');
+            }
+          } else if (result.action === Share.dismissedAction) {
+            // Người dùng đã hủy chia sẻ
+            console.log('Share dismissed');
+          }
+        } catch (error) {
+          console.error('Error sharing post:', error);
+        }
+      };
+
       // Lấy hashtags từ nội dung bài viết hoặc sử dụng tags nếu có
       const getHashtags = () => {
         const hashtags = post?.hashTags || [];
@@ -359,7 +378,7 @@ import {
   
       return (
         <>
-          <CommentSheet visible={showComments} setVisible={setShowComments} />
+          <CommentSheet visible={showComments} setVisible={setShowComments} postId={post._id}/>
   
           <View
             style={{
@@ -387,7 +406,7 @@ import {
             <View
               style={{ position: "absolute", right: 0, flexDirection: "row" }}
             >
-              <FooterButton icon={"arrow-redo"} onPress={() => {}}/>
+              <FooterButton icon={"arrow-redo"} onPress={handleSharePost}/>
               <FooterButton icon={"bookmark"} onPress={() => {}} />
             </View>
           </View>

@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Text, View, StyleSheet, Image, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 import * as ImagePicker from 'expo-image-picker';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
-import { RouteProp, useRoute } from '@react-navigation/native';
+import { RouteProp, useRoute, useFocusEffect } from '@react-navigation/native';
 import { useUser } from '@/context/UserContext';
 import { navigate } from 'expo-router/build/global-state/routing';
 import {API_BASE_URL} from '../constants/config';
@@ -11,16 +11,13 @@ import {API_BASE_URL} from '../constants/config';
 interface User {
     userName: string;
     userEmail: string;
-
 }
-
 
 export default function ProfileScreen({ navigation }: { navigation: NativeStackNavigatorProps }) {
     const { userId } = useUser();
     const [userData, setUserData] = useState<any>(null);
-  
-
     const [image, setImage] = useState<string | null>(null);
+    const [uploading, setUploading] = useState(false);
 
     const pickImage = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
@@ -32,6 +29,110 @@ export default function ProfileScreen({ navigation }: { navigation: NativeStackN
 
         if (!result.canceled && result.assets[0].uri) {
             setImage(result.assets[0].uri);
+            // Tự động upload avatar khi người dùng chọn ảnh
+            uploadAvatar(result.assets[0].uri);
+        }
+    };
+
+    const getFilename = (uri: string) => {
+        const uriParts = uri.split("/");
+        const name = uriParts[uriParts.length - 1];
+        const fileTypeParts = name.split(".");
+        const fileType = fileTypeParts[fileTypeParts.length - 1];
+        return { name, fileType };
+      };
+
+    const uploadAvatar = async (imageUri: string) => {
+        try {
+            setUploading(true);
+            console.log("Starting avatar upload...");
+            
+            // 1. Đầu tiên, tải ảnh lên server
+            const formData = new FormData();
+            const fileInfo = getFilename(imageUri); // Sử dụng imageUri thay vì image
+            
+            formData.append("files", {
+                uri: imageUri,
+                type: `image/${fileInfo.fileType}`,
+                name: fileInfo.name,
+            } as any);
+            
+            console.log("FormData prepared, sending to server...");
+            
+            // Upload ảnh lên Cloudinary thông qua API
+            const uploadResponse = await fetch(`${API_BASE_URL}/upload`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+                credentials: 'include',
+            });
+            
+            console.log("Upload response status:", uploadResponse.status);
+            
+            const uploadResponseText = await uploadResponse.text();
+            console.log("Raw response:", uploadResponseText);
+            
+            if (!uploadResponse.ok) {
+                throw new Error(`Không thể tải ảnh lên: ${uploadResponseText}`);
+            }
+            
+            const uploadResult = JSON.parse(uploadResponseText);
+            console.log('Upload result:', uploadResult);
+            
+            if (!uploadResult.isSuccess) {
+                throw new Error(uploadResult.error || "Lỗi không xác định khi tải ảnh");
+            }
+            
+            // Lấy thông tin ảnh từ mảng kết quả
+            const imageData = uploadResult.data[0];
+            console.log("Image data:", imageData);
+            
+            // 2. Sau khi tải lên thành công, cập nhật avatar user
+            const updateResponse = await fetch(`${API_BASE_URL}/user/avt`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userAvatar: {
+                        url: imageData.url,
+                        publicId: imageData.publicId,
+                    }
+                }),
+                credentials: 'include',
+            });
+            
+            const updateResponseText = await updateResponse.text();
+            console.log("Update avatar response:", updateResponseText);
+            
+            if (!updateResponse.ok) {
+                throw new Error(`Không thể cập nhật avatar: ${updateResponseText}`);
+            }
+            
+            const updateResult = JSON.parse(updateResponseText);
+            console.log('Avatar update result:', updateResult);
+            
+            // Cập nhật dữ liệu người dùng trong state
+            setUserData((prev: any) => ({
+                ...prev,
+                userAvatar: {
+                    url: imageData.url,
+                    publicId: imageData.publicId,
+                }
+            }));
+            
+            // Cập nhật ảnh hiển thị với timestamp để tránh cache
+            setImage(imageData.url + '?cache=' + new Date().getTime());
+            
+            Alert.alert('Thành công', 'Đã cập nhật ảnh đại diện');
+            
+        } catch (error) {
+            console.error('Error uploading avatar:', error);
+            Alert.alert('Lỗi', 'Không thể cập nhật ảnh đại diện. Vui lòng thử lại.');
+        } finally {
+            setUploading(false);
         }
     };
 
@@ -55,27 +156,45 @@ export default function ProfileScreen({ navigation }: { navigation: NativeStackN
         }
     };
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const response = await fetch(`${API_BASE_URL}/user/getbyid/${userId}`, {
-                    method: 'GET',
-                    credentials: 'include',
-                });
+    const fetchUserData = async () => {
+        try {
+            console.log('Fetching user data for ID:', userId);
+            const response = await fetch(`${API_BASE_URL}/user/getbyid/${userId}`, {
+                method: 'GET',
+                credentials: 'include',
+            });
 
-                if (response.ok) {
-                    const data = await response.json();
-                    setUserData(data.data); 
-                    setImage(data.data?.userAvatar?.url + '?cache=' + new Date().getTime());                    console.log(data.data);
-                } else {
-                    console.error('Failed to fetch user data:', response.statusText);
+            if (response.ok) {
+                const data = await response.json();
+                console.log('User data fetched successfully:', data.data);
+                setUserData(data.data); 
+                if (data.data?.userAvatar?.url) {
+                    setImage(data.data?.userAvatar?.url + '?cache=' + new Date().getTime());
                 }
-            } catch (error) {
-                console.error('Error fetching user data:', error);
+            } else {
+                console.error('Failed to fetch user data:', response.statusText);
             }
-        };
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+        }
+    };
 
-        if (userId) fetchUserData(); 
+    // Thêm useFocusEffect để tải lại dữ liệu khi màn hình được focus
+    useFocusEffect(
+        useCallback(() => {
+            console.log('Profile Screen Focused - Refreshing user data');
+            if (userId) {
+                fetchUserData();
+            }
+            return () => {
+                // Cleanup nếu cần
+            };
+        }, [userId])
+    );
+
+    // Vẫn giữ useEffect để tải dữ liệu ban đầu khi component được mount
+    useEffect(() => {
+        if (userId) fetchUserData();
     }, [userId]);
 
     if (!userId) {
@@ -101,8 +220,12 @@ export default function ProfileScreen({ navigation }: { navigation: NativeStackN
                     <View style={styles.imagePlaceholderContainer}>
                     </View>
                 )}
-                <TouchableOpacity style={styles.addButton}onPress={pickImage}>
-                    <Image source={require('../assets/icons/changeavt.png')}></Image>
+                <TouchableOpacity style={styles.addButton} onPress={pickImage} disabled={uploading}>
+                    {uploading ? (
+                        <ActivityIndicator size="small" color="#0000ff" />
+                    ) : (
+                        <Image source={require('../assets/icons/changeavt.png')}></Image>
+                    )}
                 </TouchableOpacity>
                 <Text style = {styles.name}>{userData?.userName}</Text>
                 <Text style = {styles.email}>{userData?.userEmail}</Text>

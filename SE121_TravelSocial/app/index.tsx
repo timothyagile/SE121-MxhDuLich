@@ -35,6 +35,8 @@ import NotificationsSocialScreen from '@/screen/NotificationsSocialScreen';
 import NewPostScreen from '@/screen/NewPostScreen';
 import ViewMapScreen from '@/screen/ViewMapScreen';
 import VoucherScreen from '@/screen/VoucherScreen';
+import SocialScreen from '@/screen/SocialScreen';
+import PostDetailScreen from '@/screen/PostDetailScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
@@ -220,6 +222,12 @@ export default function App() {
           <Stack.Screen
             name='voucher-screen'
             component={VoucherScreen}
+            options={{
+              headerShown: false
+            }} />
+          <Stack.Screen
+            name='post-detail-screen'
+            component={PostDetailScreen}
             options={{
               headerShown: false
             }} />

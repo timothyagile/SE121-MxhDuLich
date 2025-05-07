@@ -75,7 +75,7 @@ function Posts({userId, navigation, route, refreshing }: any) {
                 } catch (error) {
                     console.error('Error fetching user data:', error);
                 }
-            };
+    };
 
     useEffect(() => {
         getPosts();

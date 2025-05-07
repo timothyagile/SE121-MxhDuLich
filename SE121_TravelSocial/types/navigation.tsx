@@ -39,5 +39,6 @@ export type SelectedRoom = {
     'new-post-screen': undefined;
     'view-map-screen': undefined;
     'voucher-screen': undefined;
+    'post-detail-screen': { postId: string };
+    
   };
-  
