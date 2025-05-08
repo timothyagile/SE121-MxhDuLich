@@ -14,20 +14,15 @@ interface DailySectionProps {
     navigation: any;
 }
 
-export default function DailySection({ categoryId}: DailySectionProps) {
+export default function DailySection({ categoryId, navigation }: DailySectionProps) {
 
     const [locations, setLocations] = useState<any[]>([]);
-    const [RCM, setRCM] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [isFetchingMore, setIsFetchingMore] = useState(false);
-    const isFirstLoadRef = useRef(true);
-    const isPageReady = useRef(false);
     
-
     useEffect(() => {
-        console.log('category: ', categoryId)
         if (categoryId === "all") {
             getAllLocations(1);
             return;
@@ -35,7 +30,6 @@ export default function DailySection({ categoryId}: DailySectionProps) {
         if (categoryId) {
             fetchPopularLocations(categoryId, 1);
         }
-        //fetchRecommendedLocations();
     }, [categoryId]);
 
     const fetchPopularLocations = async (id: string, pageNumber: number) => {
@@ -66,80 +60,82 @@ export default function DailySection({ categoryId}: DailySectionProps) {
         }
     };
 
-    // const fetchRecommendedLocations = async () => {
-    //     try {
-    //         // Fetch danh sách các location được đề xuất
-    //         const response = await fetch(`${API_BASE_URL}/recommend`);
-    //         const data = await response.json();
-
-    //         // if (data.isSuccess) {
-    //             console.log('RCM: ',data.recommendations);
-
-    //             // Duyệt qua từng location id và gọi API getlocationbyid để lấy thông tin chi tiết
-    //                 const locationDetailsPromises = data.recommendations.map(async (location:any) => {
-    //                     console.log('location id:', location.id);
-    //                     const locationResponse = await fetch(`${API_BASE_URL}/locationbyid/${location.id}`);
-    //                     const locationData = await locationResponse.json();
-    //                     console.log('location data: ', locationData);
-    //                     return locationData;
-    //                 });
-
-    //             // Đợi tất cả các lời hứa (promises) hoàn thành và lấy dữ liệu chi tiết của tất cả các location
-    //             const locationsWithDetails = await Promise.all(locationDetailsPromises);
-
-    //             console.log('BCCCC',locationsWithDetails)
-    //             // Lưu dữ liệu chi tiết vào state
-    //             setRCM(locationsWithDetails);
-    //         // } 
-    //         // else {
-    //         //     console.error("Error fetching popular locations:", data.error);
-    //         // }
-    //     } catch (error) {
-    //         console.error("Fetch error:", error);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
-
-  const getAllLocations = async (pageNumber: number, isLoadMore = false) => {
-    try {
-      if (isFetchingMore || !hasMore) return;
-  
-      setIsFetchingMore(true);
-  
-      const response = await fetch(`${API_BASE_URL}/alllocation?page=${pageNumber}&limit=10`);
-      const data = await response.json();
-  
-      if (data.isSuccess) {
-        if (pageNumber === 1) {
-          setLocations(data.data.data);
-          console.log('all location: ', data.data);
-        } else {
-            const newLocations = data.data.data;
-            setLocations(prev => {
-                const existingIds = new Set(prev.map(item => item._id));
-                const uniqueNewLocations = newLocations.filter((item: { _id: any; }) => !existingIds.has(item._id));
-                return isLoadMore ? [...prev, ...uniqueNewLocations] : newLocations;
-            });
+    const getAllLocations = async (pageNumber: number, isLoadMore = false) => {
+        try {
+            if (isFetchingMore || !hasMore) return;
+      
+            setIsFetchingMore(true);
+      
+            const response = await fetch(`${API_BASE_URL}/alllocation?page=${pageNumber}&limit=10`);
+            const data = await response.json();
+      
+            if (data.isSuccess) {
+                if (pageNumber === 1) {
+                    setLocations(data.data.data);
+                } else {
+                    const newLocations = data.data.data;
+                    setLocations(prev => {
+                        const existingIds = new Set(prev.map(item => item._id));
+                        const uniqueNewLocations = newLocations.filter((item: { _id: any; }) => !existingIds.has(item._id));
+                        return isLoadMore ? [...prev, ...uniqueNewLocations] : newLocations;
+                    });
+                }
+      
+                setHasMore(data.data.data.length > 0);
+                setPage(pageNumber + 1); 
+            } else {
+                console.error(data.error);
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsFetchingMore(false);
+            setLoading(false);
         }
-  
-        setHasMore(data.data.data.length > 0);
-        setPage(pageNumber + 1); 
-      } else {
-        console.error(data.error);
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsFetchingMore(false);
-      setLoading(false);
-    }
-  };
-    // Hiển thị vòng quay khi đang tải
-    // if (loading) {
-    //     return <ActivityIndicator size="large" color="#0000ff" />;
-    // }
+    };
 
+    const renderItem = ({ item, index }: { item: any, index: number }) => (
+        <TouchableOpacity
+            style={{
+                marginLeft: 24,
+                marginRight: index === locations.length - 1 ? 24 : 0,
+                marginBottom: 15,
+            }}
+            onPress={() => navigation.navigate('detail-screen', { id: item._id })}
+        >
+            <View style={styles.card}>
+                <View style={styles.imageBox}>
+                    <Image
+                        style={styles.image}
+                        source={
+                            item?.image?.[0]?.url
+                                ? { uri: item.image[0].url }
+                                : require('../../assets/images/bai-truoc-20.jpg')
+                        }
+                    />
+                </View>
+                <View style={styles.footer}>
+                    <Text style={[styles.textStyle, { fontSize: 16 }]}>
+                        {item?.name || 'Khách sạn mới'}
+                    </Text>
+                </View>
+                <View style={styles.footer}>
+                    <Text style={[styles.textStyle, { fontSize: 12 }]}>
+                        {item?.province || 'Tỉnh/Thành phố'}
+                    </Text>
+                </View>
+            </View>
+        </TouchableOpacity>
+    );
+
+    if (loading && locations.length === 0) {
+        return (
+            <View style={{ padding: 20 }}>
+                <Text style={styles.titleText}>Gợi ý hằng ngày</Text>
+                <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+        );
+    }
 
     return (
         <View>
@@ -148,52 +144,16 @@ export default function DailySection({ categoryId}: DailySectionProps) {
                 data={locations}
                 horizontal={false}
                 showsHorizontalScrollIndicator={false}
-                keyExtractor={(item, index) => item._id}
+                keyExtractor={(item) => item._id.toString()}
                 contentContainerStyle={styles.container}
-
-                renderItem={({ item, index }) => (
-                    <TouchableOpacity
-                        style={{
-                            marginLeft: 24,
-                            marginRight: index === locations.length - 1 ? 24 : 0,
-                        }}
-                    >
-                        <View style={styles.card}>
-                            <View style={styles.imageBox}>
-                                <Image
-                                    style={styles.image}
-                                    source={
-                                        item?.image?.[0]?.url
-                                            ? { uri: item.image[0].url }
-                                            : require('../../assets/images/bai-truoc-20.jpg')
-                                    }
-                                />
-                            </View>
-                            <View style={styles.footer}>
-                                <Text style={[styles.textStyle, { fontSize: 16 }]}>
-                                    {item?.name || 'Khách sạn mới'}
-                                </Text>
-                            </View>
-                            <View style={styles.footer}>
-                                <Text style={[styles.textStyle, { fontSize: 12 }]}>
-                                    {item?.province || 'Tỉnh/Thành phố'}
-                                </Text>
-                            </View>
-                        </View>
-                    </TouchableOpacity>
-                )}
-                numColumns={2} 
+                renderItem={renderItem}
+                numColumns={2}
                 onEndReached={() => {
-                    // if (isPageReady.current) {
-                        if (categoryId === 'all') {
-                            getAllLocations(page, true);
-                        } else if (categoryId) {
-                            fetchPopularLocations(categoryId, page);
-                        }
-                    // } 
-                    // else {
-                    //     isPageReady.current = true;
-                    // }
+                    if (categoryId === 'all') {
+                        getAllLocations(page, true);
+                    } else if (categoryId) {
+                        fetchPopularLocations(categoryId, page);
+                    }
                 }}
                 onEndReachedThreshold={0.5}
                 ListFooterComponent={
@@ -201,28 +161,30 @@ export default function DailySection({ categoryId}: DailySectionProps) {
                         <ActivityIndicator size="small" color="#000" style={{ marginHorizontal: 24 }} />
                     ) : null
                 }
+                removeClippedSubviews={true}
+                maxToRenderPerBatch={10}
+                initialNumToRender={6}
+                windowSize={10}
             />
         </View>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
     container: {
-        //flexDirection: 'row',
-        //flexWrap: 'wrap',
+        paddingHorizontal: 5,
+        paddingBottom: 20,
     },
-
     titleText: {
         fontSize: 24,
         fontWeight: 'bold',
         left: 20,
         marginBottom: 10,
-
     },
     card: {
         width: CARD_WIDTH,
         height: CARD_HEIGHT,
-        borderRadius: 1
+        borderRadius: 1,
     },
     imageBox: {
         width: CARD_WIDTH,
@@ -234,7 +196,6 @@ const styles = StyleSheet.create({
         width: CARD_WIDTH,
         height: CARD_HEIGHT - 60,
         resizeMode: 'cover',
-
     },
     textBox: {
         flexDirection: 'row',

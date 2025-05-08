@@ -1,6 +1,6 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useRef} from 'react';
 import React from 'react';
-import {View, Text, StyleSheet, TextInput, FlatList, ScrollView, TouchableOpacity, Image, ImageBackground, Modal} from 'react-native'
+import {View, Text, StyleSheet, TextInput, FlatList, SectionList, TouchableOpacity, Image, ImageBackground, Modal} from 'react-native'
 
 import CategoryItem from "@/components/HomeScreen/CategoryItem";
 import categoryData from '@/constants/category';
@@ -66,6 +66,35 @@ export default function HomeScreen ({navigation} : {navigation : NativeStackNavi
         navigation.navigate('detail-screen', { id: location._id})
       };
 
+    // Creating sections for the SectionList
+    const homeSections = [
+        {
+            key: 'popular',
+            data: [{ id: 'popular' }],
+            renderItem: () => <PopularSection categoryId={selectedCategory?.id} navigation={navigation} />,
+        },
+        {
+            key: 'recommended',
+            data: [{ id: 'recommended' }],
+            renderItem: () => <RecommendedSection categoryId={selectedCategory?.id} navigation={navigation} />,
+        },
+        {
+            key: 'newEvent',
+            data: [{ id: 'newEvent' }],
+            renderItem: () => <NewEventSection categoryId={selectedCategory?.id} navigation={navigation} />,
+        },
+        {
+            key: 'daily',
+            data: [{ id: 'daily' }],
+            renderItem: () => <DailySection categoryId={selectedCategory?.id} navigation={navigation} />,
+        },
+        {
+            key: 'banner',
+            data: [{ id: 'banner' }],
+            renderItem: () => <Image style={{width:'100%', height:200}} source={require('../assets/images/banner.png')}/>,
+        },
+    ];
+
     
     
     return (
@@ -113,14 +142,20 @@ export default function HomeScreen ({navigation} : {navigation : NativeStackNavi
                     </FlatList>
                 </View>
            
-
-            <ScrollView style = {{}}>
-                    <PopularSection categoryId={selectedCategory?.id} navigation = {navigation}/>
-                    <RecommendedSection categoryId={selectedCategory?.id} navigation = {navigation}/>
-                    <NewEventSection categoryId={selectedCategory?.id} navigation = {navigation}/>
-                    <DailySection categoryId={selectedCategory?.id} navigation={navigation}/>
-                    <Image style={{width:'100%', height:200}} source={require('../assets/images/banner.png')}/>
-            </ScrollView>
+            {/* Replace ScrollView with SectionList to fix the nested VirtualizedLists warning */}
+            <SectionList
+                sections={homeSections}
+                renderSectionHeader={() => null}
+                renderItem={({ section, item }) => section.renderItem()}
+                keyExtractor={(item, index) => item.id}
+                stickySectionHeadersEnabled={false}
+                showsVerticalScrollIndicator={false}
+                removeClippedSubviews={true}
+                initialNumToRender={3}
+                maxToRenderPerBatch={2}
+                windowSize={5}
+                contentContainerStyle={{ paddingBottom: 20 }}
+            />
             
         </View>
     </ImageBackground>

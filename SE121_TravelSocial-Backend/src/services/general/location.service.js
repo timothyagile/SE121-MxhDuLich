@@ -55,35 +55,14 @@ const getAllLocation = async (page = 1, limit = 10) => {
       Location.countDocuments()
     ]);
   
-    if (allLocation.length !== 0) {
-      return {
-        data: allLocation,
-        total,
-        page,
-        limit,
-      };
-    } else {
-      throw new NotFoundException('Not found any location in database');
-    }
+    // Return empty data array instead of throwing exception when no locations found
+    return {
+      data: allLocation,
+      total,
+      page,
+      limit,
+    };
   };
-
-// const getAllLocation = async () => {
-//     const allLocation = await Location.find();
-//     // for (const location of allLocation) {
-//     //     const slug = createSlug(location.name, location.address); // Tạo slug
-
-//     //     // Cập nhật trường slug cho tài liệu hiện tại
-//     //     await Location.updateOne(
-//     //         { _id: location._id }, // Điều kiện: tài liệu theo _id
-//     //         { $set: { slug } } // Cập nhật trường slug
-//     //     );
-//     // }
-//     if(allLocation.length !== 0)
-//         return allLocation;
-//     else
-//         throw new NotFoundException('Not found any location in database');
-// }
-
 
 const getLocationByCategory = async (categoryId, page = 1, limit = 10) => {
     const skip = (page - 1) * limit;
@@ -93,24 +72,14 @@ const getLocationByCategory = async (categoryId, page = 1, limit = 10) => {
       Location.countDocuments({ 'category.id': categoryId }),
     ]);
   
-    if (locations.length !== 0) {
-      return {
-        data: locations,
-        total,
-        page,
-        limit,
-      };
-    } else {
-      throw new NotFoundException('Not found this category location');
-    }
+    // Return empty data array instead of throwing exception when no locations found
+    return {
+      data: locations,
+      total,
+      page,
+      limit,
+    };
   };
-// const getLocationByCategory = async (categoryId) => {
-//     const locations = await Location.find({'category.id': categoryId});
-//     if(locations.length != 0)
-//         return locations;
-//     else
-//         throw new NotFoundException('Not found this category location');
-// }
 
 const getLocationByUserId = async (userId) => {
     const locations = await Location.find({ownerId: userId});
