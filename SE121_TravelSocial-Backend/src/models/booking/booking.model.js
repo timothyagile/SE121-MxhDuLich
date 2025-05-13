@@ -57,19 +57,10 @@ const BookingSchema = new Schema({
     services: {
         type: [serviceSchema],
         default: []
-    },    totalPrice: {type: Number, required: true},
-    tax: {type: Number, required: true},
-    voucher: {
-        voucherId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Voucher',
-            default: null
-        },
-        code: {type: String, default: null},
-        discountAmount: {type: Number, default: 0}
     },
+    totalPrice: {type: Number, required: true},
+    tax: {type: Number, required: true},
     totalPriceAfterTax: {type: Number, required: true},
-    finalPrice: {type: Number, required: true}, // Giá cuối cùng sau khi áp dụng voucher
     amountPaid: {type: Number, default: 0},
     status: {
         type: String,
@@ -125,22 +116,15 @@ BookingSchema.pre('validate', async function (next) {
     console.log('totalroomprice: ',totalRoomPrice);
     const totalServicePrice = calculateTotalServicePrice(this.services);
     this.totalPrice = totalRoomPrice + totalServicePrice;
-    console.log('totalprice: ', this.totalPrice);    this.tax = this.totalPrice * 0.08;
+    console.log('totalprice: ', this.totalPrice);
+    this.tax = this.totalPrice * 0.08;
     console.log('tax: ', this.tax);
     this.totalPriceAfterTax = this.totalPrice + this.tax;
-    
-    // Tính giá cuối cùng sau khi áp dụng voucher
-    const discountAmount = this.voucher && this.voucher.discountAmount ? this.voucher.discountAmount : 0;
-    this.finalPrice = this.totalPriceAfterTax - discountAmount;
-    
-    console.log('totalpriceaftertax: ', this.totalPriceAfterTax);
-    console.log('discount: ', discountAmount);
-    console.log('finalPrice: ', this.finalPrice);
+    console.log('totalpriceaftertax: ',this.totalPriceAfterTax);
     console.log('Chay toi day')
-    
-    if(this.finalPrice > this.amountPaid)
+    if(this.totalPriceAfterTax > this.amountPaid)
         this.status = 'pending'
-    if(this.finalPrice === this.amountPaid)
+    if(this.totalPriceAfterTax === this.amountPaid)
         this.status = 'complete'
     next()
 })

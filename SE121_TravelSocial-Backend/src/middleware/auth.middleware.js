@@ -153,20 +153,7 @@ const checkLocationOwner = (req, res, next) => {
             data: null
         });
     }
-    next();  });
+    next();
+  });
 };
-
-//check if user is admin
-const checkAdmin = (req, res, next) => {
-  // Kiểm tra quyền của người dùng, đã được set trong middleware checkUser
-  if (!res.locals.user || res.locals.user.userRole !== 'admin') {
-    return res.status(403).json({
-      isSuccess: false,
-      message: 'Bạn không có quyền quản trị.',
-      data: null
-    });
-  }
-  next();
-};
-
-module.exports = {requireAuth, checkUser, checkLocationOwner, verifyConnectSocket, checkAdmin};
+module.exports = {requireAuth, checkUser, checkLocationOwner, verifyConnectSocket};
