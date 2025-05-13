@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Image, View, StyleSheet, TouchableOpacity, Text, Dimensions, ActivityIndicator, FlatList } from 'react-native';
 import locationData from '@/constants/location'
 import * as Network from 'expo-network';
@@ -10,17 +10,28 @@ const CARD_HEIGHT = 200;
 const CARD_WIDTH_SPACING = CARD_WIDTH + 24;
 
 interface DailySectionProps {
-    categoryId: string | undefined; // Nhận categoryId từ HomeScreen
+    categoryId: string | undefined;
     navigation: any;
 }
 
-export default function DailySection({ categoryId, navigation }: DailySectionProps) {
+// Define a location interface for type safety
+interface Location {
+    _id: string;
+    name: string;
+    province?: string;
+    rating?: number;
+    image?: Array<{url: string}>;
+    [key: string]: any; // For other properties
+}
 
-    const [locations, setLocations] = useState<any[]>([]);
+export default function DailySection({ categoryId, navigation }: DailySectionProps) {
+    const [locations, setLocations] = useState<Location[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [isFetchingMore, setIsFetchingMore] = useState(false);
+    const [onEndReachedCalledDuringMomentum, setOnEndReachedCalledDuringMomentum] = useState(false);
+    const flatListRef = useRef(null);
     
     useEffect(() => {
         if (categoryId === "all") {
@@ -44,7 +55,13 @@ export default function DailySection({ categoryId, navigation }: DailySectionPro
                 if (pageNumber === 1) {
                     setLocations(data.data.data);
                 } else {
-                    setLocations(prev => [...prev, ...data.data.data]);
+                    // Prevent duplicates when adding new items
+                    const newItems = data.data.data as Location[];
+                    setLocations(prev => {
+                        const existingIds = new Set(prev.map(item => item._id));
+                        const uniqueNewItems = newItems.filter((item: Location) => !existingIds.has(item._id));
+                        return [...prev, ...uniqueNewItems];
+                    });
                 }
 
                 setHasMore(data.data.data.length > 0);
@@ -73,10 +90,10 @@ export default function DailySection({ categoryId, navigation }: DailySectionPro
                 if (pageNumber === 1) {
                     setLocations(data.data.data);
                 } else {
-                    const newLocations = data.data.data;
+                    const newLocations = data.data.data as Location[];
                     setLocations(prev => {
                         const existingIds = new Set(prev.map(item => item._id));
-                        const uniqueNewLocations = newLocations.filter((item: { _id: any; }) => !existingIds.has(item._id));
+                        const uniqueNewLocations = newLocations.filter((item: Location) => !existingIds.has(item._id));
                         return isLoadMore ? [...prev, ...uniqueNewLocations] : newLocations;
                     });
                 }
@@ -94,7 +111,18 @@ export default function DailySection({ categoryId, navigation }: DailySectionPro
         }
     };
 
-    const renderItem = ({ item, index }: { item: any, index: number }) => (
+    const loadMoreData = useCallback(() => {
+        if (!onEndReachedCalledDuringMomentum && !isFetchingMore && hasMore) {
+            if (categoryId === 'all') {
+                getAllLocations(page, true);
+            } else if (categoryId) {
+                fetchPopularLocations(categoryId, page);
+            }
+            setOnEndReachedCalledDuringMomentum(true);
+        }
+    }, [categoryId, page, isFetchingMore, hasMore, onEndReachedCalledDuringMomentum]);
+
+    const renderItem = ({ item, index }: { item: Location, index: number }) => (
         <TouchableOpacity
             style={{
                 marginLeft: 24,
@@ -141,6 +169,7 @@ export default function DailySection({ categoryId, navigation }: DailySectionPro
         <View>
             <Text style={styles.titleText}>Gợi ý hằng ngày</Text>
             <FlatList
+                ref={flatListRef}
                 data={locations}
                 horizontal={false}
                 showsHorizontalScrollIndicator={false}
@@ -148,23 +177,24 @@ export default function DailySection({ categoryId, navigation }: DailySectionPro
                 contentContainerStyle={styles.container}
                 renderItem={renderItem}
                 numColumns={2}
-                onEndReached={() => {
-                    if (categoryId === 'all') {
-                        getAllLocations(page, true);
-                    } else if (categoryId) {
-                        fetchPopularLocations(categoryId, page);
-                    }
-                }}
-                onEndReachedThreshold={0.5}
+                onEndReached={loadMoreData}
+                onMomentumScrollBegin={() => setOnEndReachedCalledDuringMomentum(false)}
+                onEndReachedThreshold={0.2}
                 ListFooterComponent={
                     isFetchingMore ? (
                         <ActivityIndicator size="small" color="#000" style={{ marginHorizontal: 24 }} />
                     ) : null
                 }
                 removeClippedSubviews={true}
-                maxToRenderPerBatch={10}
-                initialNumToRender={6}
-                windowSize={10}
+                maxToRenderPerBatch={6}
+                initialNumToRender={4}
+                windowSize={5}
+                updateCellsBatchingPeriod={50}
+                getItemLayout={(data, index) => ({
+                    length: CARD_HEIGHT + 15,  // Item height + margin
+                    offset: (CARD_HEIGHT + 15) * Math.floor(index / 2),
+                    index,
+                })}
             />
         </View>
     );

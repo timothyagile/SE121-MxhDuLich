@@ -1,6 +1,4 @@
-
-
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import {
   Text,
   View,
@@ -42,6 +40,7 @@ export default function PopularSection({ categoryId, navigation }: PopularSectio
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [onEndReachedCalledDuringMomentum, setOnEndReachedCalledDuringMomentum] = useState(false);
 
   const scrollX = useRef(new Animated.Value(0)).current;
 
@@ -122,6 +121,16 @@ export default function PopularSection({ categoryId, navigation }: PopularSectio
     }
   };
 
+  const loadMoreData = useCallback(() => {
+    if (!onEndReachedCalledDuringMomentum && !isFetchingMore && hasMore) {
+      if (categoryId === 'all') {
+        getAllLocations(page);
+      } else if (categoryId) {
+        fetchPopularLocations(categoryId, page);
+      }
+      setOnEndReachedCalledDuringMomentum(true);
+    }
+  }, [categoryId, page, isFetchingMore, hasMore, onEndReachedCalledDuringMomentum]);
 
   const renderItem = ({ item, index }: { item: any; index: number }) => {
     const inputRange = [
@@ -220,14 +229,12 @@ export default function PopularSection({ categoryId, navigation }: PopularSectio
         scrollEventThrottle={16}
         keyExtractor={(item, index) => item._id}
         renderItem={renderItem}
-        onEndReached={() => {
-          if (categoryId === 'all') {
-            getAllLocations(page);
-          } else {
-            fetchPopularLocations(categoryId!, page);
-          }
-        }}
-        onEndReachedThreshold={0.5}
+        onEndReached={loadMoreData}
+        onMomentumScrollBegin={() => setOnEndReachedCalledDuringMomentum(false)}
+        onEndReachedThreshold={0.2}
+        maxToRenderPerBatch={5}
+        windowSize={10}
+        removeClippedSubviews={true}
       />
       {isFetchingMore && (
   <Text style={{ textAlign: 'center', marginTop: 10 }}>Đang tải thêm...</Text>
