@@ -40,13 +40,6 @@ const createLocationWithImage = async (locationData) => {
     }
 }
 
-
-
-/**
- * @param {number} page
- * @param {number} limit
- * @returns {{ data: any[], total: number, page: number, limit: number }}
- */
 const getAllLocation = async (page = 1, limit = 10) => {
     const skip = (page - 1) * limit;
   
@@ -65,7 +58,7 @@ const getAllLocation = async (page = 1, limit = 10) => {
     } else {
       throw new NotFoundException('Not found any location in database');
     }
-  };
+};
 
 // const getAllLocation = async () => {
 //     const allLocation = await Location.find();

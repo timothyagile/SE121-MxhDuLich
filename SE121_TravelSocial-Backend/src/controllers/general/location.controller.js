@@ -95,9 +95,11 @@ module.exports.createLocation = async (req, res, next) => {
 //--GET ALL LOCATION DATA--\\
 module.exports.getAllLocation = async (req, res, next) => {
     try {
+
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const result = await locationSvc.getAllLocation(page, limit); // Lấy tất cả địa điểm từ cơ sở dữ liệu
+
         res.status(200).json({
             isSuccess: true,
             data: result,

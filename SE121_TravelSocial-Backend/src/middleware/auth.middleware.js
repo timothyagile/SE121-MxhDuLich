@@ -149,11 +149,44 @@ const checkLocationOwner = (req, res, next) => {
     if (res.locals.user.userRole !== 'location-owner') {
         return res.status(403).json({
             isSuccess: false,
-            message: 'Bạn không có quyền tạo địa điểm.',
+            message: 'Bạn không có quyền truy cập vào trang này',
             data: null
         });
     }
     next();
   });
 };
-module.exports = {requireAuth, checkUser, checkLocationOwner, verifyConnectSocket};
+
+const checkAdmin = (req, res, next) => {
+  const token = req.cookies.jwt;
+  if (!token) {
+    return res.status(401).json({
+        isSuccess: false,
+        message: 'Token không hợp lệ hoặc không tồn tại.',
+        data: null
+    });
+  }
+
+// Giải mã token
+  jwt.verify(token, 'travel', async (err, decoded) => {
+    if (err) {
+        return res.status(403).json({
+            isSuccess: false,
+            message: 'Token không hợp lệ.',
+            data: null
+        });
+    }
+    let user = await User.findById(decoded.id);
+    res.locals.user = user;
+    // Kiểm tra quyền
+    if (res.locals.user.userRole !== 'admin') {
+        return res.status(403).json({
+            isSuccess: false,
+            message: 'Bạn không có quyền truy cập vào trang này',
+            data: null
+        });
+    }
+    next();
+  });
+};
+module.exports = {requireAuth, checkUser, checkLocationOwner, checkAdmin, verifyConnectSocket};
