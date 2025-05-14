@@ -231,14 +231,20 @@ const getBookingRevenueByMonthForBusiness = async (businessId, month, year) => {
             "items.roomId": { $in: roomIds },
           }
         },
-        {
-            $unwind: "$items", 
-        },
-        {
-            $match: {
-                "items.roomId": { $in: roomIds }, 
-            },
-        },
+        // {
+        //     $unwind: "$items", 
+        // },
+        // {
+        //     $match: {
+        //         "items.roomId": { $in: roomIds }, 
+        //     },
+        // },
+        // {
+        //     $group: {
+        //       _id: "$_id", // Gom nhóm theo bookingId
+        //         // totalRevenue: { $sum: "totalPriceAfterTax" }, // Tính tổng revenue cho mỗi booking
+        //     },
+        // },
 
         {
           $group: {
@@ -248,6 +254,7 @@ const getBookingRevenueByMonthForBusiness = async (businessId, month, year) => {
           }
         }
       ]);
+
   
       console.log('Bookings Result:', bookings); 
   

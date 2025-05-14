@@ -40,36 +40,70 @@ const createLocationWithImage = async (locationData) => {
     }
 }
 
+const getAllLocation = async (page = 1, limit = 10) => {
+    const skip = (page - 1) * limit;
+  
+    const [allLocation, total] = await Promise.all([
+      Location.find().skip(skip).limit(limit),
+      Location.countDocuments()
+    ]);
+  
+    if (allLocation.length !== 0) {
+      return {
+        data: allLocation,
+        total,
+        page,
+        limit,
+      };
+    } else {
+      throw new NotFoundException('Not found any location in database');
+    }
+};
+
+// const getAllLocation = async () => {
+//     const allLocation = await Location.find();
+//     // for (const location of allLocation) {
+//     //     const slug = createSlug(location.name, location.address); // Tạo slug
+
+//     //     // Cập nhật trường slug cho tài liệu hiện tại
+//     //     await Location.updateOne(
+//     //         { _id: location._id }, // Điều kiện: tài liệu theo _id
+//     //         { $set: { slug } } // Cập nhật trường slug
+//     //     );
+//     // }
+//     if(allLocation.length !== 0)
+//         return allLocation;
+//     else
+//         throw new NotFoundException('Not found any location in database');
+// }
 
 
-const getAllLocation = async (skip, limit) => {
-    const allLocation = await Location.find()
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit)
-    ;
-    // for (const location of allLocation) {
-    //     const slug = createSlug(location.name, location.address); // Tạo slug
-
-    //     // Cập nhật trường slug cho tài liệu hiện tại
-    //     await Location.updateOne(
-    //         { _id: location._id }, // Điều kiện: tài liệu theo _id
-    //         { $set: { slug } } // Cập nhật trường slug
-    //     );
-    // }
-    if(allLocation.length !== 0)
-        return allLocation;
-    else
-        throw new NotFoundException('Not found any location in database');
-}
-
-const getLocationByCategory = async (categoryId) => {
-    const locations = await Location.find({'category.id': categoryId});
-    if(locations.length != 0)
-        return locations;
-    else
-        throw new NotFoundException('Not found this category location');
-}
+const getLocationByCategory = async (categoryId, page = 1, limit = 10) => {
+    const skip = (page - 1) * limit;
+  
+    const [locations, total] = await Promise.all([
+      Location.find({ 'category.id': categoryId }).skip(skip).limit(limit),
+      Location.countDocuments({ 'category.id': categoryId }),
+    ]);
+  
+    if (locations.length !== 0) {
+      return {
+        data: locations,
+        total,
+        page,
+        limit,
+      };
+    } else {
+      throw new NotFoundException('Not found this category location');
+    }
+  };
+// const getLocationByCategory = async (categoryId) => {
+//     const locations = await Location.find({'category.id': categoryId});
+//     if(locations.length != 0)
+//         return locations;
+//     else
+//         throw new NotFoundException('Not found this category location');
+// }
 
 const getLocationByUserId = async (userId) => {
     const locations = await Location.find({ownerId: userId});

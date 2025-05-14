@@ -13,6 +13,7 @@ import styles from '../StyleSheet/HomeScreenStyles';
 import axios from 'axios';
 import { API_BASE_URL } from '@/constants/config';
 import FilterLocation from '@/components/HomeScreen/FilterLocation';
+import NewEventSection from '@/components/HomeScreen/NewEvent';
 
 interface props {
     setFilterLocations: (filterLocations: any) => void;
@@ -35,31 +36,6 @@ export default function HomeScreen ({navigation} : {navigation : NativeStackNavi
         setSelectedCategory(category); 
     };
 
-    // useEffect(() => {
-    //     // Giả lập thời gian tải dữ liệu
-    //     const loadData = async () => {
-    //         try {
-    //             // Thực hiện các tác vụ tải dữ liệu (ví dụ: gọi API)
-    //             await new Promise((resolve) => setTimeout(resolve, 0)); // Giả lập 2 giây chờ
-    //         } catch (error) {
-    //             console.error('Error loading data:', error);
-    //         } finally {
-    //             setIsLoading(false); // Sau khi tải xong, thay đổi trạng thái
-    //         }
-    //     };
-
-    //     loadData();
-    // }, []); // useEffect chỉ chạy một lần khi component mount
-
-    // // Nếu đang tải dữ liệu, hiển thị một component loading
-    // if (isLoading) {
-    //     return (
-    //         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    //             <Text>Đang tải...</Text>
-    //         </View>
-    //     );
-    // }
-
     const fetchLocations = async (searchQuery:string) => {
         if (!searchQuery) {
             setFilterLocations([]);  // Nếu không có từ khóa tìm kiếm, xóa danh sách kết quả
@@ -70,8 +46,6 @@ export default function HomeScreen ({navigation} : {navigation : NativeStackNavi
             const response = await axios.get(`${API_BASE_URL}/locationbyname?name=${searchQuery}`);
             setFilterLocations(response.data);  // Cập nhật danh sách địa điểm
             setError(null);
-            console.log(query);
-            console.log(filterLocations);
             return response.data;  // Xóa lỗi nếu có
         } catch (err) {
             setError('Failed to fetch locations');
@@ -80,10 +54,6 @@ export default function HomeScreen ({navigation} : {navigation : NativeStackNavi
     };
 
     
-    useEffect(() => {
-        console.log(query);
-         //fetchLocations(query);
-    }, [query]);
 
     const handleTextChange =(text:string) => {
         setQuery(text.replace(/\s+/g, '-'));
@@ -93,7 +63,6 @@ export default function HomeScreen ({navigation} : {navigation : NativeStackNavi
     }
 
     const handleSelectLocation = (location: any) => {
-        console.log('Selected locationn:', location);
         navigation.navigate('detail-screen', { id: location._id})
       };
 
@@ -101,14 +70,13 @@ export default function HomeScreen ({navigation} : {navigation : NativeStackNavi
     
     return (
     <ImageBackground
-      source={require('../assets/icons/logo.png')} // Đường dẫn đến ảnh logo
-      style={styles.backgroundImage} // Định nghĩa kiểu dáng cho nền
-      // Đảm bảo ảnh bao phủ toàn bộ màn hình
+      source={require('../assets/icons/logo.png')}
+      style={styles.backgroundImage} 
     >
         <View style = {styles.container}>
             <View style = {{alignItems:'center', width:'100%'}}>
                 <View style={styles.search}>
-                    <TouchableOpacity onPress={() => console.log('Search icon pressed')}>
+                    <TouchableOpacity >
                         <Image source={require('../assets/icons/Search.png')} style={styles.icon} />
                     </TouchableOpacity>                   
                     <TextInput
@@ -149,8 +117,11 @@ export default function HomeScreen ({navigation} : {navigation : NativeStackNavi
             <ScrollView style = {{}}>
                     <PopularSection categoryId={selectedCategory?.id} navigation = {navigation}/>
                     <RecommendedSection categoryId={selectedCategory?.id} navigation = {navigation}/>
-                    <DailySection categoryId={selectedCategory?.id} navigation={undefined}/>
+                    <NewEventSection categoryId={selectedCategory?.id} navigation = {navigation}/>
+                    <DailySection categoryId={selectedCategory?.id} navigation={navigation}/>
+                    <Image style={{width:'100%', height:200}} source={require('../assets/images/banner.png')}/>
             </ScrollView>
+            
         </View>
     </ImageBackground>
     )

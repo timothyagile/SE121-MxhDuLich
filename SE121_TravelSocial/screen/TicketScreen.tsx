@@ -30,15 +30,14 @@ export default function TicketScreen() {
       const response = await fetch(`${API_BASE_URL}/booking/getbyuserid/${userId}`); // Thay bằng URL API của bạn
       const result = await response.json();
 
-      setTickets(result.data); // Gán dữ liệu từ API
+      setTickets(result.data); 
       console.log('ticket: ',tickets)
       if (result.isSuccess && result.data) {
         const ticketWithNames = await Promise.all(
           result.data.map(async (ticket: any) => {
-            // Gọi API room để lấy locationId
             const room = await fetchRoomDetails(ticket.items[0]?.roomId);  
 
-            // Gọi API location để lấy tên địa điểm
+
             const location = room && room.locationId ? await fetchLocationDetails(room.locationId) : null;
             console.log('location to image: ',location)
             const imageUrl = location && location.image && location.image?.[0]?.url ? location.image?.[0].url : 'https://via.placeholder.com/150';
@@ -47,7 +46,7 @@ export default function TicketScreen() {
             return {
               ...ticket,
               locationName: location ? location.name : 'Unknown Location',
-              imageUrl: imageUrl, // Bổ sung tên địa điểm
+              imageUrl: imageUrl, 
             };
           })
         );
@@ -65,7 +64,7 @@ export default function TicketScreen() {
       const response = await fetch(`${API_BASE_URL}/room/getbyid/${roomId}`);
       const result = await response.json();
       if (result && result.isSuccess) {
-        return result.data; // Giả sử API trả về { data: { locationId: "xyz" } }
+        return result.data; 
       }
       return null;
     } catch (error) {
@@ -79,7 +78,7 @@ export default function TicketScreen() {
       const response = await fetch(`${API_BASE_URL}/locationbyid/${locationId}`);
       const result = await response.json();
       if (result && result.isSuccess) {
-        return result.data; // Giả sử API trả về { data: { name: "Location Name" } }
+        return result.data; 
       }
       return null;
     } catch (error) {
@@ -214,8 +213,12 @@ export default function TicketScreen() {
         {loading && <ActivityIndicator size="large" color="#0000ff"  />}
       </View>
     </ScrollView> */}
-      <Image source={require('../assets/icons/logo.png')} style={styles.logo} />
+      <View style ={{ flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center', marginRight: 20}}>
       <Text style={styles.collections}>Tất cả Booking</Text>
+      <Image source={require('../assets/icons/logo.png')} style={styles.logo} />
+
+      </View>
+      
 
         <FlatList
             data={tickets}

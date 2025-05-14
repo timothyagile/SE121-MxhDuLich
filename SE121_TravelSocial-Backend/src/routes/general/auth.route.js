@@ -15,6 +15,7 @@ router.post('/signin', authController.signin_post)
 router.get('/logout', authController.logout_get)
 
 router.get('/user/getall', authController.getAllUser)
+router.get('/user/getbyuserrole', authController.getUserByUserRole)
 router.get('/user/getbyid/:id', authController.getUserById)
 router.put('/user/update/:id', authController.updateUser)
 router.put('/user/avt', checkUser, asyncHandler(authController.updateAvata))

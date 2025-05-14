@@ -22,7 +22,9 @@ export default function RecommendedSection({ categoryId, navigation }: PopularSe
     const [likedItems, setLikedItems] = useState<LikedItems>({});
     const [locations, setLocations] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
     const handlePress = (id: string) => {
         setLikedItems((prevState) => ({
             ...prevState,
@@ -30,28 +32,38 @@ export default function RecommendedSection({ categoryId, navigation }: PopularSe
         }));
     };
 
-    const getAllLocations = async () => {
-        try {
-            const ipAddress = await Network.getIpAddressAsync();
-            console.log('Device IP Address:', ipAddress);
-            const response = await fetch(`${API_BASE_URL}/alllocation`); 
-            
-            const data = await response.json();
-
-            if (data.isSuccess) {
-                setLocations(data.data); 
-            } else {
-                console.error(data.error);
-            }
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
+  const getAllLocations = async (pageNumber: number) => {
+    try {
+      if (isFetchingMore || !hasMore) return;
+  
+      setIsFetchingMore(true);
+  
+      const response = await fetch(`${API_BASE_URL}/alllocation?page=${pageNumber}&limit=10`);
+      const data = await response.json();
+  
+      if (data.isSuccess) {
+        if (pageNumber === 1) {
+          setLocations(data.data.data);
+          console.log('all location: ', data.data);
+        } else {
+          setLocations(prev => [...prev, ...data.data.data]);
         }
-    };
+  
+        setHasMore(data.data.data.length > 0);
+        setPage(pageNumber + 1); 
+      } else {
+        console.error(data.error);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsFetchingMore(false);
+      setLoading(false);
+    }
+  };
 
     useEffect(() => {
-        getAllLocations();
+        getAllLocations(1);
     }, []);
 
     if (loading) {
@@ -69,6 +81,12 @@ export default function RecommendedSection({ categoryId, navigation }: PopularSe
             snapToInterval={CARD_WIDTH_SPACING}
             decelerationRate={"fast"}
             keyExtractor={item => item._id}
+            onEndReached={() => {
+                if (categoryId === 'all') {
+                  getAllLocations(page);
+                } 
+              }}
+              onEndReachedThreshold={0.5}
             renderItem={({item, index}) => {
                 return (
                     <TouchableOpacity onPress={() => navigation.navigate('detail-screen', { id: item._id })} style = {[
@@ -91,7 +109,7 @@ export default function RecommendedSection({ categoryId, navigation }: PopularSe
                                     <View style = {[styles.textBox, {top: 10, width: 70}]}>
                                         <Image source={require('@/assets/icons/star.png')}
                                         style = {styles.star}></Image>
-                                        <Text style = {[styles.textrating, {fontSize: 15}]}>{item.rating}</Text>
+                                        <Text style = {[styles.textrating, {fontSize: 15,}]}>{item.rating}</Text>
                                     </View>
                                     
                                     <TouchableOpacity onPress={()=>handlePress(item._id.toString())} style= {[styles.textBox2,{ bottom: 25,}]}>
@@ -106,7 +124,11 @@ export default function RecommendedSection({ categoryId, navigation }: PopularSe
                             <View style = {styles.footer}>
                                 <View>
                                     <Text style = {[styles.textStyle, {fontSize: 14}]}>{item.name}</Text>
+                                    <View>
+                                        <Text style = {[styles.textStyle, {fontSize: 14}]}>{item?.province}</Text>
+                                    </View>
                                 </View>
+                                
                                 <View style = {[styles.textBox,{borderWidth:3, borderColor:'white'}]}>
                                     <Text style = {[styles.textStyle2, {marginHorizontal: 5, color: 'white'}]}>hot deal</Text>
                                 </View>
@@ -115,6 +137,10 @@ export default function RecommendedSection({ categoryId, navigation }: PopularSe
                     </TouchableOpacity>                            
                 )}
             }></FlatList>
+
+                  {isFetchingMore && (
+              <Text style={{ textAlign: 'center', marginTop: 10 }}>Đang tải thêm...</Text>
+            )}
             
         </View>
     )
@@ -135,7 +161,7 @@ const styles = StyleSheet.create({
         shadowRadius: 10, // Bán kính bóng
         elevation: 5, // Đổ bóng trên Android
         backgroundColor: 'white', // Nền trắng
-        height: CARD_HEIGHT-20,
+        height: CARD_HEIGHT-10,
       },
     
     titleText: {
@@ -210,7 +236,7 @@ const styles = StyleSheet.create({
         color: 'white',
         marginLeft: 5,
         left:7,
-        top:2,
+        top:0,
         marginVertical: 2,
     },
     textStyle2: {

@@ -1,0 +1,30 @@
+[
+    {
+        "category": {
+            "id": "hotel",
+            "name": "khách sạn"
+        },
+        "_id": "6704f3650722c4f99305dc5d",
+        "ownerId": "6729d0e8dda9481629a2a2e9",
+        "name": "Khách sạn Hương Việt",
+        "description": "Nhà hàng phục vụ các món ăn truyền thống Việt Nam, không gian ấm cúng.",
+        "rating": 3.8,
+        "image": [
+            {
+                "_id": "67f66c60d44f910e9af77fd9",
+                "url": "https://res.cloudinary.com/dzy4gcw1k/image/upload/v1735586344/travel-social/file-1735586315301-3_%20%281%29.jpg.jpg",
+                "publicId": "travel-social/file-1735586315301-3_ (1).jpg"
+            },
+            {
+                "_id": "67f66c60d44f910e9af77fda",
+                "url": "https://res.cloudinary.com/dzy4gcw1k/image/upload/v1735581647/travel-social/file-1735581614030-ystallonne-alves-U_g9ZCqKAPA-unsplash.jpg.jpg",
+                "publicId": "travel-social/file-1735586315301-3_ (1).jpg"
+            }
+        ],
+        "address": "123 Đường Trần Hưng Đạo, TP.HCM",
+        "dateCreated": "2024-10-08T03:00:00.000Z",
+        "slug": "nha-hang-huong-viet-123-uong-tran-hung-ao-tphcm",
+        "numberOfRating": 11,
+        "status": "active"
+    }
+]

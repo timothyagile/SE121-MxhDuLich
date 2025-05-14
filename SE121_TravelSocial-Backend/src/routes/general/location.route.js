@@ -23,6 +23,8 @@ router.put('/updatelocation/:locationId', checkLocationOwner, locationController
 router.delete('/detelelocation/:locationId', checkLocationOwner, locationController.deleteLocation);
 
 //MAIL SERVICES
-router.get('/location/approve/email/:locationId', locationController.sendApproveEmail)
+router.get('/location/approve/email/:locationId', locationController.sendApproveEmail);
+
+router.get('/search', locationController.searchLocationsAndRooms);
 
 module.exports = router;

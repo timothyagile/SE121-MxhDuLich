@@ -7,12 +7,16 @@
       "@/*": [
         "./*"
       ]
-    }
+    },
+  //   "module": "Node16",  // Sử dụng ESNext module
+  // "moduleResolution": "node16",  // Sử dụng module resolution của Node.js
+  //   "allowJs": true,  // Cho phép biên dịch các file JS
+  //   "resolveJsonModule": true  // Nếu cần sử dụng JSON modules
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-, "constants/icon.js"  ]
+, "constants/icon.js", "constants/Styles.js"  ]
 }
