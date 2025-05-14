@@ -42,8 +42,12 @@ const createLocationWithImage = async (locationData) => {
 
 
 
-const getAllLocation = async () => {
-    const allLocation = await Location.find();
+const getAllLocation = async (skip, limit) => {
+    const allLocation = await Location.find()
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit)
+    ;
     // for (const location of allLocation) {
     //     const slug = createSlug(location.name, location.address); // Tạo slug
 

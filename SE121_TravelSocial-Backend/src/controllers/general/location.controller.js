@@ -95,7 +95,12 @@ module.exports.createLocation = async (req, res, next) => {
 //--GET ALL LOCATION DATA--\\
 module.exports.getAllLocation = async (req, res, next) => {
     try {
-        const result = await locationSvc.getAllLocation()
+        let {page, limit} = req.query
+        page = parseInt(page) || 1
+        limit = parseInt(limit) || 10
+        const skip = (page - 1) * limit
+
+        const result = await locationSvc.getAllLocation(skip, limit)
         res.status(200).json({
             isSuccess: true,
             data: result,
