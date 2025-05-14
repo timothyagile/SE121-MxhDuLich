@@ -20,5 +20,6 @@ router.get('/user/getbyid/:id', authController.getUserById)
 router.put('/user/update/:id', authController.updateUser)
 router.put('/user/avt', checkUser, asyncHandler(authController.updateAvata))
 router.delete('/user/delete/:id', authController.deleteUser)
+router.get('/user/search', checkUser, asyncHandler(authController.searchUsers))
 
 module.exports = router

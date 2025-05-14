@@ -17,15 +17,52 @@ import {
   //import { AuthContext } from "../../../store/auth-context";
   import PressEffect from "../../UI/PressEffect";
   import { LinearGradient } from "expo-linear-gradient";
+  import AsyncStorage from '@react-native-async-storage/async-storage';
+  import { API_BASE_URL } from "@/constants/config";
   const { height, width } = Dimensions.get("window");
   
-  function PostAdvance({ post } : any) {
+  function PostAdvance({ post, navigation } : any) {
+    console.log("PostAdvance", post);
     //const authCtx = useContext(AuthContext);
+        const formatDate = (dateString: string) => {
+          if (!dateString) return "";
+          
+          try {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return dateString; // Return original if invalid date
+            
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            
+            return `${hours}:${minutes} ${day}/${month}/${year}`;
+          } catch (error) {
+            console.log("Date format error:", error);
+            return dateString;
+          }
+        };
+    
+            // useEffect(() => {
+            //   if (post.images) {
+            //     const fixedUrl = getSafeImageUrl(post.images[0].url);
+            //     setSafeUri(fixedUrl);
+            //     Image.getSize(fixedUrl, (width, height) => {
+            //       const ratio = width / height;
+            //       if (ratio < 0.7) {
+            //         setRatio(0.7);
+            //       } else {
+            //         setRatio(ratio);
+            //       }
+            //     });
+            //   }
+            // }, [post]);
   
     function Avatar() {
       const navigation = useNavigation();
       const [profilePic, setProfilePic] = React.useState(
-        !!post.userPicturePath ? post.userPicturePath : DEFAULT_DP
+        !!post?.authorId ? post?.authorId?.userAvatar?.url : DEFAULT_DP
       );
       return (
         <View style={{ flexDirection: "row" }}>
@@ -63,7 +100,7 @@ import {
                     fontSize: 15,
                   }}
                 >
-                  username
+                  {post?.authorId?.userName ? post?.authorId?.userName : "User Name"}
                 </Text>
                 <Text
                   style={{
@@ -85,7 +122,7 @@ import {
   
       return (
         <View style={{ marginHorizontal: 20 }}>
-          <View
+          {/* <View
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
@@ -110,7 +147,20 @@ import {
             >
               25 July, 2024
             </Text>
-          </View>
+          </View> */}
+          <View style={{  marginTop: 10, justifyContent:"space-between", width: "100%", flexDirection: "row"}}>
+                      <TouchableOpacity onPress={() => navigation.navigate('detail-screen', { id: post?.locationId?._id })} style={{ flexDirection: "row"}}>
+                        <Image style={{width: 20, height: 20}} source={require("../../../assets/icons/marker.png")}></Image>
+                        <Text style={{color: "gray", fontSize: 14, fontWeight: "300"}}>
+                          {post?.locationId?.name}
+                        </Text>
+                      </TouchableOpacity>
+                      <View>
+                        <Text style={{color: "gray", fontSize: 12, fontWeight: "300"}}>
+                          {formatDate(post?.createdAt)}
+                        </Text>
+                      </View>
+                    </View>
           <Text
             onPress={() => setShowCaptions(!showCaptions)}
             numberOfLines={showCaptions ? undefined : 1}
@@ -128,9 +178,9 @@ import {
                 color: GlobalStyles.colors.purple,
               }}
             >
-              Post Title:{" "}
+              {/* Post Title:{" "} */}
             </Text>
-            {post.description}
+            {post?.content}
           </Text>
         </View>
       );
@@ -138,17 +188,40 @@ import {
     function PostImage({ children } : any) {
       const [resizeModeCover, setResizeModeCover] = useState(true);
       const [ratio, setRatio] = useState(1);
+      const [safeUri, setSafeUri] = useState<string>("");
   
-      useEffect(() => {
-        Image.getSize(post.picturePath, (width, height) => {
-          const imageRatio = width / height;
-          if (imageRatio < 0.9) {
-            setRatio(1);
-          } else {
-            setRatio(imageRatio);
-          }
-        });
-      }, [post]);
+            const getSafeImageUrl = (url: string) => {
+              if (!url) return "";
+              if (url.includes("/upload/")) {
+                return url.replace("/upload/", "/upload/f_jpg/");
+              }
+              return url;
+            };
+        
+                useEffect(() => {
+                  if (post.images) {
+                    const fixedUrl = getSafeImageUrl(post?.images?.[0]?.url);
+                    setSafeUri(fixedUrl);
+                    Image.getSize(fixedUrl, (width, height) => {
+                      const ratio = width / height;
+                      if (ratio < 0.7) {
+                        setRatio(0.7);
+                      } else {
+                        setRatio(ratio);
+                      }
+                    });
+                  }
+                }, [post]);
+      // useEffect(() => {
+      //   Image.getSize(post?.picturePath, (width, height) => {
+      //     const imageRatio = width / height;
+      //     if (imageRatio < 0.9) {
+      //       setRatio(1);
+      //     } else {
+      //       setRatio(imageRatio);
+      //     }
+      //   });
+      // }, [post]);
   
       return (
         <Pressable
@@ -159,12 +232,11 @@ import {
             borderColor: GlobalStyles.colors.primary600,
           }}
           onPress={() => {
-            setResizeModeCover(!resizeModeCover);
-            console.log("object");
+            navigation.navigate('post-detail-screen', { postId: post._id });
           }}
         >
           <ImageBackground
-            source={{ uri: post.picturePath }}
+            source={{ uri: getSafeImageUrl(post?.images?.[0]?.url) || post?.picturePath }}
             style={{
               width: "100%",
               aspectRatio: ratio,
@@ -193,12 +265,75 @@ import {
     function PostStats() {
       const [liked, setLiked] = useState(false);
   
-      const [totalLikes, setTotalLikes] = useState(post.likes.length);
+      const [totalLikes, setTotalLikes] = useState(post?.stat?.reactCount || 0);
       const [showComments, setShowComments] = useState(false);
+      const [isLoading, setIsLoading] = useState(false);
+      
+      // Kiểm tra trạng thái like của người dùng khi component load
+      useEffect(() => {
+        const checkReactionStatus = async () => {
+          try {
+            // Lấy userId từ AsyncStorage
+            const userId = await AsyncStorage.getItem('userId');
+            if (!userId || !post?._id) return;
+
+            const response = await fetch(`${API_BASE_URL}/react/check?postId=${post?._id}&userId=${userId}`, {
+              method: 'GET',
+              credentials: 'include',
+            });
+            
+            const data = await response.json();
+            if (data.isSuccess && data.data.hasReacted) {
+              setLiked(true);
+            }
+          } catch (error) {
+            console.error('Error checking reaction status:', error);
+          }
+        };
+        
+        checkReactionStatus();
+      }, [post?._id]);
+      
       async function handleLike() {
-        setTotalLikes((prevData: number) => (liked ? prevData - 1 : prevData + 1));
-  
-        setLiked(!liked);
+        if (isLoading) return;
+        setIsLoading(true);
+
+        try {
+          // Cập nhật UI trước để có trải nghiệm mượt mà
+          setTotalLikes((prevData: number) => (liked ? prevData - 1 : prevData + 1));
+          setLiked(!liked);
+
+          // Gọi API để tương tác với bài đăng
+          const response = await fetch(`${API_BASE_URL}/react`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+              postId: post?._id,
+              type: "love"
+            })
+          });
+
+          const data = await response.json();
+          
+          if (!data.isSuccess) {
+            // Nếu API thất bại, hoàn tác thay đổi UI
+            setTotalLikes((prevData: number) => (liked ? prevData + 1 : prevData - 1));
+            setLiked(!liked);
+            console.log('Lỗi khi tương tác với bài viết:', data.error);
+          } else {
+            console.log('Đã tương tác với bài viết thành công:', data.data);
+          }
+        } catch (error) {
+          // Hoàn tác thay đổi UI nếu có lỗi
+          setTotalLikes((prevData: number) => (liked ? prevData + 1 : prevData - 1));
+          setLiked(!liked);
+          console.log('Lỗi khi gọi API:', error);
+        } finally {
+          setIsLoading(false);
+        }
       }
   
 
@@ -232,14 +367,14 @@ import {
                     color={color}
                   />
   
-                  {/* <Text
+                  <Text
                     style={{
                       color: "white",
                       fontWeight: "600",
                     }}
                   >
                     {number}
-                  </Text> */}
+                  </Text>
                 </View>
               </PressEffect>
             </Pressable>
@@ -249,7 +384,7 @@ import {
   
       return (
         <>
-          <CommentSheet visible={showComments} setVisible={setShowComments} />
+          <CommentSheet visible={showComments} setVisible={setShowComments} postId={post._id}  />
   
           <View
             style={{
@@ -275,7 +410,7 @@ import {
               />
               <FooterButton
                 icon={"chatbubble-ellipses"}
-                number={post.comments.length}
+                number={post?.comments?.length}
                 onPress={() => {
                   setShowComments(true);
                 }}
@@ -316,4 +451,3 @@ import {
 
     }
   });
-  

@@ -38,7 +38,7 @@ export default function Header({ navigation }: {navigation: NativeStackNavigator
         <Image
           style={{ width: 30, height: 30, borderRadius: 50, zIndex:200 }}
           source={{
-            uri: userData?.userAvatar.url ||"https://res.cloudinary.com/dzy4gcw1k/image/upload/v1744723748/download_1_hzncwm.jpg",
+            uri: userData?.userAvatar?.url ||"https://res.cloudinary.com/dzy4gcw1k/image/upload/v1744723748/download_1_hzncwm.jpg",
           }}
         />
         

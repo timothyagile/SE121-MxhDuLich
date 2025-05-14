@@ -44,7 +44,7 @@ export default function MainScreen() {
         }}
       />
               <Tab.Screen 
-        name="khám phá" 
+        name="Khám phá" 
         component={SocialScreen}
         options={{ 
           tabBarIcon: ({ focused }: any) => (
@@ -72,7 +72,7 @@ export default function MainScreen() {
         }}
       />
         <Tab.Screen 
-        name="trang cá nhân" 
+        name="Trang cá nhân" 
         component={ProfileScreen}
         options={{ 
           tabBarIcon: ({ focused }: any) => (

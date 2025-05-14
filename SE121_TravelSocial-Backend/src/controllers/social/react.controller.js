@@ -1,5 +1,5 @@
 'use strict'
-const { CREATED, OK } = require('../../constants/httpStatusCode');
+const { CREATED, OK, NOT_FOUND } = require('../../constants/httpStatusCode');
 const reactModel = require('../../models/social/react.model');
 const reactService = require('../../services/social/react.service')
 
@@ -42,4 +42,24 @@ module.exports.countReacts = async (req, res) => {
         data: result,    
         error: null
     })
+}
+
+module.exports.checkUserReacted = async (req, res) => {
+    const { postId, userId } = req.query;
+    
+    try {
+        const result = await reactService.checkUserReacted(postId, userId);
+        
+        res.status(OK).json({
+            isSuccess: true,
+            data: result,
+            error: null
+        });
+    } catch (error) {
+        res.status(NOT_FOUND).json({
+            isSuccess: false,
+            data: null,
+            error: error.message
+        });
+    }
 }

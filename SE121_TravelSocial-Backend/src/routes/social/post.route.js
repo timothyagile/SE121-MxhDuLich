@@ -23,6 +23,9 @@ router.get('/posts/author/:authorId', asyncHandler(postController.getByAuthorId)
 
 router.get('/posts/hashtag/:hashtag', asyncHandler(postController.getByHashTag));
 
+// Get posts from friends sorted by most recent time
+router.get('/posts/friends', checkUser, asyncHandler(postController.getFriendPosts));
+
 router.put('/posts/:id', asyncHandler(postController.updatePost));
 /* Soft delete */
 router.delete("/posts/:id", asyncHandler(postController.deletePost));
