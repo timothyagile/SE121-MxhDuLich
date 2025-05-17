@@ -13,10 +13,31 @@ import React from "react";
   
   const RemoteImage = ({ imageUri, style }:any) => {
     const [ratio, setRatio] = useState(1);
+    const [safeUri, setSafeUri] = useState<string>("");
+
+    // Hàm tự động fix link Cloudinary
+    // const getSafeImageUrl = (url: string) => {
+    //   if (!url) return "";
+    //   if (url.includes("?")) {
+    //     return url + "&f=jpg&q_auto";
+    //   }
+    //   return url + "?f=jpg&q_auto";
+    // };
+    
+    const getSafeImageUrl = (url: string) => {
+      if (!url) return "";
+      if (url.includes("/upload/")) {
+        return url.replace("/upload/", "/upload/f_jpg/");
+      }
+      return url;
+    };
+    
   
     useEffect(() => {
       if (imageUri) {
-        Image.getSize(imageUri, (width, height) => {
+        const fixedUrl = getSafeImageUrl(imageUri);
+        setSafeUri(fixedUrl);
+        Image.getSize(fixedUrl, (width, height) => {
           const ratio = width / height;
           if (ratio < 0.7) {
             setRatio(0.7);
@@ -27,14 +48,14 @@ import React from "react";
       }
     }, [imageUri]);
   
-    if (!imageUri) {
+    if (!safeUri) {
       return <ActivityIndicator />;
     }
   
     return (
       <ImageBackground
         source={{
-          uri: imageUri,
+          uri: getSafeImageUrl(imageUri),
         }}
         style={[styles.image, { aspectRatio: ratio }, style]}
         imageStyle={{

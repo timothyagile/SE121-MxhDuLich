@@ -3,6 +3,8 @@ const Post = require("../../models/social/post.model");
 const { slugify } = require("../../utils/normalizeString");
 const Location = require('../../models/general/location.model')
 const User = require('../../models/general/user.model');
+const Relation = require('../../models/social/relation.models');
+const { RELATION_TYPE } = require('../../enum/relation.enum');
 const postRepository = require("../../repository/post.repository");
 
 const populateOptions = [
@@ -170,9 +172,49 @@ const sharePost = async (sharePostData) => {
     return sharedPost;
 };
 
+const getFriendPosts = async (userId) => {
+    // Get all accepted friend relationships where the current user is involved
+    const friendRelations = await Relation.find({
+        $or: [
+            { requestId: userId, type: RELATION_TYPE.ACCEPTED },
+            { recipientId: userId, type: RELATION_TYPE.ACCEPTED }
+        ]
+    });
+
+    if (friendRelations.length === 0) {
+        return []; // Return empty array if user has no friends
+    }
+
+    // Extract friend IDs
+    const friendIds = friendRelations.map(relation => {
+        return relation.requestId.toString() === userId.toString() 
+            ? relation.recipientId 
+            : relation.requestId;
+    });
+
+    // Get posts from all friends
+    const posts = await postRepository.findAll(
+        { 
+            authorId: { $in: friendIds }, 
+            isDeleted: false,
+            privacyLevel: { $ne: 'PRIVATE' } // Exclude private posts
+        }, 
+        populateOptions
+    );
+
+    // Sort posts by lastInteraction time (most recent first)
+    posts.sort((a, b) => {
+        const dateA = a.stat && a.stat.lastInteraction ? new Date(a.stat.lastInteraction) : new Date(a.createdAt);
+        const dateB = b.stat && b.stat.lastInteraction ? new Date(b.stat.lastInteraction) : new Date(b.createdAt);
+        return dateB - dateA;
+    });
+
+    return posts;
+};
+
 module.exports = {
     create, getAll, getById,
     getByLocationId, getByAuthorId, getByHashTag,
     update, updateStat, deletePost,
-    sharePost
+    sharePost, getFriendPosts
 }

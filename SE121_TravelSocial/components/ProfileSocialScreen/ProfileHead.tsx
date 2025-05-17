@@ -7,12 +7,13 @@ import {
     Pressable,
     ImageBackground,
   } from "react-native";
-  import React from "react";
+  import React, { useEffect, useState } from "react";
   
   import { useNavigation, NavigationProp } from "@react-navigation/native";
   import { RootStackParamList } from "../../types/navigation"; // Adjust the path to your navigation types
   import { GlobalStyles, DEFAULT_DP } from "../../constants/Styles.js";
   import PressEffect from "../UI/PressEffect";
+import AsyncStorage from "@react-native-async-storage/async-storage";
   
   function ProfileHead ({ userData, viewMode }: any) {
     const [profilePic, setProfilePic] = React.useState(
@@ -20,6 +21,25 @@ import {
     );
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
     //const navigation = useNavigation();
+
+    const [userrData, setUserData] = useState<any>(null);
+
+    useEffect(() => {
+      const fetchUserData = async () => {
+        try {
+          const jsonValue = await AsyncStorage.getItem('userData');
+          if (jsonValue !== null) {
+            const user = JSON.parse(jsonValue);
+            setUserData(user);
+            console.log(user);
+          }
+        } catch (e) {
+          
+        }
+      };
+  
+      fetchUserData();
+    }, []);
   
     function ProfileStat({ text, subText, onPress }: any) {
       return (
@@ -52,7 +72,7 @@ import {
             imageStyle={{
               borderRadius: 100,
             }}
-            source={{ uri: profilePic }}
+            source={{ uri: userrData?.userAvatar?.url || profilePic }}
           >
             <View
               style={{
@@ -115,7 +135,7 @@ import {
               color: "black",
             }}
           >
-            {userData.fullName}
+            {userrData?.userName}
           </Text>
           <Text
             style={{
@@ -123,7 +143,7 @@ import {
               color: "rgba(6, 6, 6, 0.6)",
             }}
           >
-            @{userData.username}
+            {userrData?.userEmail}
           </Text>
         </View>
   

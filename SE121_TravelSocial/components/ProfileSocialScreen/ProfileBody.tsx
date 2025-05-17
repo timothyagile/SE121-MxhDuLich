@@ -18,14 +18,17 @@ import Post from "../../components/ProfileSocialScreen/Post";
 import { Ionicons } from "@expo/vector-icons";
 import { POSTS } from "../../data/posts";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { API_BASE_URL } from "@/constants/config.js";
 
 
 const TopTab = createMaterialTopTabNavigator();
 
-function Posts({ navigation, route, refreshing }: any) {
+function Posts({userId, navigation, route, refreshing }: any) {
+    console.log("UserID: ",userId);
     //const authCtx = useContext(AuthContext);
     const [fetching, setFetching] = useState(true);
     const [errorFetching, setErrorFetching] = useState(false);
+    const [userPosts, setUserPosts] = useState<[]>([]);
     const [posts, setPosts] = useState<
         {
             __v: number;
@@ -53,9 +56,32 @@ function Posts({ navigation, route, refreshing }: any) {
         }
         setFetching(false);
     };
+
+    const getUserPosts = async () => {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/posts/author/${userId}`, {
+                        method: 'GET',
+                        credentials: 'include',
+                    });
+    
+                    if (response) {
+                        const data = await response.json();
+                        setUserPosts(data.data); 
+                        //setImage(data.data?.userAvatar.url);
+                        console.log("userPost: ",data);
+                    } else {
+                        console.error('Failed to fetch user data:', response);
+                    }
+                } catch (error) {
+                    console.error('Error fetching user data:', error);
+                }
+    };
+
     useEffect(() => {
         getPosts();
-    }, []);
+        getUserPosts();
+
+    }, [userId]);
     useEffect(() => {
         if (refreshing) {
             console.log("refreshing");
@@ -97,16 +123,16 @@ function Posts({ navigation, route, refreshing }: any) {
                         }}
                     >
                         <View style={{ flex: 1 }}>
-                            {posts.map((item, index) => (
+                            {userPosts?.map((item, index) => (
                                 <View key={index}>
-                                    {index % 2 === 0 && <Post postData={posts[index]} />}
+                                    {index % 2 === 0 && <Post postData={userPosts[index]} />}
                                 </View>
                             ))}
                         </View>
                         <View style={{ flex: 1 }}>
-                            {posts.map((item, index) => (
+                            {userPosts?.map((item, index) => (
                                 <View key={index}>
-                                    {index % 2 !== 0 && <Post postData={posts[index]} />}
+                                    {index % 2 !== 0 && <Post postData={userPosts[index]} />}
                                 </View>
                             ))}
                         </View>
@@ -157,7 +183,7 @@ function Videos({ navigation, route, refreshing }: any) {
         </View>
     );
 }
-export default function ProfileBody({ refreshing }: any) {
+export default function ProfileBody({ userId, refreshing }: any) {
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <TopTab.Navigator
@@ -198,6 +224,7 @@ export default function ProfileBody({ refreshing }: any) {
                 >
                     {({ navigation, route }) => (
                         <Posts
+                            userId={userId}
                             navigation={navigation}
                             route={route}
                             refreshing={refreshing}

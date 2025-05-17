@@ -30,20 +30,35 @@ class PostRepository extends BaseRepository{
     
     async updateStat(postId, attribute ,increment) {
 
-        const post = await Post
-        .findByIdAndUpdate(postId, 
-            {
-                $inc: {
-                    [`stat.${attribute}`]: increment,
+        console.log("PostRepository::updateStat", postId, attribute, increment)
+        try {
+            // Kiểm tra bài đăng tồn tại trước khi cập nhật
+            const existingPost = await Post.findById(postId).select("_id stat");
+            console.log("Existing post stats:", existingPost ? existingPost.stat : null);
+            
+            const post = await Post
+            .findByIdAndUpdate(postId, 
+                {
+                    $inc: {
+                        [`stat.${attribute}`]: increment,
+                    },
+                    "stat.lastInteraction": new Date()
                 },
-                "stat.lastInteraction": new Date()
+                { new: true } // Trả về document sau khi đã cập nhật
+            )
+            .select("_id stat")
+
+            if(!post) { 
+                console.log(`Post not found with ID: ${postId}`);
+                throw new NotFoundException();
             }
-        )
-        .select("_id stat")
-
-        if(!post) { throw new NotFoundException()}
-
-        return post
+            
+            console.log("Updated post stats:", post.stat);
+            return post;
+        } catch (error) {
+            console.error("Error in updateStat:", error);
+            throw error;
+        }
     }
 }
 

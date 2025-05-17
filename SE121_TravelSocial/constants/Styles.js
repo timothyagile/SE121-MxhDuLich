@@ -9,6 +9,7 @@ export const GlobalStyles = {
     primary300: "#ECECEC",
     primary500: "#363747",
     primary600: "#3f4152",
+    primary700: "rgba(0, 136, 255, 0.5)",
     gray: "rgba(225, 225, 225,0.5)",
     gray100: "rgba(225, 225, 225,0.05)",
     blue: "#7A40F8",
