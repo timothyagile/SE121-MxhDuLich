@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
-const {db: {uri}} = require('../config/mongodb.config')
+require('dotenv').config()
+const uri = process.env.MONGO_URI_DEV
 const mongoURL = `mongodb+srv://${uri}`;
 
 
