@@ -7,6 +7,8 @@ import { RouteProp } from '@react-navigation/native';
 import { RouteParams } from 'expo-router';
 import { RootStackParamList } from '@/types/navigation';
 import {API_BASE_URL} from '../constants/config';
+import { useUser } from '../context/UserContext';
+import { trackEvents } from '../constants/recommendation';
 
 type ReservationRouteProp = RouteProp<RootStackParamList, 'reservation-required-screen'>;
 
@@ -28,6 +30,7 @@ interface SelectedRoomData {
 export default function ReservationRequiredScreen({ navigation }: {navigation: NativeStackNavigatorProps}) {
     const route = useRoute<ReservationRouteProp>();
     const { selectedRoomsData,selectedServicesData ,locationId } = route.params;
+    const { userId } = useUser();
 
     const formatRoomDate = (date: Date): string => {
         const day = date.getDate().toString().padStart(2, '0');
@@ -357,14 +360,28 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                 </View>
             </View>
             
-            <View style={{width:'100%', marginVertical:20,}}>
-                <View style = {{  alignItems:'center', justifyContent:'center',alignContent:'center',width:'100%'}}>
+            <View style={{width:'100%', marginVertical:20,}}>                <View style = {{  alignItems:'center', justifyContent:'center',alignContent:'center',width:'100%'}}>
                     
-                    <TouchableOpacity style={styles.addpaymentmethod2} onPress={()=> navigation.navigate('payment-method-screen',{
-                        locationId: locationId,
-                        totalPrice: displayedTotalPrice,
-                        selectedRoomsData: selectedRoomsData,
-                        })} >
+                    <TouchableOpacity 
+                        style={styles.addpaymentmethod2} 
+                        onPress={() => {
+                            // Track booking event (proceeding to payment)
+                            if (userId && locationId) {
+                                trackEvents.click(userId, locationId, {
+                                    action: 'proceed_to_payment',
+                                    total_price: displayedTotalPrice,
+                                    rooms_count: selectedRoomsData.length,
+                                });
+                                console.log(`Tracked payment click event for user: ${userId}, location: ${locationId}`);
+                            }
+                            
+                            navigation.navigate('payment-method-screen',{
+                                locationId: locationId,
+                                totalPrice: displayedTotalPrice,
+                                selectedRoomsData: selectedRoomsData,
+                            });
+                        }} 
+                    >
                         <Text style={styles.boxText3}>Tiếp tục để thanh toán</Text>
                     </TouchableOpacity>
                 </View>

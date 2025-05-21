@@ -9,6 +9,7 @@ import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 import { Icon, IconButton } from 'react-native-paper';
+import { trackEvents } from '../constants/recommendation';
 
 
 type ReservationRouteProp = RouteProp<RootStackParamList, 'payment-method-screen'>;
@@ -239,9 +240,19 @@ const saveQRImageToGallery = async () => {
     
             const result = await response.json();
             console.log('API response status:', response.status);
-            console.log('API response data:', result);
-    
-            if (result.isSuccess) {
+            console.log('API response data:', result);            if (result.isSuccess) {
+                // Track successful booking event
+                if (userId && locationId) {
+                    trackEvents.book(userId, locationId, {
+                        total_price: totalPrice,
+                        check_in_date: selectedRoomsData[0].roomDetails.checkinDate.toISOString(),
+                        check_out_date: selectedRoomsData[0].roomDetails.checkoutDate.toISOString(),
+                        rooms_count: selectedRoomsData.reduce((sum, room) => sum + room.count, 0),
+                        booking_id: result.data?._id || 'unknown'
+                    });
+                    console.log(`Tracked successful booking event for user: ${userId}, location: ${locationId}`);
+                }
+                
                 Alert.alert('Thành công!', 'Đặt chỗ của bạn đã được tạo.');
                 navigation.navigate('main-screen', { screen: 'Booking' }); 
             } else {
