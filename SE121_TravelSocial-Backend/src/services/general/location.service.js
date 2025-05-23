@@ -40,13 +40,6 @@ const createLocationWithImage = async (locationData) => {
     }
 }
 
-
-
-/**
- * @param {number} page
- * @param {number} limit
- * @returns {{ data: any[], total: number, page: number, limit: number }}
- */
 const getAllLocation = async (page = 1, limit = 10) => {
     const skip = (page - 1) * limit;
   
@@ -55,14 +48,35 @@ const getAllLocation = async (page = 1, limit = 10) => {
       Location.countDocuments()
     ]);
   
-    // Return empty data array instead of throwing exception when no locations found
-    return {
-      data: allLocation,
-      total,
-      page,
-      limit,
-    };
-  };
+    if (allLocation.length !== 0) {
+      return {
+        data: allLocation,
+        total,
+        page,
+        limit,
+      };
+    } else {
+      throw new NotFoundException('Not found any location in database');
+    }
+};
+
+// const getAllLocation = async () => {
+//     const allLocation = await Location.find();
+//     // for (const location of allLocation) {
+//     //     const slug = createSlug(location.name, location.address); // Tạo slug
+
+//     //     // Cập nhật trường slug cho tài liệu hiện tại
+//     //     await Location.updateOne(
+//     //         { _id: location._id }, // Điều kiện: tài liệu theo _id
+//     //         { $set: { slug } } // Cập nhật trường slug
+//     //     );
+//     // }
+//     if(allLocation.length !== 0)
+//         return allLocation;
+//     else
+//         throw new NotFoundException('Not found any location in database');
+// }
+
 
 const getLocationByCategory = async (categoryId, page = 1, limit = 10) => {
     const skip = (page - 1) * limit;
