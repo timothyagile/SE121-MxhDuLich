@@ -30,14 +30,19 @@ interface Voucher {
   name: string;
   description: string;
   type: 'PERCENT' | 'AMOUNT';
+  discount: {
+    amount: number;
+    type: string | null;
+  };
   value: number;
   maxDiscount: number | null;
-  minOrderValue: number;
+  minOderValue: number;
   startDate: string;
   endDate: string;
   usageLimit: number | null;
   usageCount: number;
   isActive: boolean;
+  status: 'active' | 'EXPIRED' | 'DISABLED';
   applyFor: 'ALL' | 'ROOM' | 'SERVICE';
   locationIds: string[];
   createdAt: string;
@@ -67,7 +72,8 @@ export default function VoucherScreen() {
   const fetchVouchers = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/vouchers`, {
+      
+      const response = await fetch(`${API_BASE_URL}/voucher/getall`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -86,7 +92,7 @@ export default function VoucherScreen() {
         setVouchers(voucherData);
         setFilteredVouchers(voucherData);
       } else {
-        console.error('Lỗi khi tải voucher:', responseData.message);
+        console.error('Lỗi khi tải voucher:', responseData.message || responseData.error);
       }
     } catch (error) {
       console.error('Lỗi khi gọi API:', error);
@@ -113,7 +119,7 @@ export default function VoucherScreen() {
     if (selectedFilter === 'active') {
       const now = new Date();
       filtered = filtered.filter(v => 
-        v.isActive && 
+        v.status == 'active' && 
         new Date(v.startDate) <= now && 
         new Date(v.endDate) >= now
       );
@@ -146,7 +152,7 @@ export default function VoucherScreen() {
     // Hoặc điều hướng đến màn hình chi tiết voucher
     Alert.alert(
       voucher.name,
-      `${voucher.description}\n\nMã: ${voucher.code}\nGiá trị: ${voucher.type === 'PERCENT' ? voucher.value + '%' : formatter.format(voucher.value)}\nĐơn hàng tối thiểu: ${formatter.format(voucher.minOrderValue)}\nHiệu lực đến: ${new Date(voucher.endDate).toLocaleDateString('vi-VN')}`,
+      `${voucher.description}\n\nMã: ${voucher.code}\nGiá trị: ${voucher.discount.type === 'percentage' ? voucher.discount.amount + '%' : formatter.format(voucher.discount.amount)}\nĐơn hàng tối thiểu: ${formatter.format(voucher.minOderValue)}\nHiệu lực đến: ${new Date(voucher.endDate).toLocaleDateString('vi-VN')}`,
       [
         { text: 'Đóng', style: 'cancel' },
         { text: 'Sao chép mã', onPress: () => copyVoucherCode(voucher.code) }
@@ -188,10 +194,10 @@ export default function VoucherScreen() {
       >
         <View style={styles.voucherLeftPart}>
           <View style={styles.voucherIconContainer}>
-            {item.type === 'PERCENT' ? (
-              <Text style={styles.voucherValue}>{item.value}%</Text>
+            {item.discount.type === 'percentage' ? (
+              <Text style={styles.voucherValue}>{item.discount.amount}%</Text>
             ) : (
-              <Text style={styles.voucherValue}>{formatter.format(item.value).replace('₫', '')}</Text>
+              <Text style={styles.voucherValue}>{formatter.format(item.discount.amount).replace('₫', '')}</Text>
             )}
           </View>
         </View>
@@ -397,7 +403,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: GlobalStyles.colors.primary500,
+    backgroundColor: '#0D99FF',
   },
   voucherIconContainer: {
     alignItems: 'center',
