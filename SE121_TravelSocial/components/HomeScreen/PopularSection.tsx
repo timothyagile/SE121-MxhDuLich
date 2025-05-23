@@ -213,7 +213,7 @@ export default function PopularSection({ categoryId, navigation }: PopularSectio
         <Text style={styles.titleText}>Danh mục</Text>
         <TouchableOpacity onPress={() => navigation.navigate('search-location-screen')} style={{ marginRight: 20, top: 10 }}>
           <Text style={{ fontSize: 14, color: '#196EEE' }}>Xem tất cả</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> 
 
       </View>
       <Animated.FlatList
