@@ -2,7 +2,7 @@ import {Text, View, FlatList, Dimensions, TouchableOpacity, StyleSheet, Image, A
 import locationData from '@/constants/location';
 import React, { useEffect, useState } from 'react';
 import * as Network from 'expo-network';
-import {API_BASE_URL} from '../../constants/config';
+import {API_BASE_URL, API_RCM_URL} from '../../constants/config';
 
 const {width, height} = Dimensions.get('window')
 const CARD_WIDTH =  width - 190;
@@ -32,31 +32,33 @@ export default function Recommendation({ navigation, locationId }: PopularSectio
         }));
     };
 
-   const getAllLocations = async (pageNumber: number) => {
+   const getContentBasedRecommendations = async (pageNumber: number) => {
      try {
-       if (isFetchingMore || !hasMore) return;
-   
+       setLoading(true);
        setIsFetchingMore(true);
-   
-       const response = await fetch(`${API_BASE_URL}/alllocation?page=${pageNumber}&limit=10`);
+       // Gọi API content_based recommendation với product_id
+       const response = await fetch(`${API_RCM_URL}/recommend_legacy/?case=content_based&product_id=${locationId}`);
        const data = await response.json();
-   
-       console.log('Response data: ', data);
-       if (data.isSuccess) {
+       if (data.recommendations) {
          if (pageNumber === 1) {
-           setLocations(data.data.data);
-           console.log('all location: ', data.data);
+           setLocations(data.recommendations);
          } else {
-           setLocations(prev => [...prev, ...data.data.data]);
+           // Tránh trùng lặp
+           const newItems = data.recommendations;
+           setLocations(prev => {
+             const existingIds = new Set(prev.map(item => item._id || item.location_id));
+             const uniqueNewItems = newItems.filter((item: any) => !existingIds.has(item._id || item.location_id));
+             return [...prev, ...uniqueNewItems];
+           });
          }
-   
-         setHasMore(data.data.data.length > 0);
-         setPage(pageNumber + 1); 
+         setHasMore(data.recommendations.length > 0);
+         setPage(pageNumber + 1);
        } else {
-         console.error(data.error);
+         setHasMore(false);
        }
      } catch (error) {
-       console.error(error);
+       setHasMore(false);
+       console.error('Content-based Recommend API error:', error);
      } finally {
        setIsFetchingMore(false);
        setLoading(false);
@@ -64,7 +66,8 @@ export default function Recommendation({ navigation, locationId }: PopularSectio
    };
 
     useEffect(() => {
-        getAllLocations(1);
+        getContentBasedRecommendations(1);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [locationId]);
       
 
@@ -82,10 +85,10 @@ export default function Recommendation({ navigation, locationId }: PopularSectio
             horizontal
             snapToInterval={CARD_WIDTH_SPACING}
             decelerationRate={"fast"}
-            keyExtractor={item => item?._id}
+            keyExtractor={item => item?._id || item?.location_id}
             onEndReached={() => {
-                if (1) {
-                  getAllLocations(page);
+                if (hasMore) {
+                  getContentBasedRecommendations(page);
                 } 
               }}
               onEndReachedThreshold={0.5}
