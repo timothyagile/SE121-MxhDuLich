@@ -7,26 +7,56 @@
   padding: 20px;
 }
 
-@media (min-width: 1400px) {
-}
-
 @media (min-width: 1200px) {
+  .containerformobile {
+    width: 100% !important;
+  }
+
+  .widthlistbusiness {
+    width: 100% !important;
+  }
 }
 
 @media (min-width: 978px) and (max-width: 1199px) {
   .containerformobile {
-    width: 900px;
+    width: 100%;
   }
 
   .widthlistbusiness {
+    width: 100% !important;
+  }
+
+  .listbusinessbody {
     width: 900px;
   }
 }
 
 @media (min-width: 768px) and (max-width: 979px) {
+  .containerformobile {
+    width: 100%;
+  }
+
+  .widthlistbusiness {
+    width: 100% !important;
+  }
+
+  .listbusinessbody {
+    width: 100%;
+  }
 }
 
 @media (min-width: 481px) and (max-width: 767px) {
+  .containerformobile {
+    width: 100%;
+  }
+
+  .widthlistbusiness {
+    width: 100% !important;
+  }
+
+  .listbusinessbody {
+    width: 100%;
+  }
 }
 
 .widthlistbusiness {
@@ -39,6 +69,8 @@
 }
 
 .search {
+  margin-top: 20px;
+  margin-left: 20px;
   width: 30%;
 
   margin-bottom: 20px;
@@ -47,9 +79,10 @@
 }
 
 table {
-  width: 100%;
+  width: calc(100% - 20px) !important;
   border-collapse: separate;
   border-spacing: 0 10px;
+  margin-left: 20px;
 }
 
 thead th {
@@ -107,64 +140,25 @@ tbody td {
   background-color: var(--blue-color);
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
+.business-table th.stt-col {
+  width: 5%;
+}
+.business-table th.name-col {
+  width: 25%;
+}
+.business-table th.id-col {
+  width: 20%;
+}
+.business-table th.email-col {
+  width: 25%;
+}
+.business-table th.phone-col {
+  width: 15%;
+}
+.business-table th.action-col {
+  width: 10%;
 }
 
-th,
-td {
-  padding: 8px;
-  text-align: left;
-}
-
-.lislocation th:nth-child(1),
-.clickable-row td:nth-child(1) {
-  width: 5%; /* Set width cho cột STT */
-}
-
-.lislocation th:nth-child(2),
-.clickable-row td:nth-child(2) {
-  width: 25%; /* Set width cho cột Tên địa điểm */
-}
-
-.lislocation th:nth-child(3),
-.clickable-row td:nth-child(3) {
-  width: 10%; /* Set width cho cột Loại */
-}
-
-.lislocation th:nth-child(4),
-.clickable-row td:nth-child(4) {
-  width: 45%; /* Set width cho cột Địa chỉ */
-}
-
-.lislocation th:nth-child(5),
-.clickable-row td:nth-child(5) {
-  width: 15%; /* Set width cho cột Trạng thái */
-}
-
-.lislocation th:nth-child(6),
-.clickable-row td:nth-child(6) {
-  width: 10%; /* Set width cho cột nút hành động */
-}
-.widthlistbusiness {
-  width: 100%;
-  max-width: 1153px; /* Chắc chắn rằng chiều rộng tối đa không vượt quá 1100px */
-  margin: 0 auto; /* Để căn giữa khi chiều rộng nhỏ hơn 1100px */
-  height: 800px;
-}
-
-@media (min-width: 978px) and (max-width: 1199px) {
-  .widthlistbusiness {
-    width: 900px; /* Sử dụng chiều rộng nhỏ hơn trên màn hình vừa */
-  }
-}
-
-@media (max-width: 767px) {
-  .widthlistbusiness {
-    width: 100%; /* Trên các màn hình nhỏ hơn, sử dụng 100% chiều rộng */
-  }
-}
 .pg-0 {
   padding: 0 !important;
 }
