@@ -86,24 +86,14 @@ const getLocationByCategory = async (categoryId, page = 1, limit = 10) => {
       Location.countDocuments({ 'category.id': categoryId }),
     ]);
   
-    if (locations.length !== 0) {
-      return {
-        data: locations,
-        total,
-        page,
-        limit,
-      };
-    } else {
-      throw new NotFoundException('Not found this category location');
-    }
+    // Return empty data array instead of throwing exception when no locations found
+    return {
+      data: locations,
+      total,
+      page,
+      limit,
+    };
   };
-// const getLocationByCategory = async (categoryId) => {
-//     const locations = await Location.find({'category.id': categoryId});
-//     if(locations.length != 0)
-//         return locations;
-//     else
-//         throw new NotFoundException('Not found this category location');
-// }
 
 const getLocationByUserId = async (userId) => {
     const locations = await Location.find({ownerId: userId});

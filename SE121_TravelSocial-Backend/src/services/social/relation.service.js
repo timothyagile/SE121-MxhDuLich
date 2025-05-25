@@ -264,19 +264,26 @@ const unblockUser = async (userId, targetId) => {
 };
 
 const cancelFriendRequest = async (requestId, recipientId) => {
+	// Check if the friend request exists (either as requestId->recipientId or recipientId->requestId)
 	const relation = await Relation.findOne({
-		requestId,
-		recipientId,
-		type: RELATION_TYPE.PENDING
+		$or: [
+			{ requestId, recipientId, type: RELATION_TYPE.PENDING },
+			{ requestId: recipientId, recipientId: requestId, type: RELATION_TYPE.PENDING }
+		]
 	});
+
 	if (!relation) {
 		throw new NotFoundException('Friend request not found');
 	}
 
+	// Store the actual requestId and recipientId from the found relation
+	const actualRequestId = relation.requestId;
+	const actualRecipientId = relation.recipientId;
+
 	await relation.deleteOne();
 	
 	// Xóa thông báo lời mời kết bạn khi hủy lời mời
-	await notificationService.deleteFriendRequestNotification(requestId, recipientId);
+	await notificationService.deleteFriendRequestNotification(actualRequestId, actualRecipientId);
 	
 	return { message: 'Friend request cancelled successfully' };
 };

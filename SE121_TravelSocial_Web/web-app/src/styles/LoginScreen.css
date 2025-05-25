@@ -9,14 +9,14 @@ body {
   justify-content: center;
   align-items: center;
   margin: 0;
-  font-family: 'UTMTimesBold', sans-serif;
+  font-family: "UTMTimesBold", sans-serif;
 }
 
-*, ::after, ::before {
-  box-sizing: content-box; 
+*,
+::after,
+::before {
+  box-sizing: content-box;
 }
-
-
 
 .container {
   align-items: self-start;
@@ -29,7 +29,7 @@ body {
   /* height: 100vh; */
 }
 
-@media (min-width:1400px)  {
+@media (min-width: 1400px) {
   :root {
     font-size: 18px;
   }
@@ -41,11 +41,9 @@ body {
   .sidebar {
     width: 130px;
   }
-
 }
 
-
-@media (min-width:1200px)  {
+@media (min-width: 1200px) {
   :root {
     font-size: 18px;
   }
@@ -57,7 +55,6 @@ body {
   .sidebar {
     width: 130px;
   }
-
 }
 
 @media (min-width: 978px) and (max-width: 1199px) {
@@ -72,11 +69,9 @@ body {
   .sidebar {
     width: 127px;
   }
-
-  
 }
 
-@media (min-width: 768px) and (max-width:979px) {
+@media (min-width: 768px) and (max-width: 979px) {
   :root {
     font-size: 14px;
   }
@@ -90,10 +85,9 @@ body {
   .w-form {
     width: 100%;
   }
-  
 }
 
-@media (min-width: 481px) and (max-width:767px) {
+@media (min-width: 481px) and (max-width: 767px) {
   :root {
     font-size: 12px;
   }
@@ -101,7 +95,6 @@ body {
     flex-direction: column;
     width: 476px;
     align-items: center;
-    
   }
   .containerformobile {
     height: 400px;
@@ -110,7 +103,6 @@ body {
   .w-form {
     width: 100%;
   }
-  
 }
 
 @media (max-width: 480px) {
@@ -176,7 +168,9 @@ label {
   color: #555;
 }
 
-input[type="email"], input[type="text"], input[type="date"],
+input[type="email"],
+input[type="text"],
+input[type="date"],
 input[type="password"] {
   width: 100%;
   padding: 10px;
@@ -207,7 +201,7 @@ input[type="checkbox"]:checked {
 }
 
 input[type="checkbox"]:checked::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 1px;
   left: 6px;
@@ -246,9 +240,6 @@ input[type="checkbox"]:checked::after {
   cursor: pointer;
 }
 
-
-
 .login-button:hover {
-  background-color: var(--button-color-hover);  
+  background-color: var(--button-color-hover);
 }
-

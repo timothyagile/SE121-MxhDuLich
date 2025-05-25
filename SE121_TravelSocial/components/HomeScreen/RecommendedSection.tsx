@@ -1,8 +1,8 @@
 import {Text, View, FlatList, Dimensions, TouchableOpacity, StyleSheet, Image, ActivityIndicator} from 'react-native'
 import locationData from '@/constants/location';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import * as Network from 'expo-network';
-import {API_BASE_URL} from '../../constants/config';
+import {API_BASE_URL, API_RCM_URL} from '../../constants/config';
 
 const {width, height} = Dimensions.get('window')
 const CARD_WIDTH =  width - 190;
@@ -15,16 +15,28 @@ type LikedItems = {
 interface PopularSectionProps {
     categoryId: string | undefined;
     navigation: any;
-  }
+}
 
+// Define a location interface for type safety
+interface Location {
+    _id: string;
+    name: string;
+    province?: string;
+    rating?: number;
+    image?: Array<{url: string}>;
+    [key: string]: any; // For other properties
+}
 
 export default function RecommendedSection({ categoryId, navigation }: PopularSectionProps) {
     const [likedItems, setLikedItems] = useState<LikedItems>({});
-    const [locations, setLocations] = useState<any[]>([]);
+    const [locations, setLocations] = useState<Location[]>([]);
     const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [isFetchingMore, setIsFetchingMore] = useState(false);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const [isFetchingMore, setIsFetchingMore] = useState(false);
+    const [onEndReachedCalledDuringMomentum, setOnEndReachedCalledDuringMomentum] = useState(false);
+    const flatListRef = useRef(null);
+
     const handlePress = (id: string) => {
         setLikedItems((prevState) => ({
             ...prevState,
@@ -32,116 +44,123 @@ export default function RecommendedSection({ categoryId, navigation }: PopularSe
         }));
     };
 
-  const getAllLocations = async (pageNumber: number) => {
-    try {
-      if (isFetchingMore || !hasMore) return;
-  
-      setIsFetchingMore(true);
-  
-      const response = await fetch(`${API_BASE_URL}/alllocation?page=${pageNumber}&limit=10`);
-      const data = await response.json();
-  
-      if (data.isSuccess) {
-        if (pageNumber === 1) {
-          setLocations(data.data.data);
-          console.log('all location: ', data.data);
-        } else {
-          setLocations(prev => [...prev, ...data.data.data]);
+    const getPopularLocations = async (pageNumber: number) => {
+        try {
+            setLoading(true);
+            // Gọi API Python popular recommendation
+            const response = await fetch(`${API_RCM_URL}/recommend_legacy?case=popular`);
+            const data = await response.json();
+            console.log('Response data: ', data);
+            if (data.recommendations) {
+                if (pageNumber === 1) {
+                    setLocations(data.recommendations);
+                } else {
+                    // Tránh trùng lặp
+                    const newItems = data.recommendations as Location[];
+                    setLocations(prev => {
+                        const existingIds = new Set(prev.map(item => item._id || item.location_id));
+                        const uniqueNewItems = newItems.filter((item: Location) => !existingIds.has(item._id || item.location_id));
+                        return [...prev, ...uniqueNewItems];
+                    });
+                }
+                setHasMore(data.recommendations.length > 0);
+                setPage(pageNumber + 1);
+            } else {
+                setHasMore(false);
+            }
+        } catch (error) {
+            setHasMore(false);
+            console.error('Popular API error:', error);
+        } finally {
+            setIsFetchingMore(false);
+            setLoading(false);
         }
-  
-        setHasMore(data.data.data.length > 0);
-        setPage(pageNumber + 1); 
-      } else {
-        console.error(data.error);
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsFetchingMore(false);
-      setLoading(false);
-    }
-  };
+    };
+
+    const loadMoreData = useCallback(() => {
+        if (!onEndReachedCalledDuringMomentum && !isFetchingMore && hasMore) {
+            getPopularLocations(page);
+            setOnEndReachedCalledDuringMomentum(true);
+        }
+    }, [page, isFetchingMore, hasMore, onEndReachedCalledDuringMomentum]);
 
     useEffect(() => {
-        getAllLocations(1);
+        getPopularLocations(1);
     }, []);
 
     if (loading) {
-        return <ActivityIndicator size="large" color="#0000ff" />; // Hiển thị loading indicator
+        return <ActivityIndicator size="large" color="#0000ff" />;
     }
 
     return (
-
         <View style={{height:CARD_HEIGHT+50}}>
             <Text style = {styles.titleText}>Phổ biến</Text>
             <FlatList
-            data={locations}
-            
-            horizontal
-            snapToInterval={CARD_WIDTH_SPACING}
-            decelerationRate={"fast"}
-            keyExtractor={item => item._id}
-            onEndReached={() => {
-                if (categoryId === 'all') {
-                  getAllLocations(page);
-                } 
-              }}
-              onEndReachedThreshold={0.5}
-            renderItem={({item, index}) => {
-                return (
-                    <TouchableOpacity onPress={() => navigation.navigate('detail-screen', { id: item._id })} style = {[
-                        styles.cardContainer,
-                        {
-                        marginLeft: 24,
-                        marginRight:  index === locationData.length - 1 ? 24 : 0}]}>
-                        <View>
-                            <View style = {[styles.imageBox, ]}>
-                            <Image
-                            source={
-                            item?.image?.[0]?.url
-                                ? { uri: item.image[0].url }
-                                : require('@/assets/images/bai-truoc-20.jpg') // Hình ảnh mặc định
-                            }
-                            
-                            style={styles.image}
-                            /> 
-                                <View style= {styles.titleBox}>
-                                    <View style = {[styles.textBox, {top: 10, width: 70}]}>
-                                        <Image source={require('@/assets/icons/star.png')}
-                                        style = {styles.star}></Image>
-                                        <Text style = {[styles.textrating, {fontSize: 15,}]}>{item.rating}</Text>
+                ref={flatListRef}
+                data={locations}
+                horizontal
+                snapToInterval={CARD_WIDTH_SPACING}
+                decelerationRate={"fast"}
+                keyExtractor={item => item._id || item.location_id}
+                onEndReached={loadMoreData}
+                onMomentumScrollBegin={() => setOnEndReachedCalledDuringMomentum(false)}
+                onEndReachedThreshold={0.2}
+                maxToRenderPerBatch={5}
+                windowSize={10}
+                removeClippedSubviews={true}
+                renderItem={({item, index}) => {
+                    return (
+                        <TouchableOpacity onPress={() => navigation.navigate('detail-screen', { id: item._id || item.location_id })} style = {[
+                            styles.cardContainer,
+                            {
+                            marginLeft: 24,
+                            marginRight:  index === locations.length - 1 ? 24 : 0}]}>
+                            <View>
+                                <View style = {[styles.imageBox, ]}>
+                                <Image
+                                source={
+                                item?.image?.[0]?.url
+                                    ? { uri: item.image[0].url }
+                                    : require('@/assets/images/bai-truoc-20.jpg')
+                                }
+                                style={styles.image}
+                                /> 
+                                    <View style= {styles.titleBox}>
+                                        <View style = {[styles.textBox, {top: 10, width: 70}]}> 
+                                            <Image source={require('@/assets/icons/star.png')}
+                                            style = {styles.star}></Image>
+                                            <Text style = {[styles.textrating, {fontSize: 15,}]}>{item.rating}</Text>
+                                        </View>
+                                        <TouchableOpacity onPress={()=>handlePress(item._id?.toString() || item.location_id?.toString())} style= {[styles.textBox2,{ bottom: 25,}]}> 
+                                            <Image source={require('@/assets/icons/heart.png')}
+                                            style={[
+                                            styles.heart, 
+                                            { tintColor: likedItems[item._id || item.location_id] ? 'red' : 'white' } 
+                                        ]}></Image>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                                <View style = {styles.footer}>
+                                    <View>
+                                        <Text style = {[styles.textStyle, {fontSize: 14}]}>{item.name}</Text>
+                                        <View>
+                                            <Text style = {[styles.textStyle, {fontSize: 14}]}>{item?.province}</Text>
+                                        </View>
                                     </View>
                                     
-                                    <TouchableOpacity onPress={()=>handlePress(item._id.toString())} style= {[styles.textBox2,{ bottom: 25,}]}>
-                                        <Image source={require('@/assets/icons/heart.png')}
-                                        style={[
-                                        styles.heart, 
-                                        { tintColor: likedItems[item._id] ? 'red' : 'white' } 
-                                    ]}></Image>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                            <View style = {styles.footer}>
-                                <View>
-                                    <Text style = {[styles.textStyle, {fontSize: 14}]}>{item.name}</Text>
-                                    <View>
-                                        <Text style = {[styles.textStyle, {fontSize: 14}]}>{item?.province}</Text>
+                                    <View style = {[styles.textBox,{borderWidth:3, borderColor:'white'}]}>
+                                        <Text style = {[styles.textStyle2, {marginHorizontal: 5, color: 'white'}]}>hot deal</Text>
                                     </View>
                                 </View>
-                                
-                                <View style = {[styles.textBox,{borderWidth:3, borderColor:'white'}]}>
-                                    <Text style = {[styles.textStyle2, {marginHorizontal: 5, color: 'white'}]}>hot deal</Text>
-                                </View>
                             </View>
-                        </View>
-                    </TouchableOpacity>                            
-                )}
-            }></FlatList>
+                        </TouchableOpacity>                            
+                    )
+                }}
+            />
 
-                  {isFetchingMore && (
-              <Text style={{ textAlign: 'center', marginTop: 10 }}>Đang tải thêm...</Text>
+            {isFetchingMore && (
+                <Text style={{ textAlign: 'center', marginTop: 10 }}>Đang tải thêm...</Text>
             )}
-            
         </View>
     )
 }

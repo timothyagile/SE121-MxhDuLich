@@ -42,7 +42,7 @@ export default function Post ({ postData }:any) {
         }}
         style={{ margin: 5 }}
       >
-        <RemoteImage imageUri={postData?.images?.[0].url || postData?.picturePath } />
+        <RemoteImage imageUri={postData?.images?.[0]?.url || postData?.picturePath } />
       </Pressable>
     </View>
   );

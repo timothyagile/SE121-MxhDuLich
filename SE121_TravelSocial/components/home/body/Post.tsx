@@ -79,7 +79,7 @@ import {
     function PostHeader() {
       const navigation = useNavigation();
       const [profilePic, setProfilePic] = React.useState(
-        !!post?.authorId ? post?.authorId.userAvatar.url : DEFAULT_DP
+        !!post?.authorId ? post?.authorId?.userAvatar?.url : DEFAULT_DP
       );
       return (
         <View style={{ alignSelf: "center", flexDirection: "row" }}>
@@ -194,7 +194,7 @@ import {
   
       useEffect(() => {
         if (post.images) {
-          const fixedUrl = getSafeImageUrl(post.images[0].url);
+          const fixedUrl = getSafeImageUrl(post?.images?.[0]?.url);
           setSafeUri(fixedUrl);
           Image.getSize(fixedUrl, (width, height) => {
             const ratio = width / height;

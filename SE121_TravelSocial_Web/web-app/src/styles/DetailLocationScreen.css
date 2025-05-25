@@ -11,3 +11,7 @@
     background-image: var(--gradient-room-background);
     height: 130px;
 }
+
+.w-room {
+    width: 94% !important;
+}

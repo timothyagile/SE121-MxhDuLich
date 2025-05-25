@@ -2,13 +2,15 @@ import { RouteProp, useRoute } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { Text, View, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView, Alert, Platform, Modal, FlatList, Dimensions } from 'react-native';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
-import {iconMapping} from '../constants/icon';
+import { iconMapping } from '../constants/icon';
 import { RootStackParamList } from '@/types/navigation';
-import {API_BASE_URL} from '../constants/config';
+import { API_BASE_URL } from '../constants/config';
 import axios from 'axios';
 import { FontAwesome } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import ServiceOption2 from '@/components/DetailScreen/ServiceOption2';
+import { useUser } from '../context/UserContext';
+import { trackEvents } from '../constants/recommendation';
 
 const { width } = Dimensions.get('window');
 
@@ -41,6 +43,7 @@ interface Room {
 export default function AvailableRoomScreen({ navigation }: {navigation: NativeStackNavigatorProps}) {
     const route = useRoute<RouteProp<RootStackParamList, 'available-room-screen'>>();
     const { id, checkinDate, checkoutDate, serviceOfLocation } = route.params;
+    const { userId } = useUser();
     console.log('checkin ddate: ', checkinDate, serviceOfLocation);
     const [date1, setDate1] = useState(checkinDate);
     const [date2, setDate2] = useState(checkoutDate);
@@ -230,9 +233,7 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
           checkinDate: Date;
           checkoutDate: Date;
         };
-    };
-
-    const handleConfirm = () => {
+    };    const handleConfirm = () => {
         const selectedRoomsData = Object.keys(selectedRoomCounts).map((roomId) => {
             const room = rooms.find((r) => r._id === roomId);
             return {
@@ -253,6 +254,18 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
             return;
         }
         const selectedServicesData = selectedServices.filter((service: any) => service.quantity > 0);
+
+        // Track click event for the booking process
+        if (userId && id) {
+          trackEvents.click(userId, id, {
+            action: 'proceed_to_booking',
+            rooms_selected: selectedRoomsData.length,
+            services_selected: selectedServicesData.length,
+            checkin_date: date1.toISOString(),
+            checkout_date: date2.toISOString()
+          });
+          console.log(`Tracked booking click event for user: ${userId}, location: ${id}`);
+        }
 
         console.log('selectedServicesDataaaaa: ', selectedServicesData);
         navigation.navigate('reservation-required-screen', {
