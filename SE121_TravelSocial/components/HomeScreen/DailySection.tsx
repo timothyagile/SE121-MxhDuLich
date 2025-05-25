@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Image, View, StyleSheet, TouchableOpacity, Text, Dimensions, ActivityIndicator, FlatList } from 'react-native';
 import locationData from '@/constants/location'
 import * as Network from 'expo-network';
-import { API_BASE_URL } from '../../constants/config';
+import { API_BASE_URL, API_RCM_URL } from '../../constants/config';
+import { useUser } from '../../context/UserContext';
 
 const { width, height } = Dimensions.get('window')
 const CARD_WIDTH = width - 240;
@@ -32,79 +33,44 @@ export default function DailySection({ categoryId, navigation }: DailySectionPro
     const [isFetchingMore, setIsFetchingMore] = useState(false);
     const [onEndReachedCalledDuringMomentum, setOnEndReachedCalledDuringMomentum] = useState(false);
     const flatListRef = useRef(null);
+    const { userId } = useUser();
     
     useEffect(() => {
-        if (categoryId === "all") {
-            getAllLocations(1);
-            return;
-        }
-        if (categoryId) {
-            fetchPopularLocations(categoryId, 1);
-        }
-    }, [categoryId]);
+        getRealtimeRecommendations(1);
+    }, [userId]);
 
-    const fetchPopularLocations = async (id: string, pageNumber: number) => {
-        if (isFetchingMore || !hasMore) return;
-
-        setIsFetchingMore(true);
+    const getRealtimeRecommendations = async (pageNumber: number) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/locationbycategory/${id}?page=${pageNumber}&limit=10`);
+            setLoading(true);
+            // Gọi API Python realtime_recommend với user_id
+            let url = `${API_RCM_URL}/realtime-recommend`;
+            if (userId) {
+                url += `?user_id=${userId}`;
+            } else {
+                url += `?top_n=10`;
+            }
+            const response = await fetch(url);
             const data = await response.json();
-
-            if (data.isSuccess) {
+            if (data.recommendations) {
                 if (pageNumber === 1) {
-                    setLocations(data.data.data);
+                    setLocations(data.recommendations);
                 } else {
-                    // Prevent duplicates when adding new items
-                    const newItems = data.data.data as Location[];
+                    // Tránh trùng lặp
+                    const newItems = data.recommendations as Location[];
                     setLocations(prev => {
-                        const existingIds = new Set(prev.map(item => item._id));
-                        const uniqueNewItems = newItems.filter((item: Location) => !existingIds.has(item._id));
+                        const existingIds = new Set(prev.map(item => item._id || item.location_id));
+                        const uniqueNewItems = newItems.filter((item: Location) => !existingIds.has(item._id || item.location_id));
                         return [...prev, ...uniqueNewItems];
                     });
                 }
-
-                setHasMore(data.data.data.length > 0);
+                setHasMore(data.recommendations.length > 0);
                 setPage(pageNumber + 1);
             } else {
                 setHasMore(false);
             }
         } catch (error) {
-            console.error("Fetch error:", error);
-        } finally {
-            setIsFetchingMore(false);
-            setLoading(false);
-        }
-    };
-
-    const getAllLocations = async (pageNumber: number, isLoadMore = false) => {
-        try {
-            if (isFetchingMore || !hasMore) return;
-      
-            setIsFetchingMore(true);
-      
-            const response = await fetch(`${API_BASE_URL}/alllocation?page=${pageNumber}&limit=10`);
-            const data = await response.json();
-      
-            if (data.isSuccess) {
-                if (pageNumber === 1) {
-                    setLocations(data.data.data);
-                } else {
-                    const newLocations = data.data.data as Location[];
-                    setLocations(prev => {
-                        const existingIds = new Set(prev.map(item => item._id));
-                        const uniqueNewLocations = newLocations.filter((item: Location) => !existingIds.has(item._id));
-                        return isLoadMore ? [...prev, ...uniqueNewLocations] : newLocations;
-                    });
-                }
-      
-                setHasMore(data.data.data.length > 0);
-                setPage(pageNumber + 1); 
-            } else {
-                console.error(data.error);
-            }
-        } catch (error) {
-            console.error(error);
+            setHasMore(false);
+            console.error('Realtime Recommend API error:', error);
         } finally {
             setIsFetchingMore(false);
             setLoading(false);
@@ -113,14 +79,10 @@ export default function DailySection({ categoryId, navigation }: DailySectionPro
 
     const loadMoreData = useCallback(() => {
         if (!onEndReachedCalledDuringMomentum && !isFetchingMore && hasMore) {
-            if (categoryId === 'all') {
-                getAllLocations(page, true);
-            } else if (categoryId) {
-                fetchPopularLocations(categoryId, page);
-            }
+            getRealtimeRecommendations(page);
             setOnEndReachedCalledDuringMomentum(true);
         }
-    }, [categoryId, page, isFetchingMore, hasMore, onEndReachedCalledDuringMomentum]);
+    }, [page, isFetchingMore, hasMore, onEndReachedCalledDuringMomentum]);
 
     const renderItem = ({ item, index }: { item: Location, index: number }) => (
         <TouchableOpacity
