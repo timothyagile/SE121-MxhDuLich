@@ -41,6 +41,7 @@ export default function Recommendation({ navigation, locationId }: PopularSectio
        const response = await fetch(`${API_BASE_URL}/alllocation?page=${pageNumber}&limit=10`);
        const data = await response.json();
    
+       console.log('Response data: ', data);
        if (data.isSuccess) {
          if (pageNumber === 1) {
            setLocations(data.data.data);

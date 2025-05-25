@@ -2,7 +2,7 @@ import {Text, View, FlatList, Dimensions, TouchableOpacity, StyleSheet, Image, A
 import locationData from '@/constants/location';
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import * as Network from 'expo-network';
-import {API_BASE_URL} from '../../constants/config';
+import {API_BASE_URL, API_RCM_URL} from '../../constants/config';
 
 const {width, height} = Dimensions.get('window')
 const CARD_WIDTH =  width - 190;
@@ -44,35 +44,33 @@ export default function RecommendedSection({ categoryId, navigation }: PopularSe
         }));
     };
 
-    const getAllLocations = async (pageNumber: number) => {
+    const getPopularLocations = async (pageNumber: number) => {
         try {
-            if (isFetchingMore || !hasMore) return;
-      
-            setIsFetchingMore(true);
-      
-            const response = await fetch(`${API_BASE_URL}/alllocation?page=${pageNumber}&limit=10`);
+            setLoading(true);
+            // Gọi API Python popular recommendation
+            const response = await fetch(`${API_RCM_URL}/recommend_legacy?case=popular`);
             const data = await response.json();
-      
-            if (data.isSuccess) {
+            console.log('Response data: ', data);
+            if (data.recommendations) {
                 if (pageNumber === 1) {
-                    setLocations(data.data.data);
+                    setLocations(data.recommendations);
                 } else {
-                    // Prevent duplicates when adding new items
-                    const newItems = data.data.data as Location[];
+                    // Tránh trùng lặp
+                    const newItems = data.recommendations as Location[];
                     setLocations(prev => {
-                        const existingIds = new Set(prev.map(item => item._id));
-                        const uniqueNewItems = newItems.filter((item: Location) => !existingIds.has(item._id));
+                        const existingIds = new Set(prev.map(item => item._id || item.location_id));
+                        const uniqueNewItems = newItems.filter((item: Location) => !existingIds.has(item._id || item.location_id));
                         return [...prev, ...uniqueNewItems];
                     });
                 }
-      
-                setHasMore(data.data.data.length > 0);
-                setPage(pageNumber + 1); 
+                setHasMore(data.recommendations.length > 0);
+                setPage(pageNumber + 1);
             } else {
                 setHasMore(false);
             }
         } catch (error) {
-            console.error(error);
+            setHasMore(false);
+            console.error('Popular API error:', error);
         } finally {
             setIsFetchingMore(false);
             setLoading(false);
@@ -81,13 +79,13 @@ export default function RecommendedSection({ categoryId, navigation }: PopularSe
 
     const loadMoreData = useCallback(() => {
         if (!onEndReachedCalledDuringMomentum && !isFetchingMore && hasMore) {
-            getAllLocations(page);
+            getPopularLocations(page);
             setOnEndReachedCalledDuringMomentum(true);
         }
     }, [page, isFetchingMore, hasMore, onEndReachedCalledDuringMomentum]);
 
     useEffect(() => {
-        getAllLocations(1);
+        getPopularLocations(1);
     }, []);
 
     if (loading) {
@@ -103,7 +101,7 @@ export default function RecommendedSection({ categoryId, navigation }: PopularSe
                 horizontal
                 snapToInterval={CARD_WIDTH_SPACING}
                 decelerationRate={"fast"}
-                keyExtractor={item => item._id}
+                keyExtractor={item => item._id || item.location_id}
                 onEndReached={loadMoreData}
                 onMomentumScrollBegin={() => setOnEndReachedCalledDuringMomentum(false)}
                 onEndReachedThreshold={0.2}
@@ -112,11 +110,11 @@ export default function RecommendedSection({ categoryId, navigation }: PopularSe
                 removeClippedSubviews={true}
                 renderItem={({item, index}) => {
                     return (
-                        <TouchableOpacity onPress={() => navigation.navigate('detail-screen', { id: item._id })} style = {[
+                        <TouchableOpacity onPress={() => navigation.navigate('detail-screen', { id: item._id || item.location_id })} style = {[
                             styles.cardContainer,
                             {
                             marginLeft: 24,
-                            marginRight:  index === locationData.length - 1 ? 24 : 0}]}>
+                            marginRight:  index === locations.length - 1 ? 24 : 0}]}>
                             <View>
                                 <View style = {[styles.imageBox, ]}>
                                 <Image
@@ -128,17 +126,16 @@ export default function RecommendedSection({ categoryId, navigation }: PopularSe
                                 style={styles.image}
                                 /> 
                                     <View style= {styles.titleBox}>
-                                        <View style = {[styles.textBox, {top: 10, width: 70}]}>
+                                        <View style = {[styles.textBox, {top: 10, width: 70}]}> 
                                             <Image source={require('@/assets/icons/star.png')}
                                             style = {styles.star}></Image>
                                             <Text style = {[styles.textrating, {fontSize: 15,}]}>{item.rating}</Text>
                                         </View>
-                                        
-                                        <TouchableOpacity onPress={()=>handlePress(item._id.toString())} style= {[styles.textBox2,{ bottom: 25,}]}>
+                                        <TouchableOpacity onPress={()=>handlePress(item._id?.toString() || item.location_id?.toString())} style= {[styles.textBox2,{ bottom: 25,}]}> 
                                             <Image source={require('@/assets/icons/heart.png')}
                                             style={[
                                             styles.heart, 
-                                            { tintColor: likedItems[item._id] ? 'red' : 'white' } 
+                                            { tintColor: likedItems[item._id || item.location_id] ? 'red' : 'white' } 
                                         ]}></Image>
                                         </TouchableOpacity>
                                     </View>

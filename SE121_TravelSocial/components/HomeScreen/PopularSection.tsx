@@ -103,7 +103,7 @@ export default function PopularSection({ categoryId, navigation }: PopularSectio
       if (data.isSuccess) {
         if (pageNumber === 1) {
           setLocations(data.data.data);
-          console.log('all location: ', data.data);
+          // console.log('all location: ', data.data);
         } else {
           setLocations(prev => [...prev, ...data.data.data]);
         }
