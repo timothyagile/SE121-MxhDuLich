@@ -1,9 +1,11 @@
 const Voucher = require('../../models/booking/voucher.model')
 const Location = require('../../models/general/location.model')
 const Room = require('../../models/booking/room.model')
+const VoucherUser = require('../../models/booking/voucher-user.model')
+const previewBookingService = require('../../services/booking/preview-booking.service')
 const {NotFoundException, ForbiddenError} = require('../../errors/exception')
 const { default: mongoose } = require('mongoose')
-const { VOUCHER_SOURCE } = require('../../enum/voucher.enum')
+const { VOUCHER_SOURCE, VOUCHER_USER, DISCOUNT_TYPE, VOUCHER_STATUS } = require('../../enum/voucher.enum')
 
 const getAllVouchers = async (skip, limit) => {
     const vouchers = await Voucher.find()
@@ -79,7 +81,7 @@ const createVoucher = async (voucher, userId) => {
         throw new ForbiddenError('Tạo voucher thất bại')
 }
 
-const updateVoucher = async (voucherId, voucherData) => {
+const updateVoucher = async (voucherId, voucherData, session = null) => {
     const result = await Voucher.findByIdAndUpdate(voucherId, voucherData, {new: true, runValidators: true})
     if(result)
         return result
@@ -95,12 +97,24 @@ const deleteVoucher = async (voucherId) => {
         throw new ForbiddenError('Xóa thất bại')
 }
 
-const useVoucher = async (code, userId) => {
-    const voucher = await Voucher.findOne({ code: code })
-    
+const verifyVoucher = async (code, previewBookingId, userId, session = null) => {
+
+    // Lấy lại preview booking từ redis
+    const previewBooking = await previewBookingService.getBookingPreview(userId, previewBookingId)
+
+    console.log("Preview booking: ", previewBooking)
+
+    const totalPrice = previewBooking.totalPrice
+    const rooms = previewBooking.items
+
+    const voucher = await Voucher.findOne({ code: code }).session(session)
     if(!voucher)
         throw new NotFoundException('Không tìm thấy mã voucher')
     
+    //Kiểm tra trạng thái voucher
+    if(voucher.status !== VOUCHER_STATUS.ACTIVE)
+        throw new ForbiddenError('Mã voucher không hợp lệ')
+
     // Kiểm tra thời hạn voucher
     const currentDate = new Date()
     if(currentDate < voucher.startDate || currentDate > voucher.endDate)
@@ -109,17 +123,53 @@ const useVoucher = async (code, userId) => {
     // Kiểm tra đã đạt giới hạn sử dụng chưa
     if(voucher.usesCount >= voucher.maxUse)
         throw new ForbiddenError('Mã voucher đã đạt giới hạn sử dụng')
+
+    // Kiểm tra các sản phẩm hiện tại có trong danh sách áp dụng không
+    //TODO: lấy roomids
+    if(voucher.productApplied && voucher.productApplied.length > 0) {
+        //const isValid = roomIds.every(roomId => voucher.productApplied.includes(roomId))
+        const isValid = rooms.every(room => voucher.productApplied.includes(room.roomId.toString()))
+        if(!isValid)
+            throw new ForbiddenError('Mã voucher không áp dụng cho sản phẩm này')   
+    }
+    // Check bill có đạt điều kiện sử dụng hay chưa
+    // TODO: Lấy totalPrice
+    if(voucher.minOderValue && totalPrice < voucher.minOderValue)
+        throw new ForbiddenError('Giá trị đơn hàng không đủ điều kiện sử dụng mã voucher này')
+
+    // Check xem user hiện tại có quá số lần sử dụng voucher hay không
+    if(voucher.maxUsePerUser && voucher.maxUsePerUser > 0) {
+        const voucherUseCount = await VoucherUser.countDocuments({
+            userId: userId,
+            voucherId: voucher._id,
+            status: VOUCHER_USER.USED
+        }).session(session)
+        if(voucherUseCount >= voucher.maxUsePerUser)
+            throw new ForbiddenError('Bạn đã sử dụng mã voucher này quá số lần cho phép')
+    }
+
+    //Tính số tiền được giảm
+    let discountAmount = 0
+    if(voucher.discount.type === DISCOUNT_TYPE.PERCENT) {
+        discountAmount = (totalPrice * voucher.discount.amount) / 100
+    }
+    else if(voucher.discount.type === DISCOUNT_TYPE.DIRECT) {
+        discountAmount = voucher.discount.amount
+    }
     
-    //TODO: Check bill có đạt điều kiện sử dụng hay chưa
-    
-    // Tăng số lần sử dụng
-    voucher.usesCount += 1
-    const result = await voucher.save()
-    
-    if(result)
-        return result
-    else
-        throw new ForbiddenError('Không thể sử dụng voucher')
+    console.log("Max discount: ", voucher.maxDiscount)
+    // Kiểm tra xem số tiền giảm có lớn hơn maxDiscount không
+    discountAmount = Math.min(discountAmount, voucher.maxDiscount)
+    console.log("Discount amount: ", discountAmount)
+    // TODO: Lấy total price
+    return {totalPrice, discountAmount, 
+        totalPriceAfterDiscount: totalPrice - discountAmount}
+}
+
+//Hàm này sẽ được gọi trong transaction khi người dùng xác nhận đặt phòng
+const applyVoucher = async (userId, voucherId) => {
+    // Check số lượng
+    // Check ngày hết hạn
 }
 
 module.exports = {
@@ -130,5 +180,5 @@ module.exports = {
     createVoucher,
     updateVoucher,
     deleteVoucher,
-    useVoucher
+    verifyVoucher
 }

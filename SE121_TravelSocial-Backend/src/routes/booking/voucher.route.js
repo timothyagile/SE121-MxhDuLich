@@ -32,6 +32,6 @@ router.put('/voucher/update/:voucherId', voucherController.updateVoucher)
 router.delete('/voucher/delete/:voucherId', voucherController.deleteVoucher)
 
 // Sử dụng voucher
-router.put('/voucher/use/:code', voucherController.useVoucher)
+router.post('/voucher/verify', checkUser, voucherController.verifyVoucher)
 
 module.exports = router

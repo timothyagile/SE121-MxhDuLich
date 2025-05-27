@@ -1,7 +1,6 @@
 const express = require('express');
 const app = express();
 
-
 require('dotenv').config();
 //require('./utils/cronJobs'); // Chạy cron job tự động
 
@@ -60,13 +59,19 @@ app.set('io', io);
 
 //Init dbs
 require('./databases/init.mongodb');
+const client = require('./databases/init.redis');
+
 const {countConnect, checkOverload} = require('./helpers/check.connect'); 
 countConnect()
 //checkOverload()
 
 //Handle routers
 
-app.get('/', (req, res) => res.render('signin'))
+app.get('/', async (req, res) => {
+    await client.set('message', 'Hello Redis from Express!');
+    const message = await client.get('message');
+    res.send(message);
+});
 app.get('/signup', (req, res) => {res.render('signup')})
 app.get('/signin', (req, res) => {res.render('signin')})
 
