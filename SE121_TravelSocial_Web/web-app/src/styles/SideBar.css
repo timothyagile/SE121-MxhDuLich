@@ -4,7 +4,7 @@
 .sidebar {
   border-radius: 10px;
   /* width: 70%; */
-  height: 110%;
+  height: 100vh;
   background-image: var(--gradient-blue-sidebar);
   padding: 10px;
   display: flex;
@@ -73,7 +73,7 @@
 
 .menu-item {
   border-radius: 5px;
-  width: 80%;
+  /* width: 80%; */
   display: flex;
   align-items: center;
   padding: 10px;
@@ -82,12 +82,12 @@
 }
 
 .menu-item:hover {
-  width: 80%;
+  /* width: 80%; */
   background-color: var(--blue-color);
 }
 
 .menu-item.active {
-  width: 80%;
+  /* width: 80%; */
   background-color: var(--white-color);
 }
 

@@ -274,6 +274,52 @@ const getBookingRevenueByMonthForBusiness = async (businessId, month, year) => {
       throw new Error("Error retrieving revenue data: " + error.message);
     }
 };
+// API mới: Lấy tất cả booking của business kèm thông tin user, room, location
+const getFullBookingByBusinessId = async (businessId) => {
+    // Lấy tất cả location thuộc business
+    const locations = await Location.find({ ownerId: businessId });
+    const locationIds = locations.map(location => location._id);
+    // Lấy tất cả room thuộc các location này
+    const rooms = await Room.find({ locationId: { $in: locationIds } });
+    const roomIds = rooms.map(room => room._id);
+    // Lấy tất cả booking liên quan đến các room này
+    const bookings = await Booking.find({
+        items: {
+            $elemMatch: {
+                roomId: { $in: roomIds },
+            },
+        },
+    })
+    .populate({
+        path: 'userId',
+        select: 'userName userAvatar',
+    })
+    .populate({
+        path: 'items.roomId',
+        select: 'name locationId',
+        populate: {
+            path: 'locationId',
+            select: 'name image',
+        }
+    });
+    // Định dạng lại dữ liệu cho FE
+    const result = bookings.map(booking => {
+        const firstRoom = booking.items[0]?.roomId;
+        const location = firstRoom?.locationId;
+        return {
+            _id: booking._id,
+            userId: booking.userId?._id,
+            userName: booking.userId?.userName,
+            userAvatar: booking.userId?.userAvatar,
+            locationName: location?.name,
+            locationImage: location?.image,
+            dateBooking: booking.dateBooking,
+            status: booking.status,
+            ...booking._doc
+        };
+    });
+    return result;
+};
   
 module.exports = {
     updateStatusBooking,
@@ -288,4 +334,5 @@ module.exports = {
     deleteBooking,
     getRevenueByMonth,
     getBookingRevenueByMonthForBusiness,
+    getFullBookingByBusinessId,
 }

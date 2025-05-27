@@ -31,11 +31,11 @@
 
 .widthlistbusiness {
   width: 1100px;
-  height: 800px;
+  height: 100vh;
 }
 
 .listbusinessbody {
-  height: 740px;
+  height: 100%;
 }
 
 .search {
@@ -151,7 +151,7 @@ td {
   width: 100%;
   max-width: 1153px; /* Chắc chắn rằng chiều rộng tối đa không vượt quá 1100px */
   margin: 0 auto; /* Để căn giữa khi chiều rộng nhỏ hơn 1100px */
-  height: 800px;
+  height: 100vh;
 }
 
 @media (min-width: 978px) and (max-width: 1199px) {

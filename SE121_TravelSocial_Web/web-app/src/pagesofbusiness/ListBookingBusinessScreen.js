@@ -3,7 +3,6 @@ import "../styles/ListBookingScreen.css";
 import { useNavigate } from "react-router-dom";
 import { FaSearch, FaEye } from "react-icons/fa";
 import Pagination from "../components/Pagination";
-import { bookings } from "../pages/BusinessData";
 import axios from "axios";
 import moment from "moment";
 import "../styles/ListBookingScreen.css";
@@ -22,45 +21,16 @@ const ListBookingBusinessScreen = () => {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
+        // Sử dụng API mới trả về đầy đủ thông tin
         const response = await fetch(
-          `http://localhost:3000/booking/getbybusinessid/${userId}`
+          `http://localhost:3000/booking/getfullbybusinessid/${userId}`
         );
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
         const data = await response.json();
-        console.log("list booking: ", data.data);
-
-        const bookingsWithDetails = await Promise.all(
-          data.data.map(async (booking) => {
-            const userResponse = await fetch(
-              `http://localhost:3000/user/getbyid/${booking.userId}`
-            );
-            const userData = await userResponse.json();
-            const userName = userData.data.userName;
-
-            const roomResponse = await fetch(
-              `http://localhost:3000/room/getbyid/${booking.items?.[0].roomId}`
-            );
-            const roomData = await roomResponse.json();
-            const locationId = roomData.data.locationId;
-            console.log("location: ", locationId);
-
-            const locationResponse = await fetch(
-              `http://localhost:3000/locationbyid/${locationId}`
-            );
-            const locationData = await locationResponse.json();
-            const locationName = locationData.data.name;
-            return {
-              ...booking,
-              userName,
-              locationId,
-              locationName,
-            };
-          })
-        );
-
-        setBookings(bookingsWithDetails);
+        console.log("Fetched bookings:", data);
+        setBookings(data.data);
       } catch (error) {
         console.error("Error fetching bookings:", error);
       }
@@ -144,8 +114,8 @@ const ListBookingBusinessScreen = () => {
                       <div className="namefield">
                         <img
                           src={
-                            booking.avatar
-                              ? require(`../assets/images/${booking.avatar}`)
+                            booking?.locationImage?.[0]?.url
+                              ? booking?.locationImage?.[0]?.url
                               : require("../assets/images/avt.png")
                           }
                           alt="User Avatar"
@@ -177,7 +147,7 @@ const ListBookingBusinessScreen = () => {
                           booking.status}
                       </span>
                     </td>
-                    <td>{booking.totalPriceAfterTax}</td>
+                    <td>{booking.totalPriceAfterTax?.toLocaleString('vi-VN')} đ</td>
                     <td>
                       <button
                         type="button"
