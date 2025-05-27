@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView, Alert, Platform, Linking, ActivityIndicator } from 'react-native';
+import { Text, View, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView, Alert, Platform, Linking, ActivityIndicator, Modal } from 'react-native';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 import { RadioButton } from 'react-native-paper';
 import { useRoute } from '@react-navigation/native';
@@ -7,6 +7,8 @@ import { RouteProp } from '@react-navigation/native';
 import { RouteParams } from 'expo-router';
 import { RootStackParamList } from '@/types/navigation';
 import {API_BASE_URL} from '../constants/config';
+import { useUser } from '../context/UserContext';
+import { trackEvents } from '../constants/recommendation';
 
 type ReservationRouteProp = RouteProp<RootStackParamList, 'reservation-required-screen'>;
 
@@ -28,6 +30,7 @@ interface SelectedRoomData {
 export default function ReservationRequiredScreen({ navigation }: {navigation: NativeStackNavigatorProps}) {
     const route = useRoute<ReservationRouteProp>();
     const { selectedRoomsData,selectedServicesData ,locationId } = route.params;
+    const { userId } = useUser();
 
     const formatRoomDate = (date: Date): string => {
         const day = date.getDate().toString().padStart(2, '0');
@@ -54,8 +57,11 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [checked, setChecked] = useState('first');
     const [locationDetails, setLocationDetails] = useState<any>(null);
+    const [selectedVoucher, setSelectedVoucher] = useState<any>(null);
+    const [voucherList, setVoucherList] = useState<any[]>([]);
+    const [voucherDetail, setVoucherDetail] = useState<any>(null);
+    const [showVoucherModal, setShowVoucherModal] = useState(false);
    
-
 
     const totalRooms = selectedRoomsData.reduce((sum, room) => sum + room.count, 0);
 
@@ -104,6 +110,17 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
     useEffect(() => {
         console.log('Received Rooms:', selectedRoomsData);
       }, [selectedRoomsData]);
+
+      useEffect(() => {
+        const fetchVouchers = async () => {
+          try {
+            const res = await fetch(`${API_BASE_URL}/voucher/getall`);
+            const data = await res.json();
+            if (data.isSuccess) setVoucherList(data.data || []);
+          } catch (e) { console.log('Lỗi lấy voucher', e); }
+        };
+        fetchVouchers();
+      }, []);
 
       const handleSelect = (option: string) => {
         setSelectedOption(option);
@@ -177,7 +194,34 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
         }
     };
 
-   
+    // Hàm kiểm tra voucher hợp lệ
+const verifyVoucher = async (voucher: any) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/voucher/getbycode/${voucher.code}`);
+    const data = await res.json();
+    if (!data || !data.data) return false;
+    const v = data.data;
+    const now = new Date();
+    if (v.status !== 'active') return false;
+    if (now < new Date(v.startDate) || now > new Date(v.endDate)) return false;
+    if (v.usesCount >= v.maxUse) return false;
+    if (v.minOderValue && totalPrice < v.minOderValue) return false;
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
+// Khi chọn voucher, kiểm tra hợp lệ
+const handleSelectVoucher = async (voucher: any) => {
+  const valid = await verifyVoucher(voucher);
+  if (!valid) {
+    Alert.alert('Voucher không hợp lệ', 'Voucher đã hết hạn, hết lượt dùng hoặc không đủ điều kiện.');
+    return;
+  }
+  setSelectedVoucher(voucher);
+};
+
 
     return (
 
@@ -357,18 +401,97 @@ export default function ReservationRequiredScreen({ navigation }: {navigation: N
                 </View>
             </View>
             
-            <View style={{width:'100%', marginVertical:20,}}>
-                <View style = {{  alignItems:'center', justifyContent:'center',alignContent:'center',width:'100%'}}>
+            <View style={{width:'100%', marginVertical:20,}}>                <View style = {{  alignItems:'center', justifyContent:'center',alignContent:'center',width:'100%'}}>
                     
-                    <TouchableOpacity style={styles.addpaymentmethod2} onPress={()=> navigation.navigate('payment-method-screen',{
-                        locationId: locationId,
-                        totalPrice: displayedTotalPrice,
-                        selectedRoomsData: selectedRoomsData,
-                        })} >
+                    <TouchableOpacity 
+                        style={styles.addpaymentmethod2} 
+                        onPress={() => {
+                            // Track booking event (proceeding to payment)
+                            if (userId && locationId) {
+                                trackEvents.click(userId, locationId, {
+                                    action: 'proceed_to_payment',
+                                    total_price: displayedTotalPrice,
+                                    rooms_count: selectedRoomsData.length,
+                                });
+                                console.log(`Tracked payment click event for user: ${userId}, location: ${locationId}`);
+                            }
+                            
+                            navigation.navigate('payment-method-screen',{
+                                locationId: locationId,
+                                totalPrice: displayedTotalPrice,
+                                selectedRoomsData: selectedRoomsData,
+                                selectedVoucher: selectedVoucher ? selectedVoucher.code : null,
+                            });
+                        }} 
+                    >
                         <Text style={styles.boxText3}>Tiếp tục để thanh toán</Text>
                     </TouchableOpacity>
                 </View>
             </View>
+
+            <View style={styles.bookingcontainer}>
+                <Text style={styles.yourbooking}>Chọn voucher</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{marginTop: 10}}>
+                  {voucherList.map((voucher) => (
+                    <TouchableOpacity
+                      key={voucher._id}
+                      style={{
+                        backgroundColor: selectedVoucher?._id === voucher._id ? '#176FF2' : '#eee',
+                        padding: 10, borderRadius: 10, marginRight: 10,
+                      }}
+                      onPress={async () => {
+                        setVoucherDetail(voucher);
+                        setShowVoucherModal(true);
+                      }}
+                    >
+                      <Text style={{color: selectedVoucher?._id === voucher._id ? '#fff' : '#000'}}>{voucher.name}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+            </View>
+            {/* Modal hiển thị chi tiết voucher */}
+<Modal
+  visible={showVoucherModal}
+  transparent
+  animationType="slide"
+  onRequestClose={() => setShowVoucherModal(false)}
+>
+  <View style={{flex:1, backgroundColor:'rgba(0,0,0,0.4)', justifyContent:'center', alignItems:'center'}}>
+    <View style={{backgroundColor:'#fff', borderRadius:16, padding:24, width:'80%'}}>
+      <Text style={{fontWeight:'bold', fontSize:20, marginBottom:8}}>Chi tiết voucher</Text>
+      {voucherDetail && (
+        <>
+          <Text style={{fontSize:16, marginBottom:4}}>Tên: {voucherDetail.name}</Text>
+          <Text style={{fontSize:16, marginBottom:4}}>Mã: {voucherDetail.code}</Text>
+          <Text style={{fontSize:16, marginBottom:4}}>Giảm: {voucherDetail.discountValue}{voucherDetail.discountType === 'percent' ? '%' : ' VND'}</Text>
+          <Text style={{fontSize:16, marginBottom:4}}>Điều kiện: Đơn tối thiểu {voucherDetail.minOderValue?.toLocaleString('vi-VN') || 0} VND</Text>
+          <Text style={{fontSize:16, marginBottom:4}}>Hiệu lực: {voucherDetail.startDate ? new Date(voucherDetail.startDate).toLocaleDateString() : ''} - {voucherDetail.endDate ? new Date(voucherDetail.endDate).toLocaleDateString() : ''}</Text>
+          <Text style={{fontSize:16, marginBottom:4}}>Số lượt còn lại: {voucherDetail.maxUse - voucherDetail.usesCount}</Text>
+        </>
+      )}
+      <View style={{flexDirection:'row', justifyContent:'flex-end', marginTop:16}}>
+        <TouchableOpacity onPress={() => setShowVoucherModal(false)} style={{marginRight:16}}>
+          <Text style={{color:'#176FF2', fontWeight:'bold'}}>Đóng</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={async () => {
+            if (voucherDetail) {
+              const valid = await verifyVoucher(voucherDetail);
+              if (!valid) {
+                Alert.alert('Voucher không hợp lệ', 'Voucher đã hết hạn, hết lượt dùng hoặc không đủ điều kiện.');
+                return;
+              }
+              setSelectedVoucher(voucherDetail);
+              setShowVoucherModal(false);
+            }
+          }}
+        >
+          <Text style={{color:'#fff', backgroundColor:'#176FF2', paddingHorizontal:16, paddingVertical:8, borderRadius:8, fontWeight:'bold'}}>Áp dụng</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+</Modal>
 
             </ScrollView>
         </View>  

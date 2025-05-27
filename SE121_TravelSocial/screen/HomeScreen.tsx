@@ -1,6 +1,6 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useRef, useCallback, useMemo} from 'react';
 import React from 'react';
-import {View, Text, StyleSheet, TextInput, FlatList, ScrollView, TouchableOpacity, Image, ImageBackground, Modal} from 'react-native'
+import {View, Text, StyleSheet, TextInput, FlatList, SectionList, TouchableOpacity, Image, ImageBackground, Modal} from 'react-native'
 
 import CategoryItem from "@/components/HomeScreen/CategoryItem";
 import categoryData from '@/constants/category';
@@ -19,10 +19,20 @@ interface props {
     setFilterLocations: (filterLocations: any) => void;
 }
 
+// Define section and item types
+interface SectionItem {
+    id: string;
+    [key: string]: any;
+}
+
+interface HomeSection {
+    key: string;
+    data: SectionItem[];
+    renderItem: (info: { item: SectionItem, index: number, section: HomeSection }) => React.ReactElement;
+}
+
 export default function HomeScreen ({navigation} : {navigation : NativeStackNavigatorProps})
 {
-    
-    
     const [selectedCategory, setSelectedCategory] = useState(categoryData.at(0));
     const [locations, setLocations] = useState([]);
     const [filterLocations, setFilterLocations] = useState<any[]>([]);
@@ -30,64 +40,94 @@ export default function HomeScreen ({navigation} : {navigation : NativeStackNavi
     const [error, setError] = useState<string | null>(null);
     const [query, setQuery] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
-
+    const sectionListRef = useRef(null);
 
     const handleSetCategory = (category: typeof categoryData[0]) => {
         setSelectedCategory(category); 
     };
 
-    const fetchLocations = async (searchQuery:string) => {
+    const fetchLocations = useCallback(async (searchQuery:string) => {
         if (!searchQuery) {
-            setFilterLocations([]);  // Nếu không có từ khóa tìm kiếm, xóa danh sách kết quả
+            setFilterLocations([]);  // If no search keyword, clear results list
             return;
         }
-        // setIsLoading(true);  // Bắt đầu loading
         try {
             const response = await axios.get(`${API_BASE_URL}/locationbyname?name=${searchQuery}`);
-            setFilterLocations(response.data);  // Cập nhật danh sách địa điểm
+            setFilterLocations(response.data);
             setError(null);
-            return response.data;  // Xóa lỗi nếu có
+            return response.data;
         } catch (err) {
             setError('Failed to fetch locations');
             return filterLocations;
         } 
-    };
+    }, []);
 
-    
-
-    const handleTextChange =(text:string) => {
+    const handleTextChange = useCallback((text:string) => {
         setQuery(text.replace(/\s+/g, '-'));
-        if (!query){
+        if (!text) {
             setModalVisible(true);
         }
-    }
+    }, []);
 
-    const handleSelectLocation = (location: any) => {
+    const handleSelectLocation = useCallback((location: any) => {
         navigation.navigate('detail-screen', { id: location._id})
-      };
+    }, [navigation]);
 
+    // Creating sections for the SectionList - memoized to prevent recreating on every render
+    const homeSections = useMemo<HomeSection[]>(() => [
+        {
+            key: 'popular',
+            data: [{ id: 'popular' }],
+            renderItem: () => <PopularSection categoryId={selectedCategory?.id} navigation={navigation} />,
+        },
+        {
+            key: 'recommended',
+            data: [{ id: 'recommended' }],
+            renderItem: () => <RecommendedSection categoryId={selectedCategory?.id} navigation={navigation} />,
+        },
+        {
+            key: 'newEvent',
+            data: [{ id: 'newEvent' }],
+            renderItem: () => <NewEventSection categoryId={selectedCategory?.id} navigation={navigation} />,
+        },
+        {
+            key: 'daily',
+            data: [{ id: 'daily' }],
+            renderItem: () => <DailySection categoryId={selectedCategory?.id} navigation={navigation} />,
+        },
+        {
+            key: 'banner',
+            data: [{ id: 'banner' }],
+            renderItem: () => <Image style={{width:'100%', height:200}} source={require('../assets/images/banner.png')}/>,
+        },
+    ], [selectedCategory, navigation]);
+
+    // Performance optimizations for section list
+    const renderItem = useCallback(({ section, item }: { section: HomeSection, item: SectionItem }) => 
+        section.renderItem({ item, index: 0, section }), [homeSections]);
     
+    const keyExtractor = useCallback((item: SectionItem) => item.id, []);
     
     return (
     <ImageBackground
       source={require('../assets/icons/logo.png')}
       style={styles.backgroundImage} 
     >
-        <View style = {styles.container}>
-            <View style = {{alignItems:'center', width:'100%'}}>
+        <View style={styles.container}>
+            <View style={{alignItems:'center', width:'100%'}}>
                 <View style={styles.search}>
-                    <TouchableOpacity >
+                    <TouchableOpacity>
                         <Image source={require('../assets/icons/Search.png')} style={styles.icon} />
                     </TouchableOpacity>                   
                     <TextInput
                         style={styles.input}
                         placeholder="Tìm kiếm"
                         value={query}
-                        onChangeText={(text) => handleTextChange(text)}
+                        onChangeText={handleTextChange}
                         placeholderTextColor="#000000"
                     />
                     <Image source={require('../assets/icons/logoblue.png')} style={styles.logo}/>
-                    {query &&  (
+                    {query && (
                         <View style={styles.dropdownContainer}>
                         <FilterLocation
                             query={query}
@@ -97,31 +137,46 @@ export default function HomeScreen ({navigation} : {navigation : NativeStackNavi
                     )}
                 </View>
             </View>
-            <View style  = {styles.categoryContainer}>
-                    <FlatList
-                    data= {categoryData}
+            <View style={styles.categoryContainer}>
+                <FlatList
+                    data={categoryData}
                     keyExtractor={(item) => item.id.toString()}
-                    renderItem={({item}) => (<CategoryItem 
-                        item = {item}
-                        selectedCategory = {selectedCategory}
-                        setSelectedCategory = {setSelectedCategory}
-                        setLocations={setLocations}/>)}
-
+                    renderItem={({item}) => (
+                        <CategoryItem 
+                            item={item}
+                            selectedCategory={selectedCategory}
+                            setSelectedCategory={setSelectedCategory}
+                            setLocations={setLocations}
+                        />
+                    )}
                     horizontal
-                    showsHorizontalScrollIndicator = {false}
-                    style = {styles.flatList}>
-                    </FlatList>
-                </View>
+                    showsHorizontalScrollIndicator={false}
+                    style={styles.flatList}
+                    removeClippedSubviews={true}
+                    windowSize={5}
+                    maxToRenderPerBatch={10}
+                />
+            </View>
            
-
-            <ScrollView style = {{}}>
-                    <PopularSection categoryId={selectedCategory?.id} navigation = {navigation}/>
-                    <RecommendedSection categoryId={selectedCategory?.id} navigation = {navigation}/>
-                    <NewEventSection categoryId={selectedCategory?.id} navigation = {navigation}/>
-                    <DailySection categoryId={selectedCategory?.id} navigation={navigation}/>
-                    <Image style={{width:'100%', height:200}} source={require('../assets/images/banner.png')}/>
-            </ScrollView>
-            
+            <SectionList
+                ref={sectionListRef}
+                sections={homeSections}
+                renderSectionHeader={() => null}
+                renderItem={renderItem}
+                keyExtractor={keyExtractor}
+                stickySectionHeadersEnabled={false}
+                showsVerticalScrollIndicator={false}
+                removeClippedSubviews={true}
+                initialNumToRender={2}
+                maxToRenderPerBatch={1}
+                windowSize={3}
+                updateCellsBatchingPeriod={100}
+                onEndReachedThreshold={0.5}
+                maintainVisibleContentPosition={{
+                    minIndexForVisible: 0
+                }}
+                contentContainerStyle={{ paddingBottom: 20 }}
+            />
         </View>
     </ImageBackground>
     )

@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
   selectedLocationText: {
     fontSize: 16,
     marginLeft: 8,
-    color: GlobalStyles.colors.gray,
+    color: 'black',
     flex: 1,
   },
   modalContainer: {
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: GlobalStyles.colors.gray,
+    color: 'black',
   },
   searchContainer: {
     flexDirection: 'row',
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 8,
     fontSize: 16,
-    color: GlobalStyles.colors.gray,
+    color: 'black',
   },
   loader: {
     marginTop: 50,
@@ -324,11 +324,11 @@ const styles = StyleSheet.create({
   locationName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: GlobalStyles.colors.gray,
+    color: 'black',
   },
   locationAddress: {
     fontSize: 14,
-    color: GlobalStyles.colors.gray,
+    color: 'black',
     marginTop: 3,
   },
   emptyContainer: {

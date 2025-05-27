@@ -4,124 +4,50 @@ import {
     Image,
     Pressable,
     Modal,
-    FlatList,
     Text,
     ImageBackground,
     Animated,
     Dimensions,
+    ActivityIndicator,
   } from "react-native";
-  import React, { useRef, useState } from "react";
-  //import { USERS } from "../../../data/users";
+  import React, { useRef, useState, useEffect } from "react";
   import { useNavigation } from "@react-navigation/native";
-  import { GlobalStyles } from "../../../constants/Styles";
-//   import ImageStory from "../../story/ImageStory";
+  import { DEFAULT_DP, GlobalStyles } from "../../../constants/Styles";
   import { Ionicons } from "@expo/vector-icons";
   import PressEffect from "../../UI/PressEffect";
+  import { API_BASE_URL } from "../../../constants/config";
   // https://github.com/birdwingo/react-native-instagram-stories?tab=readme-ov-file
   
-  const data = [
-    {
-      user_id: 0,
-      user_image:
-        "https://p16.tiktokcdn.com/tos-maliva-avt-0068/2f134ee6b5d3a1340aeb0337beb48f2d~c5_720x720.jpeg",
-      user_name: "Ajmal",
-      active: false,
-      stories: [
-        {
-          story_id: 1,
-          story_image:
-            "https://image.freepik.com/free-vector/universe-mobile-wallpaper-with-planets_79603-600.jpg",
-        },
-      ],
-    },
-    {
-      user_id: 1,
-      user_image: "https://randomuser.me/api/portraits/women/2.jpg",
-      user_name: "Ajmal",
-      active: false,
-      stories: [
-        {
-          story_id: 1,
-          story_image:
-            "https://image.freepik.com/free-vector/universe-mobile-wallpaper-with-planets_79603-600.jpg",
-        },
-      ],
-    },
-    {
-      user_id: 2,
-      user_image: "https://randomuser.me/api/portraits/women/5.jpg",
-      user_name: "Ajmal",
-      stories: [
-        {
-          story_id: 1,
-          story_image:
-            "https://image.freepik.com/free-vector/universe-mobile-wallpaper-with-planets_79603-600.jpg",
-        },
-      ],
-    },
-    {
-      user_id: 3,
-      user_image: "https://randomuser.me/api/portraits/women/8.jpg",
-      user_name: "Ajmal",
-      active: true,
-  
-      stories: [
-        {
-          story_id: 1,
-          story_image:
-            "https://image.freepik.com/free-vector/universe-mobile-wallpaper-with-planets_79603-600.jpg",
-        },
-      ],
-    },
-    {
-      user_id: 4,
-      user_image: "https://randomuser.me/api/portraits/women/10.jpg",
-      user_name: "Ajmal",
-      active: false,
-  
-      stories: [
-        {
-          story_id: 1,
-          story_image:
-            "https://image.freepik.com/free-vector/universe-mobile-wallpaper-with-planets_79603-600.jpg",
-        },
-      ],
-    },
-    {
-      user_id: 5,
-      user_image: "https://randomuser.me/api/portraits/women/25.jpg",
-      user_name: "Ajmal",
-      active: false,
-  
-      stories: [
-        {
-          story_id: 1,
-          story_image:
-            "https://image.freepik.com/free-vector/universe-mobile-wallpaper-with-planets_79603-600.jpg",
-        },
-      ],
-    },
-    {
-      user_id: 6,
-      user_image: "https://randomuser.me/api/portraits/women/52.jpg",
-      user_name: "Ajmal",
-      active: false,
-      stories: [
-        {
-          story_id: 1,
-          story_image:
-            "https://image.freepik.com/free-vector/universe-mobile-wallpaper-with-planets_79603-600.jpg",
-        },
-      ],
-    },
-  ];
-  const { width: SCREEN_WIDTH } = Dimensions.get("screen");
-  const ITEM_SIZE = SCREEN_WIDTH / 5;
-  const TRANSLATE_VALUE = ITEM_SIZE / 2;
-  export const CONTAINER_HEIGHT = ITEM_SIZE + TRANSLATE_VALUE + 10;
+  // Initial data structure with self user for the "Your Story" option
+const initialData = [
+  {
+    user_id: 0,
+    user_image: "https://p16.tiktokcdn.com/tos-maliva-avt-0068/2f134ee6b5d3a1340aeb0337beb48f2d~c5_720x720.jpeg",
+    user_name: "Tin của bạn",
+    active: false,
+    stories: [
+      {
+        story_id: 1,
+        story_image: "https://image.freepik.com/free-vector/universe-mobile-wallpaper-with-planets_79603-600.jpg",
+      },
+    ],
+  }
+];
+
+const { width: SCREEN_WIDTH } = Dimensions.get("screen");
+const ITEM_SIZE = SCREEN_WIDTH / 5;
+const TRANSLATE_VALUE = ITEM_SIZE / 2;
+export const CONTAINER_HEIGHT = ITEM_SIZE + TRANSLATE_VALUE + 10;
+
+// Add Friend interface
+interface Friend {
+  userId: string;
+  userName: string;
+  userAvatar: any;
+}
 
   type StoriesProps = {
-    followingsData: any[]; // Hoặc thay thế bằng kiểu chính xác, ví dụ: followingsData: UserType[]
+    followingsData?: any[]; // Optional prop for following data
   };
   
   const Stories: React.FC<StoriesProps> = ({ followingsData }) => {
@@ -129,11 +55,85 @@ import {
     const [showStory, setShowStory] = useState(false);
     const ScrollX = useRef(new Animated.Value(0)).current;
     const navigation = useNavigation();
+    
+    // State for friends data
+    const [friends, setFriends] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [storyData, setStoryData] = useState(initialData);
+
+    // Fetch friends from API
+    useEffect(() => {
+      const fetchFriends = async () => {
+        setLoading(true);
+        try {
+          const response = await fetch(`${API_BASE_URL}/friends?type=accept`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+          });
+          
+          if (!response.ok) {
+            throw new Error('Failed to fetch friends');
+          }
+          
+          const data = await response.json();
+          
+          if (data.isSuccess && Array.isArray(data.data)) {
+            setFriends(data.data);
+            console.log("Friends data:", data.data);
+            
+          // Transform friends data into the format expected by the Stories component
+            const friendStories = data.data.map((friend: Friend, index: number) => ({
+              user_id: friend.userId,
+              user_image: friend.userAvatar.url || DEFAULT_DP,
+              user_name: friend.userName || "Friend",  // Ensure we always have a user name
+              active: Math.random() > 0.7, // Randomly set some friends as active (for demo)
+              stories: [
+                {
+                  story_id: 1,
+                  story_image: "https://image.freepik.com/free-vector/universe-mobile-wallpaper-with-planets_79603-600.jpg",
+                },
+              ],
+            }));
+            
+            // Combine the initial "Your Story" entry with friends data
+            setStoryData([...initialData, ...friendStories]);
+          }
+        } catch (error) {
+          console.error('Error fetching friends:', error);
+          setError('Failed to load friends');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchFriends();
+    }, []);
+
+    if (loading) {
+      return (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="small" color={GlobalStyles.colors.magenta} />
+        </View>
+      );
+    }
+
+    if (error) {
+      return (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      );
+    }
+    
     return (
       <View>
         <Animated.FlatList
-          keyExtractor={(data, index) => index.toString()}
-          data={data}
+          keyExtractor={(item, index) => index.toString()}
+          data={storyData}
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{
@@ -174,13 +174,14 @@ import {
               ],
             });
             return (
-              <PressEffect>
-                <Pressable
+              <PressEffect>                <Pressable
                   onPress={() => {
                     if (item.user_id == 0) {
-                      //navigation.navigate("AddStoryScreen");
+                      // Handle "Your Story" option - could navigate to AddStoryScreen
+                      // navigation.navigate("AddStoryScreen");
                     } else {
-                      //navigation.navigate("ViewStoryScreen");
+                      // Navigate to friend's profile
+                      navigation.navigate("profile-social-screen" as never);
                     }
                   }}
                 >
@@ -192,13 +193,9 @@ import {
                       width: ITEM_SIZE,
                       height: ITEM_SIZE,
                       marginVertical: 5,
-                    }}
-                    // onPress={() => {
-                    //   setShowStory(true);
-                    // }}
-                  >
+                    }}                  >
                     <ImageBackground
-                      source={{ uri: item.user_image }}
+                      source={{ uri: item.user_image ? item.user_image : DEFAULT_DP }}
                       style={{
                         width: "100%",
                         height: "100%",
@@ -241,14 +238,17 @@ import {
                         )}
                       </View>
                     </ImageBackground>
+                    <View style={styles.userNameContainer}>
+                      <Text style={styles.userName} numberOfLines={1}>
+                        {item.user_name.length > 8 ? `${item.user_name.substring(0, 8)}...` : item.user_name}
+                      </Text>
+                    </View>
                   </Animated.View>
                 </Pressable>
               </PressEffect>
             );
           }}
-        />
-  
-        {showStory && (
+        />        {showStory && (
           <Modal
             animationType="slide"
             transparent={true}
@@ -258,7 +258,7 @@ import {
               setShowStory(!showStory);
             }}
           >
-            {/* <ImageStory setShowStory={setShowStory} stories={data?.stories} /> */}
+            {/* <ImageStory setShowStory={setShowStory} stories={storyData?.stories} /> */}
           </Modal>
         )}
       </View>
@@ -266,8 +266,7 @@ import {
   };
   
   export default Stories;
-  
-  const styles = StyleSheet.create({
+    const styles = StyleSheet.create({
     story: {
       width: 70,
       height: 70,
@@ -275,5 +274,29 @@ import {
       borderWidth: 3,
       borderColor: GlobalStyles.colors.cyan,
     },
+    loadingContainer: {
+      height: CONTAINER_HEIGHT + 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    errorContainer: {
+      height: CONTAINER_HEIGHT + 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    errorText: {
+      color: 'red',
+      fontSize: 12,
+    },
+    userNameContainer: {
+      width: ITEM_SIZE,
+      alignItems: 'center',
+    },
+    userName: {
+      marginTop: 2,
+      fontSize: 10,
+      color: 'black',
+      textAlign: 'center',
+    }
   });
   

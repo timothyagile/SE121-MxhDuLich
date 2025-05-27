@@ -1,19 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions, ScrollView, Linking, TextInput, Alert, SafeAreaView, StatusBar, FlatList } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import Facility from '@/components/HomeScreen/Facility';
 import axios from 'axios';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useRoute,RouteProp } from '@react-navigation/native';
-import {API_BASE_URL} from '../../constants/config';
+import { useRoute, RouteProp } from '@react-navigation/native';
+import { API_BASE_URL } from '../../constants/config';
 import { Icon } from 'react-native-paper';
-import {iconMapping} from '../../constants/icon';
+import { iconMapping } from '../../constants/icon';
 import CustomModal from '@/components/CollectionScreen/AddIntoCollection';
 import ImageCarousel from '@/components/HomeScreen/ImageCarousel';
 import Recommendation from '@/components/DetailScreen/Recommendation';
 import ServiceOption from '@/components/DetailScreen/ServiceOption';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { trackEvents } from '../../constants/recommendation';
+import { useUser } from '../../context/UserContext';
 
 const { width, height } = Dimensions.get('window');
 
@@ -33,7 +35,9 @@ type DetailScreenRouteProp = RouteProp<RootStackParamList, 'detail-screen'>;
 
 export default function DetailScreen({navigation} : {navigation : NativeStackNavigatorProps}) {
   const route = useRoute<DetailScreenRouteProp>();
-  const { id } = route.params; 
+  const { id } = route.params;
+  const { userId } = useUser();
+  
   interface Service {
     _id: string;
     id: string;
@@ -140,16 +144,21 @@ const facilityIcons: FacilityIcons = {
     const toggleLike = () => {
         
 
-    };
-
-    const handlePress = (id: string) => {
-      setIsLiked(!isLiked);
+    };    const handlePress = (id: string) => {
+      const newLikedState = !isLiked;
+      setIsLiked(newLikedState);
       setLikedItems((prevState) => ({
         ...prevState,
-        [id]: !prevState[id],
+        [id]: newLikedState,
       }));
       setSelectedLocationId(id);
       setModalVisible(true); 
+      
+      // Track favorite event to recommendation system
+      if (userId) {
+        trackEvents.favorite(userId, id, newLikedState);
+        console.log(`Tracked favorite event for user: ${userId}, location: ${id}, state: ${newLikedState ? 'liked' : 'unliked'}`);
+      }
     };
 
     const toggleExpanded = () => {
@@ -185,6 +194,15 @@ const facilityIcons: FacilityIcons = {
     useEffect(() => {
         getCoordinatesFromAddress(ADDRESS);
     }, []);
+    
+    // Track view event when the component loads
+    useEffect(() => {
+        if (userId && id) {
+            // Log view event to recommendation system
+            trackEvents.view(userId, id, { source: 'detail_screen' });
+            console.log(`Tracked view event for user: ${userId}, location: ${id}`);
+        }
+    }, [userId, id]);
 
     useEffect(() => {
       console.log(locationDetails?.address)
@@ -473,11 +491,20 @@ const storeLocationDetails = async (data: any) => {
                 keyboardType="numeric"
               />
               <FontAwesome name="chevron-down" size={20} color="gray" style={styles.iconRight} />
-            </View>
-
-            <TouchableOpacity onPress={()=> {
+            </View>            <TouchableOpacity onPress={()=> {
               console.log('Navigating with ID: ', locationDetails._id);
               console.log('servicesOfLocation:', servicesOfLocation);
+              
+              // Track the search/click event to recommendation system
+              if (userId && locationDetails._id) {
+                trackEvents.click(userId, locationDetails._id, { 
+                  action: 'search_rooms',
+                  checkin_date: date1?.toISOString(),
+                  checkout_date: date2?.toISOString()
+                });
+                console.log(`Tracked search/click event for user: ${userId}, location: ${locationDetails._id}`);
+              }
+              
               navigation.navigate('available-room-screen', {
                 id: locationDetails._id,
                 checkinDate: date1, // Gửi ngày checkin
