@@ -2,9 +2,14 @@ const Booking = require('../../models/booking/booking.model').Booking
 const ServiceBooked = require('../../models/booking/booking.model').ServiceBooked
 const Location = require('../../models/general/location.model')
 const Service = require('../../models/booking/service.model')
+const roomService = require('../../services/booking/room.service')
+const voucherService = require('../../services/booking/voucher.service')
+const previewBookingService = require('../../services/booking/preview-booking.service')
+const voucherUserService = require('../../services/booking/voucher-user.service')
 const Room = require('../../models/booking/room.model')
 const {NotFoundException, ForbiddenError} = require('../../errors/exception')
 const { default: mongoose } = require('mongoose')
+const BookingBuilder = require('../../components/builder/booking.builder')
 
 const updateStatusBooking = async (bookingId, amountPayed) => {
     const booking = await Booking.findById(bookingId);
@@ -47,7 +52,6 @@ const getBookingByUserId = async (userId) => {
         throw new NotFoundException('Not found')
 }
 
-//TODO: 
 const getBookingByLocationId = async (locationId) => {
     const result = await Booking.aggregate([
         { $unwind: "$items" },
@@ -90,24 +94,64 @@ const getBookingByLocationId = async (locationId) => {
         throw new NotFoundException('Not found')
 }
 
-const createBooking = async (bookingData) => {
-    for (let item of bookingData.items) {
-        const room = await Room.findById(item.roomId, 'pricePerNight');
-        console.log('room: ', room);
-        item.price = room.pricePerNight;
-    }
+const createBooking = async (bookingData, preview_bookingId) => {
+    const { userId, dateBooking, checkinDate, checkoutDate, voucherId } = bookingData;
+    const previewBooking = await previewBookingService.getBookingPreview(userId, preview_bookingId)
+    const voucher = await voucherService.getVoucherById(voucherId)
+
+    console.log('previewBooking: ', previewBooking)
+
+    const booking = new BookingBuilder()
+    .setUserId(userId)    
+    .setDateBooking(dateBooking)
+    .setRooms(previewBooking.items, checkinDate, checkoutDate)
+    .setServices(previewBooking.services)
+    .setVoucherId(voucherId)
+    .setPrice(previewBooking.totalPrice)
+
+    const session = await mongoose.startSession();
     
-    for (let service of bookingData.services) {
-        const service = await Service.findById(service.serviceId);
-        service.price = service.price;
+    try {
+        session.startTransaction();
+        // 1. Kiểm tra & trừ số lượng phòng
+        if(await roomService.getRoomAvailable(previewBooking.items, checkinDate, checkoutDate, session) === false) {
+            throw new Error('Phòng đã được đặt')
+        }
+        // 2. Validate lại voucher
+        if(voucherId) {
+            const {totalPrice, discountAmount, totalPriceAfterDiscount} 
+            = await voucherService.verifyVoucher(voucher.code, preview_bookingId, userId, session)
+            booking.setVoucherId(new mongoose.Types.ObjectId(voucherId))
+            booking.setDiscount(discountAmount)
+        }
+        console.log('Here: ')
+        
+        booking.setTax(0.08)
+
+        // 3. Tạo booking
+
+        booking.build()
+        
+        const bookingData = new Booking(booking.booking)
+        const savedBooking = await bookingData.save({ session });
+
+        
+
+        // 4. Update các bên liên quan
+        await voucherService.updateVoucher(
+            voucherId,
+            { $inc: { usesCount: 1 } }, // tăng 1 lượt dùng
+            session);
+        await voucherUserService.addVoucherUsage(userId, voucher.code, session);
+
+        await session.commitTransaction();
+        return savedBooking;
+    } catch (err) {
+        await session.abortTransaction();
+        throw err;
+    } finally {
+        session.endSession();
     }
-    console.log('before: ', bookingData);
-    const result = await bookingData.save();
-    console.log('after: ',result);
-    if(result)
-        return result
-    else
-        throw new ForbiddenError('Not allow to create')
 }
 
 const updateBooking = async (bookingId, bookingData) => {
@@ -163,6 +207,50 @@ const getBookingByBusinessId = async (businessId) => {
     });
     return bookings;
 };
+
+const calculateTotalEstimatedPrice = async (rooms, services) => {
+    //Lấy thông tin của các phòng từ database
+    let totalServicePrice = 0
+    let totalRoomPrice = 0
+    if (rooms) {
+        const roomIds = rooms.map(r => new mongoose.Types.ObjectId(r.roomId))
+        const roomData = await Room.find({ _id: { $in: roomIds } }, { _id: 1, pricePerNight: 1})
+        
+        //Đưa data vào map để tối ưu thời gian
+        const roomMap = new Map()
+        roomData.forEach(r => roomMap.set(r._id.toString(), r.pricePerNight))
+
+        //Tính tổng giá các phòng
+        
+        for (const r of rooms) {
+            const roomPrice = roomMap.get(r.roomId)
+            if(!roomPrice)
+                throw new NotFoundException('Cannot found room')
+            totalRoomPrice += roomPrice * r.quantity * r.nights
+        }
+    }
+
+    //Lấy thông tin của các dịch vụ từ database
+    if (services) {
+        const serviceIds = services.map(s => new mongoose.Types.ObjectId(s.serviceId))
+        const serviceData = await Service.find({ _id: { $in: serviceIds } }, { _id: 1, price: 1})
+        
+        //Đưa data vào map để tối ưu thời gian
+        const serviceMap = new Map()
+        serviceData.forEach(s => roomMap.set(s._id.toString(), s.price))
+
+        //Tính tổng giá các phòng
+        
+        for (const s of services) {
+            const servicePrice = serviceMap.get(r.roomId)
+            if(!servicePrice)
+                throw new NotFoundException('Cannot found service')
+            totalServicePrice += servicePrice * s.quantity
+        }
+    }
+
+    return totalRoomPrice + totalServicePrice
+}
 
 const getRevenueByMonth = async (month, year) => {
     const startDate = new Date(year, month - 1, 1); // Ngày đầu tiên của tháng
@@ -332,6 +420,7 @@ module.exports = {
     updateBooking,
     addServices,
     deleteBooking,
+    calculateTotalEstimatedPrice,
     getRevenueByMonth,
     getBookingRevenueByMonthForBusiness,
     getFullBookingByBusinessId,

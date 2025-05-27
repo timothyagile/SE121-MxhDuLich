@@ -1,6 +1,8 @@
 const Booking = require('../../models/booking/booking.model').Booking
 const bookingSvc = require('../../services/booking/booking.service')
+const previewBookingService = require('../../services/booking/preview-booking.service')
 const emailSvc = require('../../services/general/email.service')
+
 module.exports.getAllBooking = async (req, res, next) => {
     try {
         const result = await bookingSvc.getAllBooking()
@@ -76,27 +78,25 @@ module.exports.getBookingByBusinessId = async (req, res, next) => {
 
 module.exports.createBooking = async (req, res, next) => {
     const {
-        userId,
-        dateBooking,
         checkinDate,
         checkoutDate,
-        items, //Item nhap data gom: id phong, so luong (default: 1), so dem
-        services, //Service nhap data gom: id phong, so luong (default: 1), so dem
-        amountPaid,
+        voucherId, 
+        preview_bookingId,
     } = req.body
+
+    const userId = res.locals.user._id; // Lấy userId từ token đã xác thực
     
     try {
-        const bookingData = new Booking({
+        const bookingData = {
             userId,
-            dateBooking,
+            dateBooking: new Date(),
             checkinDate,
             checkoutDate,
-            items,
-            services,      
-            amountPaid,       
-        })
+            voucherId,           
+        }
+
         console.log(bookingData)    
-        const result = await bookingSvc.createBooking(bookingData)
+        const result = await bookingSvc.createBooking(bookingData, preview_bookingId)
         res.status(201).json({
             isSuccess: true,
             data: result,
@@ -107,6 +107,7 @@ module.exports.createBooking = async (req, res, next) => {
         next(error)
     }
 }
+
 module.exports.updateBooking = async (req, res, next) => {
     const bookingData = req.body
     const bookingId = req.params.id
@@ -214,6 +215,50 @@ module.exports.getBookingRevenue = async (req, res, next) => {
         next(error);
     }
 };
+
+module.exports.calculateTotalEstimatedPrice = async (req, res, next) => {
+    console.log('CalculateTotalEstimatedPrice::', req.body);
+    const { items, services } = req.body;
+    try {
+        const result = await bookingSvc.calculateTotalEstimatedPrice(items, services);
+        res.status(200).json({
+            isSuccess: true,
+            data: result,
+            error: null,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+module.exports.createPreviewBooking = async (req, res, ) => {
+    console.log('Create preview booking::', req.body);
+    const { rooms, services } = req.body;
+    const userId = res.locals.user._id; // Lấy userId từ token đã xác thực
+
+    const result = await previewBookingService.createBookingPreview(userId, {rooms, services});
+
+    res.status(200).json({
+        isSuccess: true,
+        data: result,
+        error: null,
+    });
+}
+
+module.exports.getPreviewBooking = async (req, res, ) => {
+    console.log('Get preview booking::', req.params);
+
+    const previewId = req.params.previewId
+    const userId = res.locals.user._id; // Lấy userId từ token đã xác thực
+
+    const result = await previewBookingService.getBookingPreview(userId, previewId);
+    
+    res.status(200).json({
+        isSuccess: true,
+        data: result,
+        error: null,
+    });
+}
 
 module.exports.getFullBookingByBusinessId = async (req, res, next) => {
     const { businessId } = req.params;

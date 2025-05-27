@@ -116,14 +116,19 @@ module.exports.deleteVoucher = async (req, res, next) => {
     }
 }
 
-module.exports.useVoucher = async (req, res, next) => {
-    const {code} = req.params
-    const {userId} = req.body
+module.exports.verifyVoucher = async (req, res, next) => {
+    const {code, preview_bookingId } = req.body
+    const userId = res.locals.user._id
+    console.log(userId)
     try {
-        const result = await voucherSvc.useVoucher(code, userId)
+        const result = await voucherSvc.verifyVoucher(code, preview_bookingId, userId)
         res.status(200).json({
             isSuccess: true,
-            data: result,
+            data: {
+                totalPrice: result.totalPrice,
+                discount: result.discountAmount,
+                totalPriceAfterDiscount: result.totalPriceAfterDiscount
+            },
             error: null
         })
     }

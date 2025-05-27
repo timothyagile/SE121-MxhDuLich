@@ -58,7 +58,10 @@ const BookingSchema = new Schema({
         type: [serviceSchema],
         default: []
     },
+    voucherId: {type: mongoose.Schema.Types.ObjectId, ref: 'Voucher'},
     totalPrice: {type: Number, required: true},
+    discount: {type: Number, default: 0},
+    totalAfterDiscount: {type: Number, default: 0},
     tax: {type: Number, required: true},
     totalPriceAfterTax: {type: Number, required: true},
     amountPaid: {type: Number, default: 0},
@@ -67,7 +70,7 @@ const BookingSchema = new Schema({
         enum: ['pending', 'confirm' ,'complete', 'canceled'],
         default: 'pending'
     }
-}, {collection: 'Booking'});
+}, {collection: 'Booking', timestamps: true});
 
 const MonthlyStatisticsSchema = new Schema({
     month: {
@@ -91,43 +94,43 @@ const MonthlyStatisticsSchema = new Schema({
 });
 //Recalculate totalPrice
 
-const calculateTotalRoomPrice = (rooms) => {
-    if(rooms.length === 0)
-        return 0
-    return rooms.reduce((total, room) => {
-      return total + (room.price * room.nights * room.quantity);
-    }, 0);
-  };
+// const calculateTotalRoomPrice = (rooms) => {
+//     if(rooms.length === 0)
+//         return 0
+//     return rooms.reduce((total, room) => {
+//       return total + (room.price * room.nights * room.quantity);
+//     }, 0);
+//   };
   
-const calculateTotalServicePrice = (services) => {
-    if(services.length === 0)
-        return 0
-    return services.reduce((total, service) => {
-        return total + (service.price * service.quantity);
-    }, 0);
-};
+// const calculateTotalServicePrice = (services) => {
+//     if(services.length === 0)
+//         return 0
+//     return services.reduce((total, service) => {
+//         return total + (service.price * service.quantity);
+//     }, 0);
+// };
   
-//Hook
-BookingSchema.pre('validate', async function (next) {
-    if (!this.items || this.items.length === 0) {
-        return next(new Error("Items array cannot be empty"));
-    }
-    const totalRoomPrice = calculateTotalRoomPrice(this.items);
-    console.log('totalroomprice: ',totalRoomPrice);
-    const totalServicePrice = calculateTotalServicePrice(this.services);
-    this.totalPrice = totalRoomPrice + totalServicePrice;
-    console.log('totalprice: ', this.totalPrice);
-    this.tax = this.totalPrice * 0.08;
-    console.log('tax: ', this.tax);
-    this.totalPriceAfterTax = this.totalPrice + this.tax;
-    console.log('totalpriceaftertax: ',this.totalPriceAfterTax);
-    console.log('Chay toi day')
-    if(this.totalPriceAfterTax > this.amountPaid)
-        this.status = 'pending'
-    if(this.totalPriceAfterTax === this.amountPaid)
-        this.status = 'complete'
-    next()
-})
+// //Hook
+// BookingSchema.pre('validate', async function (next) {
+//     if (!this.items || this.items.length === 0) {
+//         return next(new Error("Items array cannot be empty"));
+//     }
+//     const totalRoomPrice = calculateTotalRoomPrice(this.items);
+//     console.log('totalroomprice: ',totalRoomPrice);
+//     const totalServicePrice = calculateTotalServicePrice(this.services);
+//     this.totalPrice = totalRoomPrice + totalServicePrice;
+//     console.log('totalprice: ', this.totalPrice);
+//     this.tax = this.totalPrice * 0.08;
+//     console.log('tax: ', this.tax);
+//     this.totalPriceAfterTax = this.totalPrice + this.tax;
+//     console.log('totalpriceaftertax: ',this.totalPriceAfterTax);
+//     console.log('Chay toi day')
+//     if(this.totalPriceAfterTax > this.amountPaid)
+//         this.status = 'pending'
+//     if(this.totalPriceAfterTax === this.amountPaid)
+//         this.status = 'complete'
+//     next()
+// })
 
 const Booking = mongoose.model('Booking', BookingSchema);
 const ServiceBooked = mongoose.model('ServiceBooked', serviceSchema);
