@@ -1,56 +1,32 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-import {
-  FaAngleRight,
-  FaBell,
-  FaEye,
-  FaSearchLocation,
-  FaEdit,
-  FaStar,
-  FaStarHalfAlt,
-  FaBed,
-  FaTimesCircle,
-  FaHotTub,
-  FaWifi,
-  FaVolumeOff,
-  FaSnowflake,
-} from "react-icons/fa";
+import { FaSearchLocation, FaEdit, FaStar, FaStarHalfAlt, FaBed, FaTimesCircle, FaHotTub, FaWifi, FaVolumeOff, FaSnowflake } from "react-icons/fa";
 import { FaRankingStar, FaX, FaPlus } from "react-icons/fa6";
 import { MdEventNote } from "react-icons/md";
 import "../styles/DetailLocationScreen.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faPhoneAlt,
-  faEnvelope,
-  faUser,
-  faMapMarkerAlt,
-  faMemo,
-} from "@fortawesome/free-solid-svg-icons";
+import { faPhoneAlt, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { locations } from "../pages/BusinessData";
-import MapComponent from "../components/MapComponent";
-import MapBoxComponent from "../components/MapBoxComponent";
 import { useSelector } from "react-redux";
 import "../styles/DetailLocationScreen.css";
 import moment from "moment";
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 
-const DetailLocationBusinessScreen = ({ mapLoaded }) => {
+const DetailLocationBusinessScreen = () => {
   const userData = useSelector((state) => state.user.userData);
   console.log("userdata: ", userData);
   const [currentTab, setCurrentTab] = useState("baseinfo");
   const [currentTab2, setCurrentTab2] = useState("viewratingservice");
   const { id } = useParams();
-  const [latitude] = useState(10.8231); // Thay bằng tọa độ mong muốn
-  const [longitude] = useState(106.6297); // Thay bằng tọa độ mong muốn
   const [reviews, setReviews] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [selectedFacilities, setSelectedFacilities] = useState([]);
   const [selectedRoomId, setSelectedRoomId] = useState(null);
   const [roomData, setRoomData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [servicesOfLocation, setServicesOfLocation] = useState([]);
+  const [roomImages, setRoomImages] = useState([]);
 
   const handleBaseInfoClick = () => {
     setCurrentTab("baseinfo");
@@ -63,6 +39,11 @@ const DetailLocationBusinessScreen = ({ mapLoaded }) => {
   const handleRatingServiceClick = () => {
     setCurrentTab("ratingservice");
     setCurrentTab2("viewratingservice");
+  };
+
+  const handleRoomsClick = () => {
+    setCurrentTab("rooms");
+    setCurrentTab2("rooms");
   };
 
   const handleViewDetails = (roomId) => {
@@ -149,12 +130,35 @@ const DetailLocationBusinessScreen = ({ mapLoaded }) => {
     facilities: [],
   });
 
-  const handleSubmit = async () => {
+  const handleSubmitRoomWithImages = async () => {
+    let imageUrls = [];
+    if (roomImages.length > 0) {
+      const formDataImg = new FormData();
+      roomImages.forEach((file) => {
+        formDataImg.append("files", file);
+      });
+      try {
+        const uploadRes = await fetch("http://localhost:3000/upload", {
+          method: "POST",
+          body: formDataImg,
+        });
+        const uploadResult = await uploadRes.json();
+        if (uploadResult.isSuccess && Array.isArray(uploadResult.data)) {
+          imageUrls = uploadResult.data.map((img) => img.url);
+        }
+        // imageData = uploadResult.data;
+        console.log("Image data uploaded successfully:", uploadResult.data);
+      } catch (err) {
+        alert("Lỗi upload ảnh phòng!");
+        return;
+      }
+    }
+    // Chuẩn bị dữ liệu phòng
     const facilityList = selectedFacilities.map((id) => {
       const service = services.find((service) => service.id === id);
       return {
         id: service.id,
-        name: service.name,
+        name: service?.name,
         quantity: 1,
         description: "",
       };
@@ -169,24 +173,32 @@ const DetailLocationBusinessScreen = ({ mapLoaded }) => {
         { category: "single", quantity: parseInt(formData.singleBeds || 0) },
         { category: "double", quantity: parseInt(formData.doubleBeds || 0) },
       ],
+      image: imageUrls,
     };
-
     try {
       const response = await fetch("http://localhost:3000/room/newroom", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(roomData),
       });
-
       const result = await response.json();
-
       if (result.isSuccess) {
         alert("Phòng được tạo thành công!");
+        setRoomImages([]);
+        setFormData({
+          name: "",
+          quantity: 1,
+          pricePerNight: 0,
+          area: 0,
+          singleBeds: 0,
+          doubleBeds: 0,
+          facilities: [],
+        });
+        setCurrentTab2("rooms");
       } else {
         alert("Lỗi khi tạo phòng: " + result.error);
       }
     } catch (err) {
-      console.error(err);
       alert("Có lỗi xảy ra!");
     }
   };
@@ -252,9 +264,7 @@ const DetailLocationBusinessScreen = ({ mapLoaded }) => {
 
         setReviews(updatedReviews);
       } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+        // XÓA: setError(err.message);
       }
     };
 
@@ -275,9 +285,7 @@ const DetailLocationBusinessScreen = ({ mapLoaded }) => {
         console.log("data of rooms: ", data.data);
         setRooms(data.data); // Giả định API trả về một object chứa danh sách phòng trong `data.data`
       } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+        // XÓA: setError(err.message);
       }
     };
 
@@ -288,13 +296,12 @@ const DetailLocationBusinessScreen = ({ mapLoaded }) => {
     if (!selectedRoomId) return;
 
     const fetchRoomDetails = async () => {
-      setLoading(true);
       try {
         const response = await fetch(
           `http://localhost:3000/room/getbyid/${selectedRoomId}`
         );
         const data = await response.json();
-        console.log(data.data);
+        console.log("dâta:",data.data);
         if (response.ok) {
           setRoomData(data.data);
         } else {
@@ -302,8 +309,6 @@ const DetailLocationBusinessScreen = ({ mapLoaded }) => {
         }
       } catch (error) {
         console.error("Lỗi khi gọi API:", error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -355,15 +360,9 @@ const DetailLocationBusinessScreen = ({ mapLoaded }) => {
     }
   };
 
-  const navigate = useNavigate();
-
-  const [address, setAddress] = useState(
-    "FFXQ+X94, Bung Riềng, Xuyên Mộc, Bà Rịa - Vũng Tàu, Vietnam"
-  );
-
   useEffect(() => {
     // Đây là nơi bạn cập nhật địa chỉ mới khi cần
-    setAddress(locationInfo.address);
+    //setAddress(locationInfo.address);
   }, [id]);
 
   function getCategoryName(id) {
@@ -379,11 +378,32 @@ const DetailLocationBusinessScreen = ({ mapLoaded }) => {
     }
   }
 
+  useEffect(() => {
+    if (currentTab === "ratingservice") {
+      const fetchServicesOfLocation = async () => {
+        try {
+          const response = await fetch(
+            `http://localhost:3000/service/location/${id}`
+          );
+          const data = await response.json();
+          if (response.ok && data.isSuccess) {
+            setServicesOfLocation(data.data);
+          } else {
+            setServicesOfLocation([]);
+          }
+        } catch (err) {
+          setServicesOfLocation([]);
+        }
+      };
+      fetchServicesOfLocation();
+    }
+  }, [currentTab, id]);
+
   return (
     <div class="container">
       <div class="containerformobile">
         <div class="containerlistbusiness widthlistbusiness">
-          <div class="max-w-4xl mx-auto mt-10 bg-white rounded-lg shadow-md p-6">
+          <div class=" bg-white rounded-lg shadow-md p-2">
             <div class="flex justify-between">
               <div class="flex items-center">
                 <img
@@ -466,6 +486,17 @@ const DetailLocationBusinessScreen = ({ mapLoaded }) => {
                   <FaRankingStar className="mr-2 text-2xl" />
                   <span>Dịch vụ và đánh giá</span>
                 </button>
+                <button
+                  onClick={handleRoomsClick}
+                  class={`flex items-center px-4 py-2 ${
+                    currentTab === "rooms"
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-200 text-gray-600"
+                  } rounded-t-lg ml-2`}
+                >
+                  <FaRankingStar className="mr-2 text-2xl" />
+                  <span>Phòng</span>
+                </button>
               </div>
             </div>
             {currentTab === "baseinfo" && (
@@ -539,7 +570,7 @@ const DetailLocationBusinessScreen = ({ mapLoaded }) => {
                       <input
                         type="text"
                         name="tenDiaDiem"
-                        value={locationInfo.category.name}
+                        value={locationInfo.category?.name}
                         onChange={handleInputChange}
                         className="border p-2 rounded"
                       />
@@ -570,22 +601,24 @@ const DetailLocationBusinessScreen = ({ mapLoaded }) => {
                   </div>
                 </div>
                 <div>
-                  {address === "Địa chỉ không khả dụng" ? (
-                    <p className="text-red-500">
-                      Không tìm thấy địa chỉ cho địa điểm này.
-                    </p>
-                  ) : (
-                    <div className="flex justify-center">
-                      <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31383.239171865847!2d107.48594181070591!3d10.508156585966674!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3175bd73c30f60a1%3A0x951e30bb705cd7c3!2zTcOAVSBDYW1waW5nIC0gQ-G6r20gVHLhuqFpIEjhu5MgQ-G7kWM!5e0!3m2!1sen!2s!4v1736102711020!5m2!1sen!2s"
-                        width="800"
-                        height="350"
-                        allowFullScreen
-                        loading="lazy"
-                      ></iframe>
+                  {/* Hiển thị bản đồ động dựa trên tọa độ */}
+                  {locationInfo?.latitude && locationInfo?.longtitude ? (
+                    <div className="flex justify-center mt-4">
+                      <MapContainer
+                        center={[Number(locationInfo.latitude), Number(locationInfo.longtitude)]}
+                        zoom={15}
+                        style={{ height: 350, width: 800 }}
+                      >
+                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                        <Marker position={[Number(locationInfo.latitude), Number(locationInfo.longtitude)]}>
+                          <Popup>
+                            {locationInfo?.name || 'Vị trí này'}
+                          </Popup>
+                        </Marker>
+                      </MapContainer>
                     </div>
-                    // <></>
-                    //<MapComponent address={address} />
+                  ) : (
+                    <p className="text-red-500">Không tìm thấy tọa độ cho địa điểm này.</p>
                   )}
                 </div>
                 <button
@@ -710,132 +743,66 @@ const DetailLocationBusinessScreen = ({ mapLoaded }) => {
               <div>
                 {currentTab2 === "viewratingservice" && (
                   <div class="border border-gray-200 rounded-b-lg p-4">
-                    <h2 class="text-xl font-bold mb-4">Phòng</h2>
-                    {/* <div class="scroll-container-x">
-                                            <div class="flex gap-4 mb-8 min-w-[800px]">
-                                                <div class="bg-white w-420 rounded-lg shadow-md p-2 flex flex-col space-y-4 bg-room" >
-                                                    <div class="border-l-4 border-blue-500 pl-4 w-full">
-                                                        <p class="text-lg font-semibold text-gray-800">Phòng 2 người</p>
-                                                        <p class="text-gray-600">Số lượng: 12</p>
-                                                    </div>
-                                                    <div class="flex justify-between items-center w-full">
-                                                        <button onClick={handleViewDetails} class="bg-blue-500 text-white px-4 py-2 rounded-md">Xem chi tiết</button>
-                                                        <div class="flex flex-col items-center">
-                                                            <p class="text-gray-600">Giá</p>
-                                                            <p class="text-red-600 font-bold text-lg">500.000 VND</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="bg-white w-420 rounded-lg shadow-md p-2 flex flex-col space-y-4 bg-room" >
-                                                    <div class="border-l-4 border-blue-500 pl-4 w-full">
-                                                        <p class="text-lg font-semibold text-gray-800">Phòng 2 người</p>
-                                                        <p class="text-gray-600">Số lượng: 12</p>
-                                                    </div>
-                                                    <div class="flex justify-between items-center w-full">
-                                                        <button onClick={handleViewDetails} class="bg-blue-500 text-white px-4 py-2 rounded-md">Xem chi tiết</button>
-                                                        <div class="flex flex-col items-center">
-                                                            <p class="text-gray-600">Giá</p>
-                                                            <p class="text-red-600 font-bold text-lg">500.000 VND</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="bg-white w-420 rounded-lg shadow-md p-2 flex flex-col space-y-4 bg-room" >
-                                                    <div class="border-l-4 border-blue-500 pl-4 w-full">
-                                                        <p class="text-lg font-semibold text-gray-800">Phòng 2 người</p>
-                                                        <p class="text-gray-600">Số lượng: 12</p>
-                                                    </div>
-                                                    <div class="flex justify-between items-center w-full">
-                                                        <button onClick={handleViewDetails} class="bg-blue-500 text-white px-4 py-2 rounded-md">Xem chi tiết</button>
-                                                        <div class="flex flex-col items-center">
-                                                            <p class="text-gray-600">Giá</p>
-                                                            <p class="text-red-600 font-bold text-lg">500.000 VND</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="bg-gray-200 w-420 p-4 rounded-lg shadow-md flex items-center justify-center">
-                                                    <button class="text-2xl text-gray-600">+</button>
-                                                    <p class="ml-2">Thêm phòng mới</p>
-                                                </div>
-                                            </div>
-                                        </div> */}
-                    <div className="scroll-container-x">
-                      <div className="flex gap-4 mb-8 min-w-[800px]">
-                        {rooms.map((room) => (
-                          <div
-                            key={room._id}
-                            className="bg-white w-420 rounded-lg shadow-md p-2 flex flex-col space-y-4 bg-room"
-                          >
-                            <div className="border-l-4 border-blue-500 pl-4 w-full">
-                              <p className="text-lg font-semibold text-gray-800">
-                                {room.name}
-                              </p>
-                              <p className="text-gray-600">
-                                Số lượng: {room.quantity}
-                              </p>
+                    {/* Dịch vụ kèm theo */}
+                    <div className="mb-8">
+                      <h2 className="text-xl font-bold mb-2">Dịch vụ kèm theo</h2>
+                      {servicesOfLocation && servicesOfLocation.length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                          {servicesOfLocation.map((service, idx) => (
+                            <div
+                              key={service._id || idx}
+                              className="flex items-center bg-gray-200 rounded-full px-3 py-1 mb-2"
+                            >
+                              {/* Nếu có icon thì render, không thì chỉ tên */}
+                              {/* <span className="mr-2">
+                                {service.icon ? (
+                                  <span
+                                    dangerouslySetInnerHTML={{ __html: service.icon }}
+                                  />
+                                ) : null}
+                              </span> */}
+                              <span>{service.name}</span>
+                              {service.price && (
+                                <span className="ml-2 text-blue-600 font-semibold">
+                                  {service.price.toLocaleString()} VND
+                                </span>
+                              )}
+                              {service.description && (
+                                <span className="ml-2 text-gray-500">
+                                  ({service.description})
+                                </span>
+                              )}
                             </div>
-                            <div className="flex justify-between items-center w-full">
-                              <button
-                                onClick={() => handleViewDetails(room._id)}
-                                className="bg-blue-500 text-white px-4 py-2 rounded-md"
-                              >
-                                Xem chi tiết
-                              </button>
-                              <div className="flex flex-col items-center">
-                                <p className="text-gray-600">Giá</p>
-                                <p className="text-red-600 font-bold text-lg">
-                                  {room?.pricePerNight?.toLocaleString()} VND
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                        <button
-                          onClick={handleAddRoom}
-                          className="bg-gray-200 w-420 p-4 rounded-lg shadow-md flex items-center justify-center"
-                        >
-                          <button className="text-2xl text-gray-600">+</button>
-                          <p className="ml-2">Thêm phòng mới</p>
-                        </button>
-                      </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p>Chưa có dịch vụ kèm theo cho địa điểm này.</p>
+                      )}
                     </div>
-
-                    <div class="scroll-container mh-200">
-                      <h2 class="text-xl font-bold mb-4">
-                        Đánh giá từ khách hàng
-                      </h2>
-                      <div>
-                        {reviews ? (
+                    {/* Đánh giá từ khách hàng */}
+                    <div className="mt-8">
+                      <h2 class="text-xl font-bold mb-4">Đánh giá từ khách hàng</h2>
+                      <div className="max-h-96 overflow-y-auto pr-2">
+                        {reviews && reviews.length > 0 ? (
                           <div>
                             {reviews.map((review) => (
-                              <div key={review.id}>
-                                <div class="flex items-center mb-4">
+                              <div key={review.id} className="mb-4">
+                                <div class="flex items-center mb-2">
                                   <img
-                                    alt="Profile picture of Hoang Huy"
+                                    alt="Profile picture of reviewer"
                                     class="w-12 h-12 rounded-full mr-4"
                                     height="50"
                                     src="https://storage.googleapis.com/a1aa/image/O5bug1WBccZwJ527TONg0tRsK6lOKxgmwdTsBcoffjoNNVlTA.jpg"
                                     width="50"
                                   />
                                   <div>
-                                    <p class="font-semibold">
-                                      {review.userName}
-                                    </p>
+                                    <p class="font-semibold">{review.userName}</p>
                                     <div className="flex items-center">
-                                      {/* Render rating stars */}
-                                      {Array.from({
-                                        length: Math.floor(review.rating),
-                                      }).map((_, index) => (
-                                        <FaStar
-                                          key={index}
-                                          className="text-yellow-500"
-                                        />
+                                      {Array.from({ length: Math.floor(review.rating) }).map((_, index) => (
+                                        <FaStar key={index} className="text-yellow-500" />
                                       ))}
-                                      {review.rating % 1 !== 0 && (
-                                        <FaStarHalfAlt className="text-yellow-500" />
-                                      )}
-                                      <span className="ml-2 text-gray-600">
-                                        {review.rating.toFixed(1)}
-                                      </span>
+                                      {review.rating % 1 !== 0 && <FaStarHalfAlt className="text-yellow-500" />}
+                                      <span className="ml-2 text-gray-600">{review.rating.toFixed(1)}</span>
                                     </div>
                                   </div>
                                 </div>
@@ -844,19 +811,122 @@ const DetailLocationBusinessScreen = ({ mapLoaded }) => {
                             ))}
                           </div>
                         ) : (
-                          <p>No reviews available for this location.</p>
+                          <p>Chưa có đánh giá cho địa điểm này.</p>
                         )}
                       </div>
                     </div>
                   </div>
                 )}
-
+              </div>
+            )}
+            {currentTab === "rooms" && (
+              <div>
+                {currentTab2 === "rooms" && (
+                  <div class="border border-gray-200 rounded-b-lg p-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 class="text-xl font-bold">Danh sách phòng</h2>
+                      <button
+                        className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+                        onClick={handleAddRoom}
+                      >
+                        + Thêm phòng
+                      </button>
+                    </div>
+                    <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
+                      <table className="min-w-full bg-white rounded-lg shadow-md">
+                        <thead>
+                          <tr>
+                            <th className="px-4 py-2 border-b">Tên phòng</th>
+                            <th className="px-4 py-2 border-b">Số lượng</th>
+                            <th className="px-4 py-2 border-b">Giá/đêm</th>
+                            <th className="px-4 py-2 border-b">Diện tích (m²)</th>
+                            <th className="px-4 py-2 border-b">Loại giường</th>
+                            <th className="px-4 py-2 border-b">Tiện nghi</th>
+                            <th className="px-4 py-2 border-b">Chi tiết</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {rooms.map((room) => (
+                            <tr key={room._id} className="hover:bg-gray-50">
+                              <td className="px-4 py-2 border-b font-semibold">
+                                {room?.name}
+                              </td>
+                              <td className="px-4 py-2 border-b text-center">
+                                {room?.quantity}
+                              </td>
+                              <td className="px-4 py-2 border-b text-right text-red-600 font-bold">
+                                {room?.pricePerNight?.toLocaleString()} VND
+                              </td>
+                              <td className="px-4 py-2 border-b text-center">
+                                {room?.area}
+                              </td>
+                              <td className="px-4 py-2 border-b text-center">
+                                {room?.bed && room.bed.length > 0 ? (
+                                  <span>
+                                    {room?.bed
+                                      .filter((b) => b.quantity > 0)
+                                      .map((b, idx) => `${b.quantity} ${b.category === "single" ? "giường đơn" : "giường đôi"}`)
+                                      .join(", ")}
+                                  </span>
+                                ) : (
+                                  <span>-</span>
+                                )}
+                              </td>
+                              <td className="px-4 py-2 border-b">
+                                <div className="flex flex-wrap gap-1">
+                                  {room.facility && room.facility.length > 0 ? (
+                                    room.facility.map((facility, idx) => (
+                                      <span key={idx} className="inline-flex items-center bg-gray-200 rounded-full px-2 py-0.5 text-xs mr-1 mb-1">
+                                        {getFacilityIcon(facility.id)}
+                                        {facility?.name}
+                                      </span>
+                                    ))
+                                  ) : (
+                                    <span>-</span>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="px-4 py-2 border-b text-center">
+                                <button
+                                  onClick={() => handleViewDetails(room._id)}
+                                  className="bg-blue-500 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-600"
+                                >
+                                  Xem chi tiết
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    
+                  </div>
+                )}
                 {currentTab2 === "roomDetails" && (
                   <div class="border border-gray-200 rounded-b-lg p-4">
                     <div class="text-gray-500 text-sm mb-4">
-                      <a class="text-xl font-bold mb-4 text-black">Phòng</a>&gt;
+                      <span class="text-xl font-bold mb-4 text-black">Phòng</span>&gt;
                       <span>Chi tiết phòng</span>
                       {/* <a href="#" class="hover:underline">Phòng</a> */}
+                    </div>
+                    {/* Hiển thị hình ảnh phòng */}
+                    <div className="flex space-x-2 mb-4 overflow-x-auto">
+                      {roomData?.image && roomData.image.length > 0 ? (
+                        roomData.image.map((img, idx) => (
+                          <img
+                            key={idx}
+                            src={typeof img === 'string' ? img : img.url}
+                            alt={`Hình phòng ${idx + 1}`}
+                            className="w-40 h-28 object-cover rounded-lg border"
+                          />
+                        ))
+                      ) : (
+                        <img
+                          src="/no-photo.jpg"
+                          alt="Không có hình ảnh"
+                          className="w-40 h-28 object-cover rounded-lg border"
+                        />
+                      )}
                     </div>
                     <h1 class="text-2xl font-bold mb-4">{roomData?.name}</h1>
                     {/* <div class="flex items-center mb-4">
@@ -923,16 +993,38 @@ const DetailLocationBusinessScreen = ({ mapLoaded }) => {
                     </div>
                   </div>
                 )}
-
                 {currentTab2 === "addRoom" && (
                   <div class="border border-gray-200 rounded-b-lg p-4">
                     <div class="text-gray-500 text-sm mb-4">
-                      <a class="text-xl font-bold mb-4 text-black">Phòng</a>&gt;
+                      <span class="text-xl font-bold mb-4 text-black">Phòng</span>&gt;
                       <span>Thêm phòng</span>
-                      {/* <a href="#" class="hover:underline">Phòng</a> */}
+                    </div>
+                    {/* Thêm UI chọn nhiều ảnh */}
+                    <div className="mb-4">
+                      <label className="block text-gray-700 text-sm font-bold mb-2">Hình ảnh phòng</label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={async (e) => {
+                          const files = Array.from(e.target.files);
+                          setRoomImages(files);
+                        }}
+                        className="mb-2"
+                      />
+                      <div className="flex flex-wrap gap-2">
+                        {roomImages && roomImages.length > 0 && roomImages.map((file, idx) => (
+                          <img
+                            key={idx}
+                            src={URL.createObjectURL(file)}
+                            alt="preview"
+                            className="w-20 h-20 object-cover rounded"
+                          />
+                        ))}
+                      </div>
                     </div>
                     <input
-                      value={formData.name}
+                      value={formData?.name}
                       onChange={handleInputAddChange}
                       name="name"
                       type="text"
@@ -994,11 +1086,11 @@ const DetailLocationBusinessScreen = ({ mapLoaded }) => {
                             className="mr-2"
                             checked={selectedFacilities.includes(service.id)}
                             onChange={() => handleCheckboxChange(service)}
-                            value={service.name}
+                            value={service?.name}
                             name={`service-${service.id}`}
                           />
                           {service.icon}
-                          <span>{service.name}</span>
+                          <span>{service?.name}</span>
                         </label>
                       ))}
                     </div>
@@ -1023,7 +1115,7 @@ const DetailLocationBusinessScreen = ({ mapLoaded }) => {
                           Hủy
                         </button>
                         <button
-                          onClick={handleSubmit}
+                          onClick={handleSubmitRoomWithImages}
                           class="bg-blue-500 text-white px-6 py-2 rounded-full shadow-md hover:bg-blue-600"
                         >
                           Tạo

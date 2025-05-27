@@ -5,56 +5,78 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 function LoginScreen() {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [userId, setUserId] = useState('');
+
 
   //API CHECK ĐĂNG NHẬP
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    console.log('email: ', email);
+    console.log('password: ', password);
+    try {
+      const response = await fetch('http://localhost:3000/signin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userEmail: email, userPassword: password }),
+        credentials: 'include'
+      });
+
+      const data = await response.json();
+      console.log(data);
+      if (!response.ok) {
+        throw new Error(data.message || 'Đăng nhập thất bại');
+      }
+
+      // Điều hướng dựa trên role
+      
+      if (response.ok) {
+        let user_id = data;  // Giả sử API trả về userId trong đối tượng data
+        setUserId(data.data._id);
+        console.log('data: ', data.data) // Cập nhật userId vào state hoặc context
+        console.log('User ID:', userId);
+        localStorage.setItem('isAuthenticated', 'true');
+        // Sau khi login thành công, lưu id vào localStorage
+        localStorage.setItem('userId', data.data._id);
+        localStorage.setItem('userRole', data.data.userRole);
+        // navigate('/dashboard/business');
+        if (data.data.userRole === 'admin') {
+          navigate('/dashboard/admin');
+        } else if (data.data.userRole === 'location-owner') {
+          navigate('/dashboard/business');
+        }
+      } else {
+
+        alert('Login Failed', data.error || 'Please try again.');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('An error occurred', 'Please check your connection and try again.');
+    }
     // try {
-    //   const response = await fetch('http://localhost:5000/login', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({ email, password }),
-    //   });
+    //   // Tạm thời sử dụng dữ liệu tĩnh thay vì gọi API thực
+    //   const mockResponse = {
+    //     email: 'admin@example.com',
+    //     role: 'business', // Thay đổi thành 'business' để test
+    //   };
 
-    //   const data = await response.json();
-
-    //   if (!response.ok) {
-    //     throw new Error(data.message || 'Đăng nhập thất bại');
-    //   }
-
-    //   // Điều hướng dựa trên role
-    //   if (data.role === 'admin') {
+    //   // Giả lập điều hướng dựa trên role
+    //   if (mockResponse.role === 'admin') {
     //     navigate('/dashboard/admin');
-    //   } else if (data.role === 'business') {
+    //   } else if (mockResponse.role === 'business') {
     //     navigate('/dashboard/business');
     //   }
     // } catch (error) {
-    //   setError(error.message);
+    //   setError('Lỗi đăng nhập tạm thời.');
     // }
-    try {
-      // Tạm thời sử dụng dữ liệu tĩnh thay vì gọi API thực
-      const mockResponse = {
-        email: 'admin@example.com',
-        role: 'business', // Thay đổi thành 'business' để test
-      };
-  
-      // Giả lập điều hướng dựa trên role
-      if (mockResponse.role === 'admin') {
-        navigate('/dashboard/admin');
-      } else if (mockResponse.role === 'business') {
-        navigate('/dashboard/business');
-      }
-    } catch (error) {
-      setError('Lỗi đăng nhập tạm thời.');
-    }
   };
-  
+
 
   return (
     <div className="container">
@@ -69,25 +91,25 @@ function LoginScreen() {
           <div className="input-group">
             <label>Email</label>
             <input
-              type="email" 
+              type="email"
               placeholder="Abc@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)} />
           </div>
           <div className="input-group">
             <label>Mật khẩu</label>
-            <input 
-              type="password" 
-              placeholder="••••••••" 
+            <input
+              type="password"
+              placeholder="••••••••"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}/>
+              onChange={(e) => setPassword(e.target.value)} />
           </div>
           <div className="checkbox-group">
             <div className="remember-group">
-              <input type="checkbox" id="remember"/>
+              <input type="checkbox" id="remember" />
               <label class=" flex flex-wrap content-around align-center mb-0" htmlFor="remember">Nhớ mật khẩu</label>
             </div>
-            
+
             <a href="#" className="forgot-password">Quên mật khẩu?</a>
           </div>
           <button type="submit" className="login-button" onClick={handleLogin} >Đăng nhập</button>

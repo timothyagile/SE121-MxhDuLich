@@ -47,12 +47,13 @@ const BusinessDetailBookingScreen = () => {
     const fetchUserData = async () => {
         try {
             setLoading(true); 
-            const response = await fetch(`http://localhost:3000/user/getbyid/${userOfBookingId}`);
+            
+            const response = await fetch(`http://localhost:3000/user/getbyid/${booking.userId._id}`);
             const data = await response.json();
 
             if (response.ok) {
                 setUserData(data.data);
-                console.log('data of detail booking: ', data.data);
+               
             } else {
                 setError(data.message || 'Không thể lấy thông tin người dùng');
             }
@@ -66,6 +67,7 @@ const BusinessDetailBookingScreen = () => {
     const fetchLocationData = async () => {
         try {
             setLoading(true); 
+            console.log('booking.locationId: ', booking);
             const response = await fetch(`http://localhost:3000/locationbyid/${booking.locationId}`);
             const data = await response.json();
 
@@ -83,17 +85,30 @@ const BusinessDetailBookingScreen = () => {
     };
 
     useEffect(() => {
-        const userOfBooking = localStorage.getItem('userOfBookingId');
-        if (userOfBooking) {
-            console.log('get booking from localstorage: ', userOfBooking);
-            setUserOfBookingId(userOfBooking);
-        }
+        // Lấy dữ liệu từ localStorage chỉ khi bookingId thay đổi
         const storedBooking = localStorage.getItem('selectedBooking');
         if (storedBooking) {
-            console.log('get booking from localstorage: ', JSON.parse(storedBooking));
-            setBooking(JSON.parse(storedBooking));
+            const bookingObj = JSON.parse(storedBooking);
+            setBooking(bookingObj);
+            if (bookingObj.userId) {
+                setUserOfBookingId(bookingObj.userId.toString());
+            }
         }
-    }, [bookingId, booking?.status]);
+    }, [bookingId]);
+
+
+    useEffect(() => {
+        if (userOfBookingId && typeof userOfBookingId === 'string') {
+            fetchUserData();
+        }
+    }, [userOfBookingId]);
+
+    // Fetch location khi booking thay đổi và có locationId hợp lệ
+    useEffect(() => {
+        if (booking && booking.locationId) {
+            fetchLocationData();
+        }
+    }, [booking]);
 
     const handleUpdateBooking = async () => {
         const userConfirmed = window.confirm('Bạn có chắc chắn muốn xác nhận đơn đặt này?');
@@ -140,7 +155,7 @@ const BusinessDetailBookingScreen = () => {
         if (booking) {
             fetchLocationData();
         }
-    }, [userOfBookingId], [booking, booking?.status]);
+    }, [userOfBookingId, booking, booking?.status]); // eslint-disable-line react-hooks/exhaustive-deps
     
     return (
         <div class="container">
@@ -162,7 +177,7 @@ const BusinessDetailBookingScreen = () => {
                                     <div class="flex items-center mt-2">
                                         <FaMoneyBill class="mr-2 w-5"/>
                                         
-                                        <span class="text-green-500 ml-2">{booking?.totalPriceAfterTax} VND</span>
+                                        <span class="text-green-500 ml-2">{booking?.totalPriceAfterTax?.toLocaleString('vi-VN')} đ</span>
 
                                         {/* <span class="text-green-500 ml-2">34,000,000 đ</span>
                                         <span class="text-green-500 ml-2 status-label-2">- 50%</span> */}
@@ -208,143 +223,116 @@ const BusinessDetailBookingScreen = () => {
                             </div>
                             {currentTab === 'bookinginfo' && (
                                 <div class="border border-gray-200 rounded-b-lg p-4">
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <div class="mb-2 text-gray-500">Mã Booking</div>
-                                            <div class="mb-4">{booking?._id}</div>
-                                            <div class="mb-2 text-gray-500">Ngày checkin</div>
-                                            <div class="mb-4">{moment(booking?.checkinDate).format('DD/MM/YYYY HH:mm:ss')}</div>
-                                            <div class="mb-2 text-gray-500">Tổng tiền</div>
-                                            <div class="mb-4">{booking?.totalPriceAfterTax}</div>
-                                            {/* <div class="mb-2 text-gray-500">Tên liên hệ</div>
-                                            <div class="mb-4">{userData?.userName}</div>
-                                            <div class="mb-2 text-gray-500">Giới tính</div>
-                                            <div className="mb-4">
-                                                {userData?.gender === 'male' ? 'Nam' : 'Nữ'}
-                                            </div> */}
-                                        </div>
-                                        <div>
-                                            <div class="mb-2 text-gray-500">Ngày đặt</div>
-                                            <div class="mb-4">{moment(booking?.dateBooking).format('DD/MM/YYYY HH:mm:ss')}</div>
-                                            <div class="mb-2 text-gray-500">Ngày checkout</div>
-                                            <div class="mb-4">{moment(booking?.checkoutDate).format('DD/MM/YYYY HH:mm:ss')}</div>
-                                            {/* <div class="mb-2 text-gray-500">Số CMND/CCCD</div>
-                                            <div class="mb-4">079303041653</div> */}
-                                            <div class="mb-2 text-gray-500">Số tiền đã trả</div>
-                                            <div class="mb-4">{booking?.amountPaid}</div>
-                                            {/* <div class="mb-2 text-gray-500">Địa chỉ</div>
-                                            <div class="mb-4">{userData?.userPhoneNumber}</div> */}
-                                        </div>
-                                        <div class="mb-4">
-                                            <h2 class="font-bold mb-2">Phòng:</h2>
-                                            
-                                            <div className="flex flex-wrap gap-2">
-                                                {booking?.items.map((item, index) => (
-                                                    <div key={index} className="flex items-center bg-gray-200 rounded-full px-3 py-1">
-                                                        {/* {getFacilityIcon(item.roomId)} */}
-                                                        <span class="mr-2">Số lượng: </span>
-                                                        <span class="font-bold">{item.quantity}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        
-                                    </div>
-                                    <div class="flex items-center justify-between">
-                                            <div className="flex items-center justify-center mt-2">
-                                                <h2 class="text-black font-bold mr-2">Trạng thái</h2>
-                                                <span
-                                                className={`status-label${
-                                                    booking.status === 'canceled' 
-                                                    ? '' 
-                                                    : booking.status === 'complete' 
-                                                    ? '-2' 
-                                                    : '-1'
-                                                }`}
-                                                >
-                                                {booking.status === 'pending' && 'Chờ duyệt'}
-                                                {booking.status === 'confirm' && 'Đã xác nhận'}
-                                                {booking.status === 'canceled' && 'Đã hủy'}
-                                                {booking.status === 'complete' && 'Hoàn thành'}
-                                                {booking.status !== 'pending' && 
-                                                booking.status !== 'confirm' && 
-                                                booking.status !== 'canceled' && 
-                                                booking.status !== 'complete' && 
-                                                booking.status}
-                                                </span>
-                                                {/* <input 
-                                                    name="pricePerNight"
-                                            
-                                                     type="number" className="w-48 p-3 border border-gray-300 rounded-lg"></input> */}
-                                            </div>
-                                            
-                                            <div class="flex">
-                                                <button onClick={handleUpdateBooking} class="bg-blue-500 text-white px-6 py-2 rounded-full shadow-md hover:bg-blue-600">Xác nhận Booking</button>
-                                            </div>
-                                        </div>
-                                </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="border rounded-lg bg-gray-50 p-4 mb-4">
+        <div class="mb-2 text-gray-500 font-semibold border-b pb-1">Thông tin chung</div>
+        <div class="mb-2"><span class="text-gray-500">Mã Booking:</span> <span class="font-bold">{booking?._id}</span></div>
+        <div class="mb-2"><span class="text-gray-500">Ngày đặt:</span> {moment(booking?.dateBooking).format('DD/MM/YYYY HH:mm:ss')}</div>
+        <div class="mb-2"><span class="text-gray-500">Ngày checkin:</span> {moment(booking?.checkinDate).format('DD/MM/YYYY')}</div>
+        <div class="mb-2"><span class="text-gray-500">Ngày checkout:</span> {moment(booking?.checkoutDate).format('DD/MM/YYYY')}</div>
+        <div class="mb-2"><span class="text-gray-500">Trạng thái:</span> <span className={`status-label${booking.status === 'canceled' ? '' : booking.status === 'complete' ? '-2' : '-1'}`}>{booking.status === 'pending' && 'Chờ duyệt'}{booking.status === 'confirm' && 'Đã xác nhận'}{booking.status === 'canceled' && 'Đã hủy'}{booking.status === 'complete' && 'Hoàn thành'}{booking.status !== 'pending' && booking.status !== 'confirm' && booking.status !== 'canceled' && booking.status !== 'complete' && booking.status}</span></div>
+      </div>
+      <div class="border rounded-lg bg-gray-50 p-4 mb-4">
+        <div class="mb-2 text-gray-500 font-semibold border-b pb-1">Chi tiết thanh toán</div>
+        <div class="mb-2"><span class="text-gray-500">Tổng tiền:</span> <span class="font-bold text-blue-700">{booking?.totalPrice?.toLocaleString('vi-VN')} đ</span></div>
+        <div class="mb-2"><span class="text-gray-500">Giảm giá:</span> {booking?.discount ? `- ${booking.discount.toLocaleString('vi-VN')} đ` : '0 đ'}</div>
+        <div class="mb-2"><span class="text-gray-500">Tổng sau giảm:</span> {booking?.totalAfterDiscount?.toLocaleString('vi-VN')} đ</div>
+        <div class="mb-2"><span class="text-gray-500">Thuế:</span> {booking?.tax?.toLocaleString('vi-VN')} đ</div>
+        <div class="mb-2"><span class="text-gray-500">Tổng tiền sau thuế:</span> <span class="font-bold text-green-700">{booking?.totalPriceAfterTax?.toLocaleString('vi-VN')} đ</span></div>
+        <div class="mb-2"><span class="text-gray-500">Số tiền đã trả:</span> {booking?.amountPaid?.toLocaleString('vi-VN')} đ</div>
+        {booking?.voucherId && (
+          <>
+            <div class="mb-2 text-gray-500">Mã voucher:</div>
+            <div class="mb-2">{booking.voucherId}</div>
+          </>
+        )}
+      </div>
+    </div>
+    <div class="mb-4 border rounded-lg bg-gray-50 p-4">
+      <h2 class="font-bold mb-2 border-b pb-1">Danh sách phòng</h2>
+      <div className="flex flex-wrap gap-2">
+        {booking?.items?.map((item, idx) => (
+          <div key={idx} className="flex flex-col bg-white border rounded px-4 py-2 mb-2 shadow min-w-[180px]">
+            <div>
+              <span className="font-semibold">Phòng:</span> {item.roomId?.name || item.roomId}
+              {locationData?.address && (
+                <FontAwesomeIcon
+                  icon={faMapMarkerAlt}
+                  className="ml-2 text-blue-500 cursor-pointer"
+                  title="Xem trên bản đồ"
+                  onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationData.address)}`, '_blank')}
+                />
+              )}
+            </div>
+            <div><span className="font-semibold">Số lượng:</span> {item.quantity}</div>
+            <div><span className="font-semibold">Giá/phòng:</span> {item.price?.toLocaleString('vi-VN')} đ</div>
+            <div><span className="font-semibold">Số đêm:</span> {item.nights}</div>
+            <div><span className="font-semibold">Thành tiền:</span> {(item.price * item.quantity * item.nights)?.toLocaleString('vi-VN')} đ</div>
+          </div>
+        ))}
+      </div>
+    </div>
+    <div class="flex items-center justify-end mt-4">
+      <button
+        onClick={handleUpdateBooking}
+        class="bg-blue-500 text-white px-6 py-2 rounded-full shadow-md hover:bg-blue-600"
+      >
+        Xác nhận Booking
+      </button>
+    </div>
+  </div>
                             )}
                             {currentTab === 'customerinfo' && (
                                 <div class="border border-gray-200 rounded-b-lg p-4">
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <div class="mb-2 text-gray-500">Mã khách hàng</div>
-                                            <div class="mb-4">{userData?._id}</div>
-                                            <div class="mb-2 text-gray-500">Số điện thoại</div>
-                                            <div class="mb-4">{userData?.userPhoneNumber}</div>
-                                            <div class="mb-2 text-gray-500">Ngày sinh</div>
-                                            <div class="mb-4">{userData?.userDateOfBirth}</div>
-                                            <div class="mb-2 text-gray-500">Tên liên hệ</div>
-                                            <div class="mb-4">{userData?.userName}</div>
-                                            <div class="mb-2 text-gray-500">Giới tính</div>
-                                            <div className="mb-4">
-                                                {userData?.gender === 'male' ? 'Nam' : 'Nữ'}
-
-                                            </div>
-
-                                        </div>
-                                        <div>
-                                            <div class="mb-2 text-gray-500">Họ và tên</div>
-                                            <div class="mb-4">{userData?.userName}</div>
-                                            <div class="mb-2 text-gray-500">Địa chỉ email</div>
-                                            <div class="mb-4">{userData?.userEmail}</div>
-                                            {/* <div class="mb-2 text-gray-500">Số CMND/CCCD</div>
-                                            <div class="mb-4">079303041653</div> */}
-                                            <div class="mb-2 text-gray-500">Số điện thoại liên hệ</div>
-                                            <div class="mb-4">{userData?.userPhoneNumber}</div>
-                                            <div class="mb-2 text-gray-500">Địa chỉ</div>
-                                            <div class="mb-4">{userData?.userPhoneNumber}</div>
-                                        </div>
-                                    </div>
-                                </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="border rounded-lg bg-gray-50 p-4 mb-4">
+        <div class="mb-2 text-gray-500 font-semibold border-b pb-1">Thông tin khách hàng</div>
+        <div class="mb-2"><span class="text-gray-500">Mã khách hàng:</span> <span class="font-bold">{userData?._id}</span></div>
+        <div class="mb-2"><span class="text-gray-500">Số điện thoại:</span> {userData?.userPhoneNumber}</div>
+        <div class="mb-2"><span class="text-gray-500">Ngày sinh:</span> {userData?.userDateOfBirth}</div>
+        <div class="mb-2"><span class="text-gray-500">Tên liên hệ:</span> {userData?.userName}</div>
+        <div class="mb-2"><span class="text-gray-500">Giới tính:</span> {userData?.gender === 'male' ? 'Nam' : 'Nữ'}</div>
+      </div>
+      <div class="border rounded-lg bg-gray-50 p-4 mb-4">
+        <div class="mb-2 text-gray-500 font-semibold border-b pb-1">Thông tin liên hệ</div>
+        <div class="mb-2"><span class="text-gray-500">Họ và tên:</span> {userData?.userName}</div>
+        <div class="mb-2"><span class="text-gray-500">Địa chỉ email:</span> {userData?.userEmail}</div>
+        <div class="mb-2"><span class="text-gray-500">Số điện thoại liên hệ:</span> {userData?.userPhoneNumber}</div>
+        <div class="mb-2"><span class="text-gray-500">Địa chỉ:</span> {userData?.userPhoneNumber}</div>
+      </div>
+    </div>
+  </div>
                             )}
                             {currentTab === 'locationinfo' && (
                                 <div class="border border-gray-200 rounded-b-lg p-4">
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <div class="mb-2 text-gray-500">Mã địa điểm</div>
-                                        <div class="mb-4">{booking._id}</div>
-                                        <div class="mb-2 text-gray-500">Loại</div>
-                                        <div className="mb-4">
-                                            {
-                                                locationData?.category?.id === 'hotel' ? 'Khách sạn' :
-                                                locationData?.category?.id === 'homestay' ? 'Homestay' :
-                                                locationData?.category?.id === 'guest_home' ? 'Nhà nghỉ' :
-                                                'Danh mục không xác định'
-                                            }
-                                        </div>
-                                    </div>
-                                    
-                                    <div>
-                                        <div class="mb-2 text-gray-500">Tên địa điểm</div>
-                                        <div class="mb-4">{locationData.name}</div>
-                                        <div class="mb-2 text-gray-500">Địa chỉ</div>
-                                        <div class="mb-4">{locationData.address}</div>
-                                        <div class="mb-2 text-gray-500">Ngày đăng ký kinh doanh</div>
-                                        <div class="mb-4">{moment(locationData.dateCreated).format('DD/MM/YYYY HH:mm:ss')}</div>
-                                    </div>
-                                </div>
-                            </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="border rounded-lg bg-gray-50 p-4 mb-4">
+        <div class="mb-2 text-gray-500 font-semibold border-b pb-1">Thông tin địa điểm</div>
+        <div class="mb-2"><span class="text-gray-500">Mã địa điểm:</span> <span class="font-bold">{booking._id}</span></div>
+        <div class="mb-2"><span class="text-gray-500">Loại:</span> {
+          locationData?.category?.id === 'hotel' ? 'Khách sạn' :
+          locationData?.category?.id === 'homestay' ? 'Homestay' :
+          locationData?.category?.id === 'guest_home' ? 'Nhà nghỉ' :
+          'Danh mục không xác định'
+        }</div>
+      </div>
+      <div class="border rounded-lg bg-gray-50 p-4 mb-4">
+        <div class="mb-2 text-gray-500 font-semibold border-b pb-1">Địa chỉ & ngày đăng ký</div>
+        <div class="mb-2"><span class="text-gray-500">Tên địa điểm:</span> {locationData?.name}
+          {locationData?.address && (
+            <FontAwesomeIcon
+              icon={faMapMarkerAlt}
+              className="ml-2 text-blue-500 cursor-pointer"
+              title="Xem trên bản đồ"
+              onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationData.address)}`, '_blank')}
+            />
+          )}
+        </div>
+        <div class="mb-2"><span class="text-gray-500">Địa chỉ:</span> {locationData?.address}</div>
+        <div class="mb-2"><span class="text-gray-500">Ngày đăng ký kinh doanh:</span> {moment(locationData?.dateCreated).format('DD/MM/YYYY HH:mm:ss')}</div>
+      </div>
+    </div>
+  </div>
                             )}
                         </div>
                     </div>
