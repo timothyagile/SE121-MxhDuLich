@@ -488,8 +488,7 @@ const StatisticBusinessScreen = () => {
               />
             </div>
           </div>
-        </div>
-        <div className="mt-8">
+          <div className="mt-8">
           <h2 className="text-xl font-bold mb-2">
             Thống kê trạng thái booking ({years})
           </h2>
@@ -528,6 +527,8 @@ const StatisticBusinessScreen = () => {
             </tbody>
           </table>
         </div>
+        </div>
+        
       </div>
     </div>
   );
