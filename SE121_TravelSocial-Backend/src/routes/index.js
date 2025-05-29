@@ -35,6 +35,7 @@ const reactCommentRoute = require('./social/react-comment.route')
 const relationRoute = require('./social/relation.route')
 const socketRoute = require('./general/socket.route')
 const notificationRoute = require('./general/notification.route')
+const emailRoute = require('./general/email.route')
 
 const router = express.Router();
 //const io = app.get('io')
@@ -63,6 +64,7 @@ router.use('/', reactCommentRoute)
 router.use('/', relationRoute)
 router.use('/', socketRoute)
 router.use('/', voucherRoute)
+router.use('/', emailRoute)
 
 
 module.exports = router
