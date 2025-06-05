@@ -13,6 +13,7 @@ const serviceRoute = require('./booking/service.route')
 const reviewRoute = require('./booking/review.route')
 const VNPayRoute = require('./booking/vnpay.route')
 const voucherRoute = require('./booking/voucher.route')
+const vnpayRoute = require('./booking/vnpay.route')
 
 //Social route
 
@@ -65,6 +66,7 @@ router.use('/', relationRoute)
 router.use('/', socketRoute)
 router.use('/', voucherRoute)
 router.use('/', emailRoute)
+router.use('/', vnpayRoute)
 
 
 module.exports = router
