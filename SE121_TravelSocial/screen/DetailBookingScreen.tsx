@@ -150,22 +150,20 @@ export default function DetailBookingScreen({ navigation }: {navigation: NativeS
                 <View style ={{width:'100%', height:10, backgroundColor:'#E0DCDC', marginVertical:10, }}></View>
                 <View style={styles.bookingcontainer}>
                     <Text style={styles.yourbooking}>Booking của bạn</Text>
-                    <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
-                        <Text style={styles.firsttext}>Ngày</Text>
-                        <Text style={styles.secondtext}>{formatRoomDate(new Date(bookingDetails.checkinDate))} - {formatRoomDate(new Date(bookingDetails.checkoutDate))}</Text>
+                    <View style={styles.tableRow}>
+                        <Text style={styles.tableLabel}>Ngày</Text>
+                        <Text style={styles.tableValue}>{formatRoomDate(new Date(bookingDetails.checkinDate))} - {formatRoomDate(new Date(bookingDetails.checkoutDate))}</Text>
                     </View>
-    
-                    <View style={{flexDirection:'column', alignItems:'flex-start', marginTop:10,}}>
-                        <Text style={[styles.firsttext,{flexDirection:'column'} ]}>Số phòng</Text>
-                        <View>
+                    <View style={styles.tableRow}>
+                        <Text style={styles.tableLabel}>Số phòng</Text>
+                        <View style={{flex:1}}>
                             {bookingDetails?.items?.map((room: { roomId: {_id:string, name:string}; quantity: number }, index: number) => (
-                            <Text key={index} style={styles.secondtext}>
-                                {room.roomId.name}: {room.quantity} phòng
-                            </Text>
+                                <Text key={index} style={styles.tableValue}>
+                                    {room.roomId.name}: {room.quantity} phòng
+                                </Text>
                             ))}
                         </View>
                     </View>
-    
                 </View>
     
                 <View style ={{width:'100%', height:10, backgroundColor:'#E0DCDC', marginVertical:10, }}></View>
@@ -470,4 +468,24 @@ const styles = StyleSheet.create({
         fontSize: 16,
       },
 
+      tableRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#E0DCDC',
+      },
+      tableLabel: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        flex: 1,
+      },
+      tableValue: {
+        fontSize: 16,
+        flex: 2,
+        textAlign: 'right',
+      },
 });
+
+

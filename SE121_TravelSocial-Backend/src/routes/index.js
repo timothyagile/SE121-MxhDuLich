@@ -63,6 +63,7 @@ router.use('/', reactCommentRoute)
 router.use('/', relationRoute)
 router.use('/', socketRoute)
 router.use('/', voucherRoute)
+router.use('/', notificationRoute)
 
 
 module.exports = router
