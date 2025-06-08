@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native'
+import { View, Text, LogBox } from 'react-native'
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
@@ -37,6 +37,12 @@ import ViewMapScreen from '@/screen/ViewMapScreen';
 import VoucherScreen from '@/screen/VoucherScreen';
 import SocialScreen from '@/screen/SocialScreen';
 import PostDetailScreen from '@/screen/PostDetailScreen';
+
+LogBox.ignoreLogs([
+  'Encountered two children with the same key',
+  'Text strings must be rendered within a <Text> component.',
+  'A props object containing a "key" prop is being spread into JSX'
+]);
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 

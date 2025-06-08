@@ -444,15 +444,16 @@ const storeLocationDetails = async (data: any) => {
             <View style={{flexDirection:'row', justifyContent:'space-between'}}>
               <View style={[styles.inputContainer, {width:'47%'}]}>
                 
-                <TouchableOpacity onPress={showDatePicker1}>
+                <TouchableOpacity style={{flex:1, flexDirection:'row', alignItems:'center'}} onPress={showDatePicker1} activeOpacity={0.8}>
                   <FontAwesome name="calendar" size={20} color="gray" style={styles.iconLeft} />
+                  <TextInput
+                    placeholder="Checkin"
+                    value={selectedDate1}
+                    style={styles.input}
+                    editable={false}
+                    pointerEvents="none"
+                  />
                 </TouchableOpacity>
-                <TextInput
-                  readOnly
-                  placeholder="Checkin"
-                  value={selectedDate1}
-                  style={styles.input}
-                />
                 {showPicker1 && (
                   <DateTimePicker
                     value={date1 || new Date()}
@@ -463,15 +464,16 @@ const storeLocationDetails = async (data: any) => {
                 )}
               </View>
               <View style={[styles.inputContainer,{width:'47%'}]}>
-                <TouchableOpacity onPress={showDatePicker2}>
+                <TouchableOpacity style={{flex:1, flexDirection:'row', alignItems:'center'}} onPress={showDatePicker2} activeOpacity={0.8}>
                   <FontAwesome name="calendar" size={20} color="gray" style={styles.iconLeft} />
+                  <TextInput
+                    placeholder="Checkout"
+                    value={selectedDate2}
+                    style={styles.input}
+                    editable={false}
+                    pointerEvents="none"
+                  />
                 </TouchableOpacity>            
-                <TextInput
-                  readOnly
-                  placeholder="Checkout"
-                  value={selectedDate2}
-                  style={styles.input}
-                />
                 {showPicker2 && (
                   <DateTimePicker
                     value={date2 || new Date()}                    mode="date"
@@ -491,12 +493,14 @@ const storeLocationDetails = async (data: any) => {
                 keyboardType="numeric"
               />
               <FontAwesome name="chevron-down" size={20} color="gray" style={styles.iconRight} />
-            </View>            <TouchableOpacity onPress={()=> {
+            </View>            
+            <TouchableOpacity onPress={()=> {
               console.log('Navigating with ID: ', locationDetails._id);
               console.log('servicesOfLocation:', servicesOfLocation);
               
-              // Track the search/click event to recommendation system
+              //Track the search/click event to recommendation system
               if (userId && locationDetails._id) {
+                
                 trackEvents.click(userId, locationDetails._id, { 
                   action: 'search_rooms',
                   checkin_date: date1?.toISOString(),
@@ -508,8 +512,8 @@ const storeLocationDetails = async (data: any) => {
               navigation.navigate('available-room-screen', {
                 id: locationDetails._id,
                 checkinDate: date1, // Gửi ngày checkin
-                checkoutDate: date2, // Gửi ngày checkout
-                serviceOfLocation: servicesOfLocation, // Gửi dịch vụ của địa điểm
+                checkoutDate: date2,
+                serviceOfLocation: servicesOfLocation // Gửi dịch vụ của địa điểm
               });}} style={styles.searchButton}>
               <Text style={styles.searchButtonText}>Tìm kiếm</Text>
             </TouchableOpacity>

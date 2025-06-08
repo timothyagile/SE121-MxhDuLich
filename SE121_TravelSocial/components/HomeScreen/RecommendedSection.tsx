@@ -27,7 +27,7 @@ interface Location {
     [key: string]: any; // For other properties
 }
 
-export default function RecommendedSection({ categoryId, navigation }: PopularSectionProps) {
+const RecommendedSectionComponent = React.memo(function RecommendedSection({ categoryId, navigation }: PopularSectionProps) {
     const [likedItems, setLikedItems] = useState<LikedItems>({});
     const [locations, setLocations] = useState<Location[]>([]);
     const [loading, setLoading] = useState(true);
@@ -88,9 +88,9 @@ export default function RecommendedSection({ categoryId, navigation }: PopularSe
         getPopularLocations(1);
     }, []);
 
-    if (loading) {
-        return <ActivityIndicator size="large" color="#0000ff" />;
-    }
+    // if (loading) {
+    //     return <ActivityIndicator size="large" color="#0000ff" />;
+    // }
 
     return (
         <View style={{height:CARD_HEIGHT+50}}>
@@ -163,7 +163,9 @@ export default function RecommendedSection({ categoryId, navigation }: PopularSe
             )}
         </View>
     )
-}
+});
+
+export default RecommendedSectionComponent;
 
 const styles = StyleSheet.create({
 

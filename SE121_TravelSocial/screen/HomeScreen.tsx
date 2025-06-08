@@ -28,7 +28,6 @@ interface SectionItem {
 interface HomeSection {
     key: string;
     data: SectionItem[];
-    renderItem: (info: { item: SectionItem, index: number, section: HomeSection }) => React.ReactElement;
 }
 
 export default function HomeScreen ({navigation} : {navigation : NativeStackNavigatorProps})
@@ -73,39 +72,52 @@ export default function HomeScreen ({navigation} : {navigation : NativeStackNavi
         navigation.navigate('detail-screen', { id: location._id})
     }, [navigation]);
 
-    // Creating sections for the SectionList - memoized to prevent recreating on every render
+    // Tối ưu: renderItem duy nhất cho SectionList, truyền categoryId qua data
+    const renderItem = useCallback(
+      ({ item, section }: { item: SectionItem; section: HomeSection }) => {
+        switch (section.key) {
+          case 'popular':
+            return <PopularSection categoryId={item.categoryId} navigation={navigation} />;
+          case 'recommended':
+            return <RecommendedSection categoryId={item.categoryId} navigation={navigation} />;
+          case 'newEvent':
+            return <NewEventSection categoryId={item.categoryId} navigation={navigation} />;
+          case 'daily':
+            return <DailySection categoryId={item.categoryId} navigation={navigation} />;
+          case 'banner':
+            return <Image style={{ width: '100%', height: 200 }} source={require('../assets/images/banner.png')} />;
+          default:
+            return null;
+        }
+      },
+      [navigation]
+    );
+
+    // Tối ưu: chỉ truyền data, không truyền renderItem vào từng section
     const homeSections = useMemo<HomeSection[]>(() => [
-        {
-            key: 'popular',
-            data: [{ id: 'popular' }],
-            renderItem: () => <PopularSection categoryId={selectedCategory?.id} navigation={navigation} />,
-        },
-        {
-            key: 'recommended',
-            data: [{ id: 'recommended' }],
-            renderItem: () => <RecommendedSection categoryId={selectedCategory?.id} navigation={navigation} />,
-        },
-        {
-            key: 'newEvent',
-            data: [{ id: 'newEvent' }],
-            renderItem: () => <NewEventSection categoryId={selectedCategory?.id} navigation={navigation} />,
-        },
-        {
-            key: 'daily',
-            data: [{ id: 'daily' }],
-            renderItem: () => <DailySection categoryId={selectedCategory?.id} navigation={navigation} />,
-        },
-        {
-            key: 'banner',
-            data: [{ id: 'banner' }],
-            renderItem: () => <Image style={{width:'100%', height:200}} source={require('../assets/images/banner.png')}/>,
-        },
-    ], [selectedCategory, navigation]);
+      {
+        key: 'popular',
+        data: [{ id: 'popular', categoryId: selectedCategory?.id }],
+      },
+      {
+        key: 'recommended',
+        data: [{ id: 'recommended', categoryId: selectedCategory?.id }],
+      },
+      {
+        key: 'newEvent',
+        data: [{ id: 'newEvent', categoryId: selectedCategory?.id }],
+      },
+      {
+        key: 'daily',
+        data: [{ id: 'daily', categoryId: selectedCategory?.id }],
+      },
+      {
+        key: 'banner',
+        data: [{ id: 'banner' }],
+      },
+    ], [selectedCategory]);
 
     // Performance optimizations for section list
-    const renderItem = useCallback(({ section, item }: { section: HomeSection, item: SectionItem }) => 
-        section.renderItem({ item, index: 0, section }), [homeSections]);
-    
     const keyExtractor = useCallback((item: SectionItem) => item.id, []);
     
     return (

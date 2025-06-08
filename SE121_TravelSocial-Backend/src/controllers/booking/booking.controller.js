@@ -227,6 +227,9 @@ module.exports.calculateTotalEstimatedPrice = async (req, res, next) => {
             error: null,
         });
     } catch (error) {
+        console.error('[BookingCalc][Controller] Error:', error);
+        console.error('[BookingCalc][Controller] Input items:', JSON.stringify(items));
+        console.error('[BookingCalc][Controller] Input services:', JSON.stringify(services));
         next(error);
     }
 }

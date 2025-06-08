@@ -25,7 +25,7 @@ interface Location {
     [key: string]: any; // For other properties
 }
 
-export default function DailySection({ categoryId, navigation }: DailySectionProps) {
+const DailySectionComponent = React.memo(function DailySection({ categoryId, navigation }: DailySectionProps) {
     const [locations, setLocations] = useState<Location[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -160,7 +160,9 @@ export default function DailySection({ categoryId, navigation }: DailySectionPro
             />
         </View>
     );
-}
+});
+
+export default DailySectionComponent;
 
 const styles = StyleSheet.create({
     container: {

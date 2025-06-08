@@ -212,44 +212,50 @@ const calculateTotalEstimatedPrice = async (rooms, services) => {
     //Lấy thông tin của các phòng từ database
     let totalServicePrice = 0
     let totalRoomPrice = 0
-    if (rooms) {
-        const roomIds = rooms.map(r => new mongoose.Types.ObjectId(r.roomId))
-        const roomData = await Room.find({ _id: { $in: roomIds } }, { _id: 1, pricePerNight: 1})
-        
-        //Đưa data vào map để tối ưu thời gian
-        const roomMap = new Map()
-        roomData.forEach(r => roomMap.set(r._id.toString(), r.pricePerNight))
-
-        //Tính tổng giá các phòng
-        
-        for (const r of rooms) {
-            const roomPrice = roomMap.get(r.roomId)
-            if(!roomPrice)
-                throw new NotFoundException('Cannot found room')
-            totalRoomPrice += roomPrice * r.quantity * r.nights
+    try {
+        console.log('[BookingCalc] Input rooms:', JSON.stringify(rooms));
+        console.log('[BookingCalc] Input services:', JSON.stringify(services));
+        if (rooms) {
+            const roomIds = rooms.map(r => new mongoose.Types.ObjectId(r.roomId))
+            const roomData = await Room.find({ _id: { $in: roomIds } }, { _id: 1, pricePerNight: 1})
+            //Đưa data vào map để tối ưu thời gian
+            const roomMap = new Map()
+            roomData.forEach(r => roomMap.set(r._id.toString(), r.pricePerNight))
+            //Tính tổng giá các phòng
+            for (const r of rooms) {
+                const roomPrice = roomMap.get(r.roomId)
+                console.log(`[BookingCalc] RoomId: ${r.roomId}, Price: ${roomPrice}, Qty: ${r.quantity}, Nights: ${r.nights}`);
+                if(!roomPrice) {
+                    console.error(`[BookingCalc] Room not found: ${r.roomId}`);
+                    throw new NotFoundException('Cannot found room')
+                }
+                totalRoomPrice += roomPrice * r.quantity * r.nights
+            }
         }
-    }
-
-    //Lấy thông tin của các dịch vụ từ database
-    if (services) {
-        const serviceIds = services.map(s => new mongoose.Types.ObjectId(s.serviceId))
-        const serviceData = await Service.find({ _id: { $in: serviceIds } }, { _id: 1, price: 1})
-        
-        //Đưa data vào map để tối ưu thời gian
-        const serviceMap = new Map()
-        serviceData.forEach(s => roomMap.set(s._id.toString(), s.price))
-
-        //Tính tổng giá các phòng
-        
-        for (const s of services) {
-            const servicePrice = serviceMap.get(r.roomId)
-            if(!servicePrice)
-                throw new NotFoundException('Cannot found service')
-            totalServicePrice += servicePrice * s.quantity
+        //Lấy thông tin của các dịch vụ từ database
+        if (services) {
+            const serviceIds = services.map(s => new mongoose.Types.ObjectId(s.serviceId))
+            const serviceData = await Service.find({ _id: { $in: serviceIds } }, { _id: 1, price: 1})
+            //Đưa data vào map để tối ưu thời gian
+            const serviceMap = new Map()
+            serviceData.forEach(s => serviceMap.set(s._id.toString(), s.price))
+            //Tính tổng giá các dịch vụ
+            for (const s of services) {
+                const servicePrice = serviceMap.get(s.serviceId)
+                console.log(`[BookingCalc] ServiceId: ${s.serviceId}, Price: ${servicePrice}, Qty: ${s.quantity}`);
+                if(!servicePrice) {
+                    console.error(`[BookingCalc] Service not found: ${s.serviceId}`);
+                    throw new NotFoundException('Cannot found service')
+                }
+                totalServicePrice += servicePrice * s.quantity
+            }
         }
+        console.log(`[BookingCalc] totalRoomPrice: ${totalRoomPrice}, totalServicePrice: ${totalServicePrice}`);
+        return totalRoomPrice + totalServicePrice
+    } catch (err) {
+        console.error('[BookingCalc] Error in calculateTotalEstimatedPrice:', err);
+        throw err;
     }
-
-    return totalRoomPrice + totalServicePrice
 }
 
 const getRevenueByMonth = async (month, year) => {
