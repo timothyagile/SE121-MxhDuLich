@@ -25,6 +25,9 @@ interface Location {
     [key: string]: any; // For other properties
 }
 
+// Đặt cacheRef ngoài component để giữ cache khi SectionList remount
+const dailySectionCacheRef = { userId: null as string | null, data: [] as Location[] };
+
 const DailySectionComponent = React.memo(function DailySection({ categoryId, navigation }: DailySectionProps) {
     const [locations, setLocations] = useState<Location[]>([]);
     const [loading, setLoading] = useState(true);
@@ -34,14 +37,34 @@ const DailySectionComponent = React.memo(function DailySection({ categoryId, nav
     const [onEndReachedCalledDuringMomentum, setOnEndReachedCalledDuringMomentum] = useState(false);
     const flatListRef = useRef(null);
     const { userId } = useUser();
+    // Sử dụng cacheRef ngoài component
+    const cacheRef = dailySectionCacheRef;
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
     
     useEffect(() => {
+        // Nếu userId không đổi và đã có cache, dùng cache thay vì gọi API
+        if (cacheRef.userId === userId && cacheRef.data.length > 0) {
+            setLocations(cacheRef.data);
+            setLoading(false);
+            setHasMore(cacheRef.data.length > 0);
+            return;
+        }
         getRealtimeRecommendations(1);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userId]);
 
     const getRealtimeRecommendations = async (pageNumber: number) => {
         try {
             setLoading(true);
+            setErrorMsg(null);
+            // Kiểm tra kết nối mạng trước khi fetch
+            const networkState = await Network.getNetworkStateAsync();
+            if (!networkState.isConnected) {
+                setErrorMsg('Không có kết nối mạng. Vui lòng kiểm tra lại.');
+                setLoading(false);
+                setIsFetchingMore(false);
+                return;
+            }
             // Gọi API Python realtime_recommend với user_id
             let url = `${API_RCM_URL}/realtime-recommend`;
             if (userId) {
@@ -52,17 +75,24 @@ const DailySectionComponent = React.memo(function DailySection({ categoryId, nav
             const response = await fetch(url);
             const data = await response.json();
             if (data.recommendations) {
+                let newLocations: Location[];
                 if (pageNumber === 1) {
-                    setLocations(data.recommendations);
+                    newLocations = data.recommendations;
+                    setLocations(newLocations);
                 } else {
                     // Tránh trùng lặp
                     const newItems = data.recommendations as Location[];
-                    setLocations(prev => {
-                        const existingIds = new Set(prev.map(item => item._id || item.location_id));
-                        const uniqueNewItems = newItems.filter((item: Location) => !existingIds.has(item._id || item.location_id));
-                        return [...prev, ...uniqueNewItems];
-                    });
+                    newLocations = [
+                        ...locations,
+                        ...newItems.filter((item: Location) =>
+                            !(locations as Location[]).some(l => (l._id || l.location_id) === (item._id || item.location_id))
+                        )
+                    ];
+                    setLocations(newLocations);
                 }
+                // Cập nhật cache ngoài component
+                cacheRef.userId = userId || null;
+                cacheRef.data = newLocations;
                 setHasMore(data.recommendations.length > 0);
                 setPage(pageNumber + 1);
             } else {
@@ -70,7 +100,12 @@ const DailySectionComponent = React.memo(function DailySection({ categoryId, nav
             }
         } catch (error) {
             setHasMore(false);
-            console.error('Realtime Recommend API error:', error);
+            if (error instanceof TypeError && String(error).includes('Network request failed')) {
+                setErrorMsg('Không thể kết nối tới máy chủ. Vui lòng kiểm tra mạng hoặc thử lại sau.');
+            } else {
+                setErrorMsg('Đã xảy ra lỗi khi tải dữ liệu. Vui lòng thử lại.');
+            }
+            console.log('Realtime Recommend API error:', error);
         } finally {
             setIsFetchingMore(false);
             setLoading(false);
@@ -123,6 +158,18 @@ const DailySectionComponent = React.memo(function DailySection({ categoryId, nav
             <View style={{ padding: 20 }}>
                 <Text style={styles.titleText}>Gợi ý hằng ngày</Text>
                 <ActivityIndicator size="large" color="#0000ff" />
+                {errorMsg && <Text style={{ color: 'red', marginTop: 10 }}>{errorMsg}</Text>}
+            </View>
+        );
+    }
+    if (errorMsg && locations.length === 0) {
+        return (
+            <View style={{ padding: 20 }}>
+                <Text style={styles.titleText}>Gợi ý hằng ngày</Text>
+                <Text style={{ color: 'red', marginTop: 10 }}>{errorMsg}</Text>
+                <TouchableOpacity onPress={() => getRealtimeRecommendations(1)} style={{ marginTop: 10, backgroundColor: '#176FF2', padding: 10, borderRadius: 8 }}>
+                    <Text style={{ color: 'white', textAlign: 'center' }}>Thử lại</Text>
+                </TouchableOpacity>
             </View>
         );
     }
