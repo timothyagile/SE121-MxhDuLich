@@ -67,6 +67,7 @@ router.use('/', socketRoute)
 router.use('/', voucherRoute)
 router.use('/', emailRoute)
 router.use('/', vnpayRoute)
+router.use('/', notificationRoute)
 
 
 module.exports = router

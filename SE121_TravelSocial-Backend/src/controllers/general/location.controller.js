@@ -52,19 +52,27 @@ module.exports.createLocation = async (req, res, next) => {
             description,
             address,
             category,
+            status,
+            province,
+            minPrice,
+            latitude,
+            longtitude
         } = req.body;
         const parseredCategory = JSON.parse(category)
-        //console.log(res.locals.user._id)
         const images = req.files.map((file) => ({
             url: file.path,
             publicId: file.filename
         }))
-        // console.log(images)
         const locationData = new Location({
             name,
             description,
             address,
             category: parseredCategory,
+            status,
+            province,
+            minPrice,
+            latitude,
+            longtitude,
             ownerId: res.locals.user._id,
             image: images,
             slug: ''

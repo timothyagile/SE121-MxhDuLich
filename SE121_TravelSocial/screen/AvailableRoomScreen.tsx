@@ -275,7 +275,6 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
         });
     };
 
-    
     return (
 
         <View style={styles.container}>
@@ -300,148 +299,71 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                 <View style={styles.container}>
                 <View style={styles.body}>
                 {rooms.map((room, index) => (
-                    <View key={index} style={styles.roomcontainer}>
-                        <View style={styles.imageCarousel}>
+                    <View key={index} style={styles.roomCard}>
+                        <View style={styles.roomImageWrapper}>
+                          {room.image && room.image.length > 1 ? (
                             <FlatList
-                                data={images}
-                                horizontal={true}
-                                pagingEnabled
-                                showsHorizontalScrollIndicator={false}
-                                keyExtractor={(item, index) => index.toString()}
-                                renderItem={({ item }) => (
+                              data={room.image}
+                              horizontal
+                              pagingEnabled
+                              showsHorizontalScrollIndicator={false}
+                              keyExtractor={(item, idx) => item + idx}
+                              renderItem={({ item }) => (
                                 <Image
-                                    source={ item }
-                                    style={styles.roomImage}
+                                  source={{ uri: item }}
+                                  style={styles.roomImagePro}
                                 />
-                                )}
-                                onMomentumScrollEnd={onScrollEnd}
+                              )}
                             />
-                            <View style={styles.pagination}>
-                                {images.map((_, index) => (
-                                <View
-                                    key={index}
-                                    style={[
-                                    styles.dot,
-                                    index === currentIndex ? styles.activeDot : styles.inactiveDot,
-                                    ]}
-                                />
-                                ))}
-                            </View>
+                          ) : (
+                            <Image
+                              source={room.image && room.image.length > 0 ? { uri: room.image[0] } : require('../assets/images/room.jpg')}
+                              style={styles.roomImagePro}
+                            />
+                          )}
                         </View>
-                        <Text style={styles.title}>{room?.name || ''}</Text>
-                        <Text style={styles.roomDescription}>
-                            {room?.description || 'Mô tả phòng hiện chưa có'}
-                        </Text>
-                        <View style={styles.bedandarea}>
-                            
-                            {room.bed.map((bed, index) => (
-                                <View key={index} style={styles.backgroundBox}>
-                                    
-                                        <Image style={{width:17, height:17}}  source={getIcon(bed.icon)}/>
-                                        <Text style={styles.bed}>{bed.category} : {bed.quantity} </Text>
-                                    
-                                </View>
+                        <View style={styles.roomInfoBox}>
+                          <Text style={styles.roomName}>{room.name}</Text>
+                          <Text style={styles.roomDescriptionPro}>{room.description || 'Mô tả phòng hiện chưa có'}</Text>
+                          <View style={styles.roomMetaRow}>
+                            <View style={styles.metaItem}>
+                              <FontAwesome name="bed" size={16} color="#176FF2" />
+                              <Text style={styles.metaText}>{room.bed.map(b => `${b.category} x${b.quantity}`).join(', ')}</Text>
+                            </View>
+                            <View style={styles.metaItem}>
+                              <FontAwesome name="arrows-alt" size={16} color="#176FF2" />
+                              <Text style={styles.metaText}>{room.area} m²</Text>
+                            </View>
+                          </View>
+                          <View style={styles.roomMetaRow}>
+                            <View style={styles.metaItem}>
+                              <FontAwesome name="users" size={16} color="#176FF2" />
+                              <Text style={styles.metaText}>Tối đa {room.quantity} khách</Text>
+                            </View>
+                            <View style={styles.metaItem}>
+                              <FontAwesome name="money" size={16} color="#2DD7A4" />
+                              <Text style={[styles.metaText, { color: '#2DD7A4', fontWeight: 'bold' }]}>{room.pricePerNight.toLocaleString('vi-VN')} VND/đêm</Text>
+                            </View>
+                          </View>
+                          <View style={styles.facilityRow}>
+                            {room.facility.map((facility, idx) => (
+                              <View key={facility.id + idx} style={styles.facilityBox}>
+                                <Image source={getIcon(facility.id)} style={styles.facilityIcon} />
+                                <Text style={styles.facilityText}>{facility.name}</Text>
+                              </View>
                             ))}
-                            
-                            <View style={styles.areacontainer}>
-                                <Text style={styles.area}>Diện tích: </Text>
-                                <Text style={styles.area}>{room.area} m²</Text>
+                          </View>
+                          <View style={styles.roomActionRow}>
+                            <View style={styles.statusBox}>
+                              <Text style={styles.statusLabel}>Còn lại:</Text>
+                              <Text style={styles.statusValue}>{room.quantity} phòng</Text>
                             </View>
+                            <TouchableOpacity style={styles.choosebuttonPro} onPress={() => toggleModal(room._id)}>
+                              <Text style={styles.choosetextPro}>{selectedRoomCounts[room._id] ? `Đã chọn ${selectedRoomCounts[room._id]} phòng` : 'Chọn phòng'}</Text>
+                            </TouchableOpacity>
+                          </View>
                         </View>
-
-                        <View style = {styles.bedandarea}>
-                            <Image style={{width:17, height:17}} source={require('../assets/icons/service.png')}></Image>
-                            <Text style={styles.area}>   Dịch vụ:</Text>
-                        </View>
-
-                        <View style={styles.featureContainer}>
-                        
-                            {room.facility.map((facility, index) => (
-                                
-                                <View key={index} style={styles.backgroundBox}>
-                                    <Image
-                                        
-                                        source={getIcon(facility?.id)}
-                                        style={{height:17, width:17, marginRight:3,}}
-                                    />
-                                    <Text style={styles.area}>{facility.name}</Text>
-                                </View>
-                            ))}
-                        </View>
-
-                        <View style={styles.servicecontainer}>
-                            <View style={styles.state}>
-                                <Text style={styles.area}>Trạng thái: </Text>
-                                <Text style={styles.statetext}>{room.quantity}</Text>
-                                <Text style={styles.statetext}> phòng</Text>
-                            </View>
-                        </View>
-                        
-                        {/* <Text style={styles.chosedate}>Chọn ngày</Text>
-                        <View style={{flexDirection:'row', justifyContent:'space-between'}}>
-                            <View style={[styles.inputContainer, {width:'44%', marginLeft: 13,}]}>
-                                <TouchableOpacity onPress={showDatePicker1}>
-                                <FontAwesome name="calendar" size={20} color="gray" style={styles.iconLeft} />
-                                </TouchableOpacity>
-                                <TextInput
-                                readOnly
-                                placeholder="Checkin"
-                                value={selectedDate1}
-                                style={styles.input}
-                                />
-                                {showPicker1 && (
-                                <DateTimePicker
-                                    value={date1}
-                                    mode="date"
-                                    display="default"
-                                    onChange={onDateChange1}
-                                />
-                                )}
-                            </View>
-                            <View style={[styles.inputContainer,{width:'44%', marginRight: 13,}]}>
-                                <TouchableOpacity onPress={showDatePicker2}>
-                                <FontAwesome name="calendar" size={20} color="gray" style={styles.iconLeft} />
-                                </TouchableOpacity>            
-                                <TextInput
-                                readOnly
-                                placeholder="Checkout"
-                                value={selectedDate2}
-                                style={styles.input}
-                                />
-                                {showPicker2 && (
-                                <DateTimePicker
-                                    value={date2}
-                                    mode="date"
-                                    display="default"
-                                    onChange={onDateChange2}
-                                />
-                                )}
-                            </View>
-                            </View> */}
-
-                        <View style={styles.endcontainer}>
-                            <View style={{ flex: 4 }}>
-                                <Text style={styles.area2}>Giá</Text>
-                                <Text style={styles.pricetext}>{room.pricePerNight.toLocaleString('vi-VN')} VND</Text>
-                            </View>
-                            <View style={{ flex: 6, justifyContent: 'center', alignItems: 'center' }}>    
-                                <TouchableOpacity style={styles.choosebutton} onPress={() => toggleModal(room._id)}>
-                                    <Text style={styles.choosetext}>
-                                        {selectedRoomCounts[room._id] ? `Đã chọn ${selectedRoomCounts[room._id]} phòng` : "Chọn"}
-                                    </Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                        <View style={{  justifyContent: 'center', alignItems: 'center' }}>    
-                                <TouchableOpacity style={[styles.choosebutton, {width: '90%', marginBottom: 20}]} onPress={() => toggleModalService(room._id)}>
-                                <Text style={styles.choosetext}>
-                                    {selectedServices.length > 0
-                                    ? `Đã chọn ${selectedServices.reduce((total: any, item:any) => total + item.quantity, 0)} dịch vụ`
-                                    : 'Dịch vụ kèm theo (tùy chọn)'}
-                                </Text>
-                                </TouchableOpacity>
-                        </View>
-                    </View>
+                      </View>
                 ))}
 
                 </View>
@@ -538,171 +460,128 @@ const styles = StyleSheet.create({
         marginRight: 0, 
     },
 
-    roomcontainer:{
-        backgroundColor:'#FFFFFF',
-        borderRadius:8,
-        
-        marginHorizontal:10,
-        marginVertical:0,
-        marginBottom:20,
+    roomCard: {
+      backgroundColor: '#fff',
+      borderRadius: 16,
+      marginHorizontal: 10,
+      marginVertical: 12,
+      flexDirection: 'row',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.12,
+      shadowRadius: 8,
+      elevation: 4,
+      borderWidth: 1,
+      borderColor: '#e0e0e0',
+      overflow: 'hidden',
     },
-
-    title:{
-        fontSize:20,
-        fontWeight:'bold',
-        marginLeft:20,
-        marginTop:10,
-        position:'absolute',
+    roomImageWrapper: {
+      width: 130,
+      height: 130,
+      borderTopLeftRadius: 16,
+      borderBottomLeftRadius: 16,
+      overflow: 'hidden',
+      backgroundColor: '#f5f7fa',
+      alignItems: 'center',
+      justifyContent: 'center',
     },
-
-    roomDescription: {
-        fontSize: 14,
-        color: '#666',
-        marginBottom: 16,
-        lineHeight: 20,
-        marginLeft: 20,
+    roomImagePro: {
+      width: 130,
+      height: 130,
+      resizeMode: 'cover',
     },
-
-    bedandarea:{
-        flexDirection: 'row',
-        marginLeft:20,
-        marginTop:20,
+    roomInfoBox: {
+      flex: 1,
+      padding: 14,
+      justifyContent: 'space-between',
     },
-
-    bed:{
-        fontSize:14,
-        marginLeft:10,
+    roomName: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: '#176FF2',
+      marginBottom: 4,
     },
-
-    areacontainer:{
-        flexDirection:'row',
-        position:'absolute',
-        right:20,
+    roomDescriptionPro: {
+      fontSize: 13,
+      color: '#666',
+      marginBottom: 6,
     },
-
-    area:{
-        fontSize:14,
-        color: '#666',
+    roomMetaRow: {
+      flexDirection: 'row',
+      marginBottom: 4,
     },
-
-    area2:{
-        fontSize: 14,
+    metaItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginRight: 18,
     },
-
-    servicecontainer:{
-
+    metaText: {
+      fontSize: 13,
+      color: '#444',
+      marginLeft: 4,
     },
-
-    featureContainer: {
-        marginTop:10,
-        marginLeft:10,
-        flexDirection: 'row',
-        flexWrap: 'wrap',
+    facilityRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      marginVertical: 4,
     },
-    backgroundBox: {
-        
-        marginLeft: 10,
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#e0e0e0',
-        borderRadius: 8,
-        padding: 5,
-        margin: 5,
+    facilityBox: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: '#e6f0ff',
+      borderRadius: 8,
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+      marginRight: 6,
+      marginBottom: 4,
     },
-
-    state:{
-        width:170,
-        marginTop:20,
-        marginLeft: 20,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent:'center',
-        backgroundColor: '#ffffff',
-        borderRadius: 8,
-        padding: 5,
-        margin: 5,
-        shadowColor: '#196EEE',
-        shadowOffset: {
-            width: 0,
-            height: 4,
-          },
-          shadowOpacity: 2,
-          shadowRadius: 4,
-          elevation: 10,
+    facilityIcon: {
+      width: 16,
+      height: 16,
+      marginRight: 3,
+      resizeMode: 'contain',
     },
-
-    inputContainer: {
-        marginTop: 20,
-
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 8,
-        marginBottom: 12,
-        paddingLeft: 10,
-        paddingRight: 10,
-      },
-    input: {
-        flex: 1,
-        padding: 10,
-      },
-    iconLeft: {
-        marginRight: 10,
-      },
-
-    chosedate: {
-        marginLeft:20,
-        marginTop:20,
-        fontSize:20,
-        fontWeight:'bold',
+    facilityText: {
+      fontSize: 12,
+      color: '#176FF2',
     },
-
-    statetext:{
-        fontSize:14,
-        color:'#196EEE',
-        shadowColor: '#196EEE',
-        shadowOffset: {
-            width: 0,
-            height: 1,
-          },
-          shadowOpacity: 2,
-          shadowRadius: 5,
-          elevation: 10,
+    roomActionRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: 8,
+      justifyContent: 'space-between',
     },
-
-    endcontainer:{
-        marginTop:10,
-        flexDirection:'row',
-        marginLeft:20,
-        marginBottom:20,
+    statusBox: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: '#f5f7fa',
+      borderRadius: 8,
+      paddingHorizontal: 10,
+      paddingVertical: 4,
     },
-
-    choosebutton:{
-        borderRadius:10,
-        backgroundColor: '#176FF2',
-        padding: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-        alignContent:'center',
-        width:200,
-        height:50,
+    statusLabel: {
+      fontSize: 13,
+      color: '#888',
+      marginRight: 4,
     },
-
-    choosetext:{
-        color:'white',
-        fontSize: 22,
-        fontWeight:'600',
+    statusValue: {
+      fontSize: 14,
+      color: '#2DD7A4',
+      fontWeight: 'bold',
     },
-
-    pricetext:{
-        color:'#2DD7A4',
-        fontSize: 16 ,
-        fontWeight:'600',
+    choosebuttonPro: {
+      borderRadius: 10,
+      backgroundColor: '#176FF2',
+      paddingVertical: 8,
+      paddingHorizontal: 18,
+      alignItems: 'center',
+      justifyContent: 'center',
+      minWidth: 100,
     },
-    
-    boxText:{
-
+    choosetextPro: {
+      color: 'white',
+      fontSize: 16,
+      fontWeight: 'bold',
     },
 
     header: {

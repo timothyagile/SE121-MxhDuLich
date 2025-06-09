@@ -4,12 +4,17 @@
 .sidebar {
   border-radius: 10px;
   /* width: 70%; */
-  height: 110%;
+  min-height: 100vh;
+  height: 100%;
   background-image: var(--gradient-blue-sidebar);
   padding: 10px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
 }
 
 .sidebar-header {
@@ -73,7 +78,7 @@
 
 .menu-item {
   border-radius: 5px;
-  width: 80%;
+  /* width: 80%; */
   display: flex;
   align-items: center;
   padding: 10px;
@@ -82,15 +87,33 @@
 }
 
 .menu-item:hover {
-  width: 80%;
+  /* width: 80%; */
   background-color: var(--blue-color);
 }
 
 .menu-item.active {
-  width: 80%;
+  /* width: 80%; */
   background-color: var(--white-color);
 }
 
 .icon-active {
   color: #ffffff;
+}
+
+/* Đảm bảo phần nội dung chính có margin-left đủ để không bị đè lên sidebar cố định */
+.container {
+  margin-left: 0px; /* hoặc đúng bằng width của sidebar */
+  /* width: calc(100% - 150px); */
+}
+
+@media (max-width: 978px) {
+  .sidebar {
+    position: static;
+    min-height: auto;
+    height: auto;
+  }
+  .container {
+    margin-left: 0;
+    width: 100%;
+  }
 }

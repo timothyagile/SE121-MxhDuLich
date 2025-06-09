@@ -51,17 +51,17 @@ class PreviewBookingBuilder {
     async setServices(services) {
         if(services && services.length > 0) {
             const serviceMap = await Service.find(
-                { _id: { $in: services.map(r => r.roomId) } },
+                { _id: { $in: services.map(r => r.serviceId) } },
                 { _id: 1, price: 1, name: 1 },
             ).then(data => {
-                return new Map(data.map(r => [r._id.toString(), r.pricePerNight, r.name]));
+                return new Map(data.map(r => [r._id.toString(), r.price, r.name]));
             });
     
             this.booking.services = services.map(service => {
-                const price = roomMap.get(service.serviceId)
-                const name = roomMap.get(service.name)
+                const price = serviceMap.get(service.serviceId)
+                const name = serviceMap.get(service.name)
                 if (!price) {
-                    throw new Error(`Room with id ${service.roomId} not found`)
+                    throw new Error(`service with id ${service.serviceId} not found`)
                 }
                 return {
                     serviceId: service.serviceId,

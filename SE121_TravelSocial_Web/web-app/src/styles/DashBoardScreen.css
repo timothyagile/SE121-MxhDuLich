@@ -45,7 +45,7 @@
   }
 
   .rightframe .user-info {
-    padding: 10px;
+    padding: 30px;
   }
 
   .rightframe img {
@@ -121,6 +121,11 @@
   width: 100%;
 }
 
+::after,
+::before {
+  box-sizing: content-box;
+}
+
 .sub-title {
   width: 100%;
   position: relative;
@@ -186,17 +191,26 @@
 }
 
 .dashboardbody {
-  width: 100%;
+  /* width: 100vw; */
+  /* min-height: 100vh; */
   display: flex;
-  height: 90%;
+  flex-direction: row;
+  background: #f7fafd;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .leftframe {
-  margin-left: 10px;
-  /* width: 60%; */
+  /* flex: 2 1 0; */
   min-width: 60%;
-
-  display: block;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 10%);
+  background: #fff;
+  border-radius: 12px;
+  margin: 16px 8px 16px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
 }
 
 .chart {
@@ -214,7 +228,7 @@
   border-radius: 10px;
   background-color: var(--blue-opacity04-color);
   border-radius: 6px;
-  padding: 5px;
+  padding: 15px;
   position: relative;
 }
 
@@ -319,7 +333,7 @@
 
 .new-booking {
   width: 100%;
-  height: 66.5%;
+  height: 160vh;
   margin-top: 10px;
   border-radius: 5px;
   border: 1px solid var(--border-color);
@@ -388,14 +402,16 @@
 }
 
 .rightframe {
-  margin-left: 10px;
-  padding-left: 10px;
-  padding-right: 10px;
-
-  /* width: 40%; */
-  height: 100%;
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 10%);
+  background: #fff;
+  border-radius: 12px;
+  margin: 16px 0 16px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
 }
 
 .staticbydate {
@@ -418,7 +434,7 @@
   background-image: var(--gradient-blue-customer);
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 16px;
+  padding: 30px;
   margin-bottom: 15px;
 }
 

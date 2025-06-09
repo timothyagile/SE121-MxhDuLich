@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import React from 'react';
 import '../styles/SideBar.css';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaHome, FaMapMarkerAlt, FaBookOpen, FaServicestack, FaChartBar } from 'react-icons/fa';
+import { FaHome, FaMapMarkerAlt, FaBookOpen, FaServicestack, FaChartBar, FaStickerMule, FaTicketAlt } from 'react-icons/fa';
 import { RiCustomerServiceFill } from "react-icons/ri";
 
 const SideBar = ({role}) => {
@@ -30,6 +30,7 @@ const SideBar = ({role}) => {
       active: <FaServicestack className="text-white" />,
       link:"/booking/list",
     },
+
     {
       inactive: <FaChartBar />,
       active: <FaChartBar className="text-white" />,
@@ -41,6 +42,11 @@ const SideBar = ({role}) => {
     { inactive: <FaHome />, active: <FaHome className="text-white" />, link: "/dashboard/business" },
     { inactive: <FaBookOpen />, active: <FaBookOpen className="text-white" />, link: "/business/location/list" },
     { inactive: <FaServicestack />, active: <FaServicestack className="text-white" />, link: "/business/booking/list" },
+        {
+      inactive: <FaTicketAlt />,
+      active: <FaTicketAlt className="text-white" />,
+      link:"/business/voucher",
+    },
     { inactive: <RiCustomerServiceFill/>, active: <RiCustomerServiceFill className="text-white" />, link: "/business/chat" },
     { inactive: <FaChartBar />,  active: <FaChartBar className="text-white" />,  link:"business/statistic" },
   ];

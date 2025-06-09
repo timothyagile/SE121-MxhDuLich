@@ -28,8 +28,14 @@ interface SectionItem {
 interface HomeSection {
     key: string;
     data: SectionItem[];
-    renderItem: (info: { item: SectionItem, index: number, section: HomeSection }) => React.ReactElement;
 }
+
+// --- Đặt các ref instance ngoài function component để giữ nguyên UI state ---
+let popularSectionInstance: any = null;
+let recommendedSectionInstance: any = null;
+let newEventSectionInstance: any = null;
+let dailySectionInstance: any = null;
+let bannerSectionInstance: any = null;
 
 export default function HomeScreen ({navigation} : {navigation : NativeStackNavigatorProps})
 {
@@ -73,39 +79,76 @@ export default function HomeScreen ({navigation} : {navigation : NativeStackNavi
         navigation.navigate('detail-screen', { id: location._id})
     }, [navigation]);
 
-    // Creating sections for the SectionList - memoized to prevent recreating on every render
+    // Tạo ref cho từng section instance để giữ nguyên UI state
+    const popularSectionRef = useRef<any>(null);
+    const recommendedSectionRef = useRef<any>(null);
+    const newEventSectionRef = useRef<any>(null);
+    const dailySectionRef = useRef<any>(null);
+    const bannerSectionRef = useRef<any>(null);
+
+    // Khởi tạo instance một lần duy nhất ở module scope
+    if (!popularSectionInstance) {
+        popularSectionInstance = <PopularSection categoryId={selectedCategory?.id} navigation={navigation} />;
+    }
+    if (!recommendedSectionInstance) {
+        recommendedSectionInstance = <RecommendedSection categoryId={selectedCategory?.id} navigation={navigation} />;
+    }
+    if (!newEventSectionInstance) {
+        newEventSectionInstance = <NewEventSection categoryId={selectedCategory?.id} navigation={navigation} />;
+    }
+    if (!dailySectionInstance) {
+        dailySectionInstance = <DailySection categoryId={selectedCategory?.id} navigation={navigation} />;
+    }
+    if (!bannerSectionInstance) {
+        bannerSectionInstance = <Image style={{ width: '100%', height: 200 }} source={require('../assets/images/banner.png')} />;
+    }
+
+    // renderItem luôn trả về instance từ ref ngoài component
+    const renderItem = useCallback(
+      ({ item, section }: { item: SectionItem; section: HomeSection }) => {
+        switch (section.key) {
+          case 'popular':
+            return popularSectionInstance;
+          case 'recommended':
+            return recommendedSectionInstance;
+          case 'newEvent':
+            return newEventSectionInstance;
+          case 'daily':
+            return dailySectionInstance;
+          case 'banner':
+            return bannerSectionInstance;
+          default:
+            return null;
+        }
+      },
+      []
+    );
+
+    // Tối ưu: chỉ truyền data, không truyền renderItem vào từng section
     const homeSections = useMemo<HomeSection[]>(() => [
-        {
-            key: 'popular',
-            data: [{ id: 'popular' }],
-            renderItem: () => <PopularSection categoryId={selectedCategory?.id} navigation={navigation} />,
-        },
-        {
-            key: 'recommended',
-            data: [{ id: 'recommended' }],
-            renderItem: () => <RecommendedSection categoryId={selectedCategory?.id} navigation={navigation} />,
-        },
-        {
-            key: 'newEvent',
-            data: [{ id: 'newEvent' }],
-            renderItem: () => <NewEventSection categoryId={selectedCategory?.id} navigation={navigation} />,
-        },
-        {
-            key: 'daily',
-            data: [{ id: 'daily' }],
-            renderItem: () => <DailySection categoryId={selectedCategory?.id} navigation={navigation} />,
-        },
-        {
-            key: 'banner',
-            data: [{ id: 'banner' }],
-            renderItem: () => <Image style={{width:'100%', height:200}} source={require('../assets/images/banner.png')}/>,
-        },
-    ], [selectedCategory, navigation]);
+      {
+        key: 'popular',
+        data: [{ id: 'popular', categoryId: selectedCategory?.id }],
+      },
+      {
+        key: 'recommended',
+        data: [{ id: 'recommended', categoryId: selectedCategory?.id }],
+      },
+      {
+        key: 'newEvent',
+        data: [{ id: 'newEvent', categoryId: selectedCategory?.id }],
+      },
+      {
+        key: 'daily',
+        data: [{ id: 'daily', categoryId: selectedCategory?.id }],
+      },
+      {
+        key: 'banner',
+        data: [{ id: 'banner' }],
+      },
+    ], [selectedCategory]);
 
     // Performance optimizations for section list
-    const renderItem = useCallback(({ section, item }: { section: HomeSection, item: SectionItem }) => 
-        section.renderItem({ item, index: 0, section }), [homeSections]);
-    
     const keyExtractor = useCallback((item: SectionItem) => item.id, []);
     
     return (
@@ -169,7 +212,7 @@ export default function HomeScreen ({navigation} : {navigation : NativeStackNavi
                 removeClippedSubviews={true}
                 initialNumToRender={2}
                 maxToRenderPerBatch={1}
-                windowSize={3}
+                windowSize={7}
                 updateCellsBatchingPeriod={100}
                 onEndReachedThreshold={0.5}
                 maintainVisibleContentPosition={{

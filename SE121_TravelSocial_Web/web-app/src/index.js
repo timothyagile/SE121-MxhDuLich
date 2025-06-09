@@ -29,6 +29,7 @@ import DetailLocationBusinessScreen from "./pagesofbusiness/DetailLocationBusine
 import AddLocationScreen from "./pagesofbusiness/AddLocationScreen";
 import ChatBusinessScreen from "./pagesofbusiness/ChatBusinessScreen";
 import BusinessDetailBookingScreen from "./pagesofbusiness/BusinessDetailBookingScreen";
+import VoucherBusinessScreen from "./pagesofbusiness/VoucherBusinessScreen";
 
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -108,6 +109,7 @@ const AppWrapper = () => {
             <Route path="/location/add" element={<AddLocationScreen />} />
             Thống kê
             <Route path="/statistic" element={<StatisticScreen />} />
+            <Route path="/business/voucher" element={<VoucherBusinessScreen />} />
           </Route>
         </Routes>
       </Router>

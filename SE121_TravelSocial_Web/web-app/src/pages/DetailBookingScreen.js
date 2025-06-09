@@ -1,16 +1,12 @@
 import React from "react";
 import "../styles/DetailBookingScreen.css";
-import { FaBell, FaCalendar, FaEnvelope, FaMoneyBill } from "react-icons/fa";
+import { FaEnvelope, FaMoneyBill } from "react-icons/fa";
 import { useState, useEffect } from "react";
-import pagination from "../components/Pagination";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faPhoneAlt,
-  faEnvelope,
+
   faUser,
   faMapMarkerAlt,
-  faMemo,
-  faLocation,
 } from "@fortawesome/free-solid-svg-icons";
 import { useParams } from "react-router-dom";
 
@@ -20,16 +16,12 @@ import moment from "moment";
 
 const DetailBookingScreen = () => {
   const [currentTab, setCurrentTab] = useState("customerinfo");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [setError] = useState(null);
   const [booking, setBooking] = useState([]);
   const [locationData, setLocationData] = useState(null);
   const [userData, setUserData] = useState([]);
   const [userOfBookingId, setUserOfBookingId] = useState(null);
-  const [room, setRoom] = useState([]);
-  const [location, setLocation] = useState([]);
-  const [owner, setOwner] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [setLoading] = useState(true);
 
   const { id: bookingId } = useParams();
 
@@ -173,6 +165,7 @@ const DetailBookingScreen = () => {
         fetchLocationData();
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [userOfBookingId],
     [booking, booking?.status]
   );

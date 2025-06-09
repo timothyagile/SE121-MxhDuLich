@@ -227,6 +227,9 @@ module.exports.calculateTotalEstimatedPrice = async (req, res, next) => {
             error: null,
         });
     } catch (error) {
+        console.error('[BookingCalc][Controller] Error:', error);
+        console.error('[BookingCalc][Controller] Input items:', JSON.stringify(items));
+        console.error('[BookingCalc][Controller] Input services:', JSON.stringify(services));
         next(error);
     }
 }
@@ -259,3 +262,17 @@ module.exports.getPreviewBooking = async (req, res, ) => {
         error: null,
     });
 }
+
+module.exports.getFullBookingByBusinessId = async (req, res, next) => {
+    const { businessId } = req.params;
+    try {
+        const result = await bookingSvc.getFullBookingByBusinessId(businessId);
+        res.status(200).json({
+            isSuccess: true,
+            data: result,
+            error: null
+        });
+    } catch (error) {
+        next(error);
+    }
+};
