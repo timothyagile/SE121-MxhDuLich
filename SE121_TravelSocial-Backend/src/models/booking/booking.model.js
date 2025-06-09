@@ -67,7 +67,7 @@ const BookingSchema = new Schema({
     amountPaid: {type: Number, default: 0},
     status: {
         type: String,
-        enum: ['pending', 'confirm' ,'complete', 'canceled'],
+        enum: ['pending', 'paid' ,'confirm' ,'complete', 'canceled'],
         default: 'pending'
     }
 }, {collection: 'Booking', timestamps: true});
