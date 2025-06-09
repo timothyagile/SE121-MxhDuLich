@@ -1,0 +1,132 @@
+@startuml
+actor Client
+participant BookingController
+participant PreviewBookingService
+database Redis
+participant BookingService
+participant RoomService
+participant VoucherService
+participant VoucherUserService
+database MongoDB
+
+title Booking Flow Sequence Diagram
+
+== Create Preview Booking ==
+Client -> BookingController: POST /booking/preview (payload: {rooms, services})
+activate BookingController
+BookingController -> PreviewBookingService: createBookingPreview(userId, payload)
+    activate PreviewBookingService
+    note right of PreviewBookingService: Internally uses PreviewBookingBuilder
+    PreviewBookingService -> MongoDB: Fetch Room details (for price, name, etc.)
+    activate MongoDB
+    MongoDB --> PreviewBookingService: Room data
+    deactivate MongoDB
+    PreviewBookingService -> MongoDB: Fetch Service details (for price, name, etc.)
+    activate MongoDB
+    MongoDB --> PreviewBookingService: Service data
+    deactivate MongoDB
+    note right of PreviewBookingService: PreviewBookingBuilder calculates total price, tax for preview.
+    PreviewBookingService -> Redis: SET preview data (key: `booking_preview:<userId>:<previewId>`)
+    activate Redis
+    Redis --> PreviewBookingService: Success
+    deactivate Redis
+    PreviewBookingService --> BookingController: previewId
+    deactivate PreviewBookingService
+BookingController --> Client: { previewId }
+deactivate BookingController
+
+== Create Booking ==
+Client -> BookingController: POST /booking/create (payload: {checkinDate, checkoutDate, voucherId?, preview_bookingId})
+activate BookingController
+BookingController -> BookingService: createBooking(userId, payload, preview_bookingId)
+    activate BookingService
+    BookingService -> PreviewBookingService: getBookingPreview(userId, preview_bookingId)
+        activate PreviewBookingService
+        PreviewBookingService -> Redis: GET preview data (key: `booking_preview:<userId>:<preview_bookingId>`)
+        activate Redis
+        Redis --> PreviewBookingService: Full preview object (with items, services, totalPrice from builder)
+        deactivate Redis
+        PreviewBookingService --> BookingService: Full preview object
+        deactivate PreviewBookingService
+
+    opt voucherId is present in payload
+        BookingService -> VoucherService: getVoucherById(voucherId)
+            activate VoucherService
+            VoucherService -> MongoDB: Find Voucher by ID
+            activate MongoDB
+            MongoDB --> VoucherService: Voucher details
+            deactivate MongoDB
+            VoucherService --> BookingService: Voucher object
+            deactivate VoucherService
+    end
+
+    BookingService -> BookingService: Start DB Transaction (Mongoose Session)
+    note right of BookingService: session starts
+
+    BookingService -> RoomService: getRoomAvailable(previewBooking.items, payload.checkinDate, payload.checkoutDate, session)
+        activate RoomService
+        RoomService -> MongoDB: Check room quantities & existing bookings in date range
+        activate MongoDB
+        MongoDB --> RoomService: Availability data
+        deactivate MongoDB
+        RoomService --> BookingService: boolean (isAvailable)
+        deactivate RoomService
+
+    alt Rooms are Available
+        opt voucherId and Voucher object exist
+            BookingService -> VoucherService: verifyVoucher(voucher.code, preview_bookingId, userId, session)
+                activate VoucherService
+                note left of VoucherService: verifyVoucher fetches preview again via PreviewBookingService\n to get totalPrice for validation if needed.
+                VoucherService -> PreviewBookingService: getBookingPreview(userId, preview_bookingId)
+                    activate PreviewBookingService
+                    PreviewBookingService -> Redis: GET preview data
+                    activate Redis
+                    Redis --> PreviewBookingService: Full preview object
+                    deactivate Redis
+                    PreviewBookingService --> VoucherService: Full preview object
+                    deactivate PreviewBookingService
+                VoucherService -> VoucherService: Validate voucher (dates, usage, minOrderValue, etc.) against preview total
+                VoucherService -> VoucherService: Calculate discountAmount
+                VoucherService --> BookingService: { discountAmount, totalPriceAfterDiscount }
+                deactivate VoucherService
+        end
+
+        note right of BookingService: Uses BookingBuilder internally to set all booking fields:\nuserId, dates, items (from preview),\nservices (from preview), price (from preview),\ndiscount (if any), tax, voucherId (if any).
+        BookingService -> BookingService: Build final Booking object (via BookingBuilder)
+
+        BookingService -> MongoDB: Save Booking (with session)
+        activate MongoDB
+        MongoDB --> BookingService: savedBooking
+        deactivate MongoDB
+
+        opt voucherId and discountAmount was applied
+            BookingService -> VoucherService: updateVoucher(voucherId, { $inc: { usesCount: 1 } }, session)
+                activate VoucherService
+                VoucherService -> MongoDB: Update Voucher.usesCount
+                activate MongoDB
+                MongoDB --> VoucherService: Success
+                deactivate MongoDB
+                deactivate VoucherService
+
+            BookingService -> VoucherUserService: addVoucherUsage(userId, voucher.code, session)
+                activate VoucherUserService
+                VoucherUserService -> MongoDB: Save UserVoucher usage record
+                activate MongoDB
+                MongoDB --> VoucherUserService: Success
+                deactivate MongoDB
+                deactivate VoucherUserService
+        end
+
+        BookingService -> BookingService: Commit DB Transaction
+        note right of BookingService: session commits
+        BookingService --> BookingController: savedBooking
+    else Rooms are Not Available
+        BookingService -> BookingService: Abort DB Transaction
+        note right of BookingService: session aborts
+        BookingService --> BookingController: Error: "Phòng đã được đặt" (Room not available)
+    end
+    deactivate BookingService
+BookingController --> Client: Booking result or Error
+deactivate BookingController
+
+@enduml

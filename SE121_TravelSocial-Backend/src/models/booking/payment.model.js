@@ -4,8 +4,8 @@ const Schema = mongoose.Schema;
 
 const PaymentSchema = new Schema({
     paymentMethodId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'PaymentMethod',
+        type: String,
+        enum: ['VNPAY', 'MOMO', 'ZALOPAY', 'BANK_TRANSFER'], // Danh sách các phương thức thanh toán
         require: true,
     },
     amount: {type: Number, require: true},
