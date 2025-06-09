@@ -30,6 +30,13 @@ interface HomeSection {
     data: SectionItem[];
 }
 
+// --- Đặt các ref instance ngoài function component để giữ nguyên UI state ---
+let popularSectionInstance: any = null;
+let recommendedSectionInstance: any = null;
+let newEventSectionInstance: any = null;
+let dailySectionInstance: any = null;
+let bannerSectionInstance: any = null;
+
 export default function HomeScreen ({navigation} : {navigation : NativeStackNavigatorProps})
 {
     const [selectedCategory, setSelectedCategory] = useState(categoryData.at(0));
@@ -72,25 +79,49 @@ export default function HomeScreen ({navigation} : {navigation : NativeStackNavi
         navigation.navigate('detail-screen', { id: location._id})
     }, [navigation]);
 
-    // Tối ưu: renderItem duy nhất cho SectionList, truyền categoryId qua data
+    // Tạo ref cho từng section instance để giữ nguyên UI state
+    const popularSectionRef = useRef<any>(null);
+    const recommendedSectionRef = useRef<any>(null);
+    const newEventSectionRef = useRef<any>(null);
+    const dailySectionRef = useRef<any>(null);
+    const bannerSectionRef = useRef<any>(null);
+
+    // Khởi tạo instance một lần duy nhất ở module scope
+    if (!popularSectionInstance) {
+        popularSectionInstance = <PopularSection categoryId={selectedCategory?.id} navigation={navigation} />;
+    }
+    if (!recommendedSectionInstance) {
+        recommendedSectionInstance = <RecommendedSection categoryId={selectedCategory?.id} navigation={navigation} />;
+    }
+    if (!newEventSectionInstance) {
+        newEventSectionInstance = <NewEventSection categoryId={selectedCategory?.id} navigation={navigation} />;
+    }
+    if (!dailySectionInstance) {
+        dailySectionInstance = <DailySection categoryId={selectedCategory?.id} navigation={navigation} />;
+    }
+    if (!bannerSectionInstance) {
+        bannerSectionInstance = <Image style={{ width: '100%', height: 200 }} source={require('../assets/images/banner.png')} />;
+    }
+
+    // renderItem luôn trả về instance từ ref ngoài component
     const renderItem = useCallback(
       ({ item, section }: { item: SectionItem; section: HomeSection }) => {
         switch (section.key) {
           case 'popular':
-            return <PopularSection categoryId={item.categoryId} navigation={navigation} />;
+            return popularSectionInstance;
           case 'recommended':
-            return <RecommendedSection categoryId={item.categoryId} navigation={navigation} />;
+            return recommendedSectionInstance;
           case 'newEvent':
-            return <NewEventSection categoryId={item.categoryId} navigation={navigation} />;
+            return newEventSectionInstance;
           case 'daily':
-            return <DailySection categoryId={item.categoryId} navigation={navigation} />;
+            return dailySectionInstance;
           case 'banner':
-            return <Image style={{ width: '100%', height: 200 }} source={require('../assets/images/banner.png')} />;
+            return bannerSectionInstance;
           default:
             return null;
         }
       },
-      [navigation]
+      []
     );
 
     // Tối ưu: chỉ truyền data, không truyền renderItem vào từng section
@@ -181,7 +212,7 @@ export default function HomeScreen ({navigation} : {navigation : NativeStackNavi
                 removeClippedSubviews={true}
                 initialNumToRender={2}
                 maxToRenderPerBatch={1}
-                windowSize={3}
+                windowSize={7}
                 updateCellsBatchingPeriod={100}
                 onEndReachedThreshold={0.5}
                 maintainVisibleContentPosition={{

@@ -38,8 +38,32 @@ export default function Recommendation({ navigation, locationId }: PopularSectio
        setIsFetchingMore(true);
        // Gọi API content_based recommendation với product_id
        const response = await fetch(`${API_RCM_URL}/recommend_legacy/?case=content_based&product_id=${locationId}`);
-       const data = await response.json();
-       if (data.recommendations) {
+       let data = null;
+       let isJson = false;
+       const contentType = response.headers.get('content-type');
+       if (contentType && contentType.includes('application/json')) {
+         try {
+           data = await response.json();
+           isJson = true;
+         } catch (jsonErr) {
+           // JSON parse error
+           const text = await response.text().catch(() => '');
+           console.log('Recommend API JSON parse error:', jsonErr, text);
+           setHasMore(false);
+           setLoading(false);
+           setIsFetchingMore(false);
+           return;
+         }
+       } else {
+         // Not JSON
+         const text = await response.text();
+         console.error('Recommend API response not ok:', text);
+         setHasMore(false);
+         setLoading(false);
+         setIsFetchingMore(false);
+         return;
+       }
+       if (isJson && data && data.recommendations) {
          if (pageNumber === 1) {
            setLocations(data.recommendations);
          } else {
@@ -173,7 +197,7 @@ const styles = StyleSheet.create({
         marginVertical: 10,
     },
     imageBox: {
-        width: CARD_WIDTH,
+        width: CARD_WIDTH - 13,
         height: CARD_HEIGHT - 60,
         borderRadius: 24,
         overflow: 'hidden',    

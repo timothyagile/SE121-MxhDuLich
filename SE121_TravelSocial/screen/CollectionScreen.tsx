@@ -1,6 +1,6 @@
 import { CommonActions, DrawerActions, useNavigation } from '@react-navigation/native';
 import React,{ useState, useEffect } from 'react'
-import {Button, Text, View,  StyleSheet, Image, TouchableOpacity, TextInput,Modal, Dimensions, FlatList} from 'react-native';
+import {Button, Text, View,  StyleSheet, Image, TouchableOpacity, TextInput,Modal, Dimensions, FlatList, Alert} from 'react-native';
 import { NativeStackNavigationProp, NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 import { useUser } from '@/context/UserContext';
 import {API_BASE_URL} from '../constants/config';
@@ -145,6 +145,82 @@ export default function CollectionScreen ()
         }
       };
 
+      // Xóa bộ sưu tập
+      const handleDeleteCollection = async (collectionId: string) => {
+        Alert.alert(
+          'Xác nhận',
+          'Bạn có chắc muốn xóa bộ sưu tập này?',
+          [
+            { text: 'Hủy', style: 'cancel' },
+            {
+              text: 'Xóa',
+              style: 'destructive',
+              onPress: async () => {
+                try {
+                  const response = await fetch(`${API_BASE_URL}/collection/deletecollection/${collectionId}`, {
+                    method: 'DELETE',
+                  });
+                  const result = await response.json();
+                  if (result.isSuccess) {
+                    setCollections((prev) => prev.filter((c) => c._id !== collectionId));
+                    Alert.alert('Thành công', 'Đã xóa bộ sưu tập.');
+                  } else {
+                    Alert.alert('Lỗi', result.error || 'Không thể xóa bộ sưu tập.');
+                  }
+                } catch (error) {
+                  Alert.alert('Lỗi', 'Có lỗi xảy ra khi xóa.');
+                }
+              },
+            },
+          ]
+        );
+      };
+
+      // Xóa item khỏi bộ sưu tập
+      const handleDeleteItemFromCollection = async (collectionId: string, itemId: string) => {
+        Alert.alert(
+          'Xác nhận',
+          'Bạn có chắc muốn xóa địa điểm này khỏi bộ sưu tập?',
+          [
+            { text: 'Hủy', style: 'cancel' },
+            {
+              text: 'Xóa',
+              style: 'destructive',
+              onPress: async () => {
+                try {
+                  const response = await fetch(`${API_BASE_URL}/collection/deleteitem/${collectionId}/${itemId}`, {
+                    method: 'DELETE',
+                  });
+                  const result = await response.json();
+                  if (result.isSuccess) {
+                    setSelectedCollectionLocations((prev) => prev.filter((item) => item._id !== itemId));
+                    Alert.alert('Thành công', 'Đã xóa địa điểm khỏi bộ sưu tập.');
+                  } else {
+                    // Ensure error message is always a string
+                    let errorMsg = 'Không thể xóa địa điểm.';
+                    if (typeof result.error === 'string') {
+                      errorMsg = result.error;
+                    } else if (result.error && result.error.message) {
+                      errorMsg = String(result.error.message);
+                    }
+                    Alert.alert('Lỗi', errorMsg);
+                  }
+                } catch (error) {
+                  // Ensure error is always a string
+                  let errorMsg = 'Có lỗi xảy ra khi xóa.';
+                  if (typeof error === 'string') {
+                    errorMsg = error;
+                  } else if (error && (error as any).message) {
+                    errorMsg = String((error as any).message);
+                  }
+                  Alert.alert('Lỗi', errorMsg);
+                }
+              },
+            },
+          ]
+        );
+      };
+
       if (loading) {
         return <LoadingScreen />; // Hiển thị LoadingScreen khi dữ liệu đang được tải
       }
@@ -194,13 +270,19 @@ export default function CollectionScreen ()
                           source={
                             item.previewImageUrl
                               ? { uri: item.previewImageUrl }
-                              : require('../assets/images/defaultlocation.png') // fallback image nếu không có ảnh
+                              : require('../assets/images/defaultlocation.png') 
                           }
                           style={{ width: 150, height: 150, borderRadius: 20 }}
                         />
 
                         </TouchableOpacity>
                         <Text style={{ marginTop: 10, fontSize: 20 }}>{item.name}</Text>
+                        <TouchableOpacity
+                          style={{ width: 28, height: 28, position: 'absolute', top: 5, right: 20, zIndex: 200 }}
+                          onPress={() => handleDeleteCollection(item._id)}
+                        >
+                          <Image source={require('../assets/icons/trash.png')} style={{ width: 16, height: 20 }} />
+                        </TouchableOpacity>
                       </View>
                     )
                   }
@@ -255,18 +337,32 @@ export default function CollectionScreen ()
                             data={selectedCollectionLocations}
                             keyExtractor={(item) => item._id} // Giả sử mỗi location có _id
                             renderItem={({ item }) => (
-                              <CollectionItem
-                                imageUrl={item.image?.[0]?.url || "https://via.placeholder.com/150"}
-                                name={item.name}
-                                rating={item.rating || 1.0}
-                                province={item.province || ""}
-                                minPrice={item.minPrice || 0}
-                                cancellation="Hủy miễn phí trong 24h"
-                                onPress={() => { 
-                                  navigation.navigate('detail-screen', { id: item._id });
-                                  setModalVisible2(false);
-                                }}// Thêm logic nếu cần
-                              />
+                              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <CollectionItem
+                                  imageUrl={item.image?.[0]?.url || "https://via.placeholder.com/150"}
+                                  name={item.name}
+                                  rating={item.rating || 1.0}
+                                  province={item.province || ""}
+                                  minPrice={item.minPrice || 0}
+                                  cancellation="Hủy miễn phí trong 24h"
+                                  onPress={() => { 
+                                    navigation.navigate('detail-screen', { id: item._id });
+                                    setModalVisible2(false);
+                                  }}
+                                />
+                                <TouchableOpacity
+                                  style={{ marginLeft: 10, zIndex: 100, position: 'absolute', top: 5, right: 20 }}
+                                  onPress={() => {
+                                    // Tìm collectionId chứa item này
+                                    const parentCollection = collections.find(c => Array.isArray(c.item) && c.item.some((i: any) => i._id === item._id));
+                                    if (parentCollection) {
+                                      handleDeleteItemFromCollection(parentCollection._id, item._id);
+                                    }
+                                  }}
+                                >
+                                  <Image source={require('../assets/icons/trash.png')} style={{ width: 16, height: 20 }} />
+                                </TouchableOpacity>
+                              </View>
                             )}
                             showsVerticalScrollIndicator={false}
                           />

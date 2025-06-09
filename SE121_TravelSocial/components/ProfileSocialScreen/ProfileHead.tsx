@@ -20,9 +20,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
       !!userData.picturePath ? userData.picturePath : DEFAULT_DP
     );
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-    //const navigation = useNavigation();
-
     const [userrData, setUserData] = useState<any>(null);
+    const [postCount, setPostCount] = useState<number>(0);
+    const [followersCount, setFollowersCount] = useState<number>(0);
+    const [followingCount, setFollowingCount] = useState<number>(0);
 
     useEffect(() => {
       const fetchUserData = async () => {
@@ -31,16 +32,51 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
           if (jsonValue !== null) {
             const user = JSON.parse(jsonValue);
             setUserData(user);
-            console.log(user);
+            // Fetch posts count
+            fetchUserPosts(user._id);
+            // Fetch followers/following
+            fetchFollowers(user._id);
+            fetchFollowing(user._id);
           }
-        } catch (e) {
-          
-        }
+        } catch (e) {}
       };
-  
       fetchUserData();
     }, []);
-  
+
+    // Fetch user's posts count
+    const fetchUserPosts = async (userId: string) => {
+      try {
+        const response = await fetch(`${require('../../constants/config').API_BASE_URL}/posts/author/${userId}`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setPostCount(Array.isArray(data.data) ? data.data.length : 0);
+        }
+      } catch (e) {}
+    };
+    // Fetch followers count
+    const fetchFollowers = async (userId: string) => {
+      try {
+        const response = await fetch(`${require('../../constants/config').API_BASE_URL}/friends?type=accept&userId=${userId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setFollowersCount(Array.isArray(data.data) ? data.data.length : 0);
+        }
+      } catch (e) {}
+    };
+    // Fetch following count
+    const fetchFollowing = async (userId: string) => {
+      try {
+        const response = await fetch(`${require('../../constants/config').API_BASE_URL}/friends?type=follow&userId=${userId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setFollowingCount(Array.isArray(data.data) ? data.data.length : 0);
+        }
+      } catch (e) {}
+    };
+
     function ProfileStat({ text, subText, onPress }: any) {
       return (
         <Pressable style={{ alignItems: "center" }} onPress={onPress}>
@@ -159,9 +195,17 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
             paddingVertical: 10,
           }}
         >
-          <ProfileStat text={"255"} subText={"Bài đăng"} />
-          <ProfileStat text={"1.6k"} subText={"Người theo dõi"} />
-          <ProfileStat text={"378"} subText={"Đang theo dõi"} />
+          <ProfileStat text={postCount} subText={"Bài đăng"} />
+          <ProfileStat
+            text={followersCount}
+            subText={"Bạn bè"}
+            onPress={() => {
+              if (userrData?._id) {
+                navigation.navigate('friends-list-screen', { userId: userrData._id });
+              }
+            }}
+          />
+          {/* <ProfileStat text={followingCount} subText={"Đang theo dõi"} /> */}
         </View>
       </View>
     );
@@ -170,4 +214,3 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
   export default ProfileHead;
   
   const styles = StyleSheet.create({});
-  

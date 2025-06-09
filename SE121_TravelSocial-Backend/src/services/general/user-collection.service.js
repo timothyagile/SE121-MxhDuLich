@@ -2,7 +2,7 @@ const { NotFoundException, ForbiddenError } = require('../../errors/exception')
 const LocationCollection = require('../../models/general/location-collection.model')
 const Location = require('../../models/general/location.model')
 const { findByIdAndDelete } = require('../../models/general/user.model')
-
+const mongoose = require('mongoose')
 
 const getAllCollection = async () => {
     const result = await LocationCollection.find().populate('item')
@@ -77,25 +77,28 @@ const updateCollectionItem= async (id, data) => {
     }
 }
 const deleteCollectionItem = async (collectionId, locationId) => {
-    const collection = await LocationCollection.findById(collectionId)
-    console.log(locationId)
-    const location = await collection.item.includes(locationId)
+    const collection = await LocationCollection.findById(collectionId);
     if (!collection) {
-        throw new NotFoundException('This collection is not exist in collection')
+        throw new NotFoundException('This collection is not exist in collection');
     }
-    if (!location) {
-        throw new NotFoundException('This location is not exist')
+    // Convert all item ids to string for comparison
+    const locationExists = collection.item.some(
+        (item) => item.toString() === locationId.toString()
+    );
+    if (!locationExists) {
+        throw new NotFoundException('This location is not exist');
     }
+    // Use ObjectId for $pull if item is ObjectId
+    const pullId = mongoose.Types.ObjectId.isValid(locationId) ? new mongoose.Types.ObjectId(locationId) : locationId;
     const result = await LocationCollection.findByIdAndUpdate(
         collectionId,
-        { $pull: { item: locationId } }, // $pull tự động xóa phần tử khớp
-        { new: true , runValidators: true} // Trả về collection đã cập nhật
+        { $pull: { item: pullId } },
+        { new: true, runValidators: true }
     );
-    if(result) {
-        return result
-    }
-    else {
-        throw new ForbiddenError('Cannot delete item')
+    if (result) {
+        return result;
+    } else {
+        throw new ForbiddenError('Cannot delete item');
     }
 }
 

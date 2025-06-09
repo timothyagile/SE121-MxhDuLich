@@ -52,6 +52,7 @@ export default function DetailScreen({navigation} : {navigation : NativeStackNav
     senderId: string;
     review: string;
     rating: number;
+    image: { url: string }[];
   }
 
   type FacilityIcons = {
@@ -103,6 +104,7 @@ const facilityIcons: FacilityIcons = {
     const [loadingReviews, setLoadingReviews] = useState(false);
     const [userNames, setUserNames] = useState<{ [key: string]: string }>({});
     const [reviewCount, setReviewCount] = useState(0);
+    const [userAvatars, setUserAvatars] = useState<{ [key: string]: { url: string } }>({});
 
 
 
@@ -318,7 +320,11 @@ const storeLocationDetails = async (data: any) => {
             const userPromises = result.data.map(async (review: any) => {
               const userResponse = await fetch(`${API_BASE_URL}/user/getbyid/${review.senderId}`);
               const userResult = await userResponse.json();
-              return { senderId: review.senderId, name: userResult.data?.userName || 'Ẩn danh' };
+              return {
+                senderId: review.senderId,
+                name: userResult.data?.userName || 'Ẩn danh',
+                avatar: userResult.data?.userAvatar?.url || null,
+              };
             });
 
             const userNamesArray = await Promise.all(userPromises);
@@ -327,6 +333,12 @@ const storeLocationDetails = async (data: any) => {
               return acc;
             }, {});
             setUserNames(userNamesMap);
+            // Build avatar map
+            const userAvatarsMap = userNamesArray.reduce((acc, user) => {
+              acc[user.senderId] = { url: user.avatar };
+              return acc;
+            }, {});
+            setUserAvatars(userAvatarsMap);
           } else {
             // Alert.alert('Lỗi', result.message || 'Không thể lấy phản hồi.');
           }
@@ -485,7 +497,7 @@ const storeLocationDetails = async (data: any) => {
             </View>
 
             {/* Number of People  */}
-            <View style={styles.inputContainer}>
+            {/* <View style={styles.inputContainer}>
               <FontAwesome name="user" size={20} color="gray" style={styles.iconLeft} />
               <TextInput
                 placeholder="Số người"
@@ -493,14 +505,13 @@ const storeLocationDetails = async (data: any) => {
                 keyboardType="numeric"
               />
               <FontAwesome name="chevron-down" size={20} color="gray" style={styles.iconRight} />
-            </View>            
+            </View>             */}
             <TouchableOpacity onPress={()=> {
-              console.log('Navigating with ID: ', locationDetails._id);
-              console.log('servicesOfLocation:', servicesOfLocation);
-              
-              //Track the search/click event to recommendation system
+              if (!date1 || !date2) {
+                Alert.alert('Thông báo', 'Vui lòng chọn ngày checkin và checkout trước khi tìm phòng.');
+                return;
+              }
               if (userId && locationDetails._id) {
-                
                 trackEvents.click(userId, locationDetails._id, { 
                   action: 'search_rooms',
                   checkin_date: date1?.toISOString(),
@@ -508,13 +519,13 @@ const storeLocationDetails = async (data: any) => {
                 });
                 console.log(`Tracked search/click event for user: ${userId}, location: ${locationDetails._id}`);
               }
-              
               navigation.navigate('available-room-screen', {
                 id: locationDetails._id,
                 checkinDate: date1, // Gửi ngày checkin
                 checkoutDate: date2,
                 serviceOfLocation: servicesOfLocation // Gửi dịch vụ của địa điểm
-              });}} style={styles.searchButton}>
+              });
+            }} style={styles.searchButton}>
               <Text style={styles.searchButtonText}>Tìm kiếm</Text>
             </TouchableOpacity>
           </View>
@@ -533,16 +544,19 @@ const storeLocationDetails = async (data: any) => {
                 <View style={styles.reviewframe} key={index}>
                   <View style={styles.feedbackContainer}>
                     <View style={styles.avatarContainer}>
-                      <Image source={require('../../assets/images/avt.png')} style={styles.avatar} />
+                      <Image
+                        source={userAvatars[review.senderId]?.url ? { uri: userAvatars[review.senderId].url } : require('../../assets/images/avt.png')}
+                        style={styles.avatar}
+                      />
                     </View>
                     <View>
                       <Text style={styles.customerName}>{userNames[review.senderId] || 'Ẩn danh'}</Text>
                       <View style={styles.rating}>
-                        {[...Array(5)].map((_, index) => (
+                        {[...Array(5)].map((_, i) => (
                           <Image
-                            key={index}
+                            key={i}
                             source={
-                              index < (review.rating || 0)
+                              i < (review.rating || 0)
                                 ? require('../../assets/icons/star.png')
                                 : require('../../assets/icons/emptystar.png')
                             }
@@ -553,7 +567,17 @@ const storeLocationDetails = async (data: any) => {
                     </View>
                   </View>
                   <Text style={styles.feedbackText}>{`"${review.review || 'Không có nhận xét.'}"`}</Text>
-
+                  {review.image && review.image.length > 0 && (
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 8 }}>
+                      {review.image.map((img, idx) => (
+                        <Image
+                          key={img?.url + idx}
+                          source={{ uri: img?.url }}
+                          style={{ width: 120, height: 90, borderRadius: 8, marginRight: 8, resizeMode: 'cover' }}
+                        />
+                      ))}
+                    </ScrollView>
+                  )}
                 </View>
                 
               ))}
@@ -757,7 +781,7 @@ const styles = StyleSheet.create({
 reviewframe: {
   // backgroundColor: 'white',
   width:'100%',
-  marginVertical:10,
+  marginVertical:5,
   borderTopWidth: 1,
   borderBottomWidth: 1,
   borderColor: '#E7E7E7',

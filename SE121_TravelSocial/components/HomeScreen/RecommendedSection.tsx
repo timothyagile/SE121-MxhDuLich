@@ -27,6 +27,9 @@ interface Location {
     [key: string]: any; // For other properties
 }
 
+// Đặt cacheRef ngoài component để giữ cache khi SectionList remount
+const recommendedSectionCacheRef = { data: [] as Location[] };
+
 const RecommendedSectionComponent = React.memo(function RecommendedSection({ categoryId, navigation }: PopularSectionProps) {
     const [likedItems, setLikedItems] = useState<LikedItems>({});
     const [locations, setLocations] = useState<Location[]>([]);
@@ -36,6 +39,8 @@ const RecommendedSectionComponent = React.memo(function RecommendedSection({ cat
     const [isFetchingMore, setIsFetchingMore] = useState(false);
     const [onEndReachedCalledDuringMomentum, setOnEndReachedCalledDuringMomentum] = useState(false);
     const flatListRef = useRef(null);
+    // Sử dụng cacheRef ngoài component
+    const cacheRef = recommendedSectionCacheRef;
 
     const handlePress = (id: string) => {
         setLikedItems((prevState) => ({
@@ -44,23 +49,63 @@ const RecommendedSectionComponent = React.memo(function RecommendedSection({ cat
         }));
     };
 
+    useEffect(() => {
+        if (cacheRef.data.length > 0) {
+            setLocations(cacheRef.data);
+            setLoading(false);
+            setHasMore(cacheRef.data.length > 0);
+            return;
+        }
+        getPopularLocations(1);
+    }, []);
+
     const getPopularLocations = async (pageNumber: number) => {
         try {
             setLoading(true);
-            // Gọi API Python popular recommendation
+            if (pageNumber === 1 && cacheRef.data.length > 0) {
+                setLocations(cacheRef.data);
+                setLoading(false);
+                setHasMore(cacheRef.data.length > 0);
+                return;
+            }
             const response = await fetch(`${API_RCM_URL}/recommend_legacy?case=popular`);
-            const data = await response.json();
-            console.log('Response data: ', data);
-            if (data.recommendations) {
+            let data = null;
+            let isJson = false;
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                try {
+                    data = await response.json();
+                    isJson = true;
+                } catch (jsonErr) {
+                    const text = await response.text().catch(() => '');
+                    console.error('Popular API JSON parse error:', jsonErr, text);
+                    setHasMore(false);
+                    setLoading(false);
+                    setIsFetchingMore(false);
+                    return;
+                }
+            } else {
+                const text = await response.text();
+                console.error('Popular API response not ok:', text);
+                setHasMore(false);
+                setLoading(false);
+                setIsFetchingMore(false);
+                return;
+            }
+            if (isJson && data && data.recommendations) {
                 if (pageNumber === 1) {
                     setLocations(data.recommendations);
+                    // Lưu cache ngoài component
+                    cacheRef.data = data.recommendations;
                 } else {
-                    // Tránh trùng lặp
                     const newItems = data.recommendations as Location[];
                     setLocations(prev => {
                         const existingIds = new Set(prev.map(item => item._id || item.location_id));
                         const uniqueNewItems = newItems.filter((item: Location) => !existingIds.has(item._id || item.location_id));
-                        return [...prev, ...uniqueNewItems];
+                        const merged = [...prev, ...uniqueNewItems];
+                        // Lưu cache ngoài component
+                        cacheRef.data = merged;
+                        return merged;
                     });
                 }
                 setHasMore(data.recommendations.length > 0);
@@ -84,9 +129,9 @@ const RecommendedSectionComponent = React.memo(function RecommendedSection({ cat
         }
     }, [page, isFetchingMore, hasMore, onEndReachedCalledDuringMomentum]);
 
-    useEffect(() => {
-        getPopularLocations(1);
-    }, []);
+    // useEffect(() => {
+    //     getPopularLocations(1);
+    // }, []);
 
     // if (loading) {
     //     return <ActivityIndicator size="large" color="#0000ff" />;
