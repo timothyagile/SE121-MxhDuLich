@@ -64,7 +64,7 @@
     "react-native-date-picker": "^5.0.4",
     "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "~2.20.2",
-    "react-native-maps": "^1.18.0",
+    "react-native-maps": "1.18.0",
     "react-native-network-info": "^5.2.1",
     "react-native-pager-view": "^6.7.0",
     "react-native-paper": "^5.12.5",
