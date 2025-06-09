@@ -26,6 +26,7 @@ const ListLocationBusinessScreen = () => {
           throw new Error("Failed to fetch locations");
         }
         const data = await response.json();
+        console.log("Fetched locations:", data);
         setLocations(data.data || []);
       } catch (error) {
         console.error("Error fetching locations:", error);
@@ -116,7 +117,7 @@ const ListLocationBusinessScreen = () => {
                   <th>Tên nhà kinh doanh</th>
                   <th>Loại</th>
                   <th>Địa chỉ</th>
-                  <th>Trạng thái</th>
+                  <th>Đánh giá</th> {/* Đổi từ Trạng thái sang Đánh giá */}
                   <th></th>
                 </tr>
               </thead>
@@ -133,8 +134,8 @@ const ListLocationBusinessScreen = () => {
                       <div className="namefield">
                         <img
                           src={
-                            location?.image
-                              ? require("../assets/images/avt.png")
+                            location?.image?.[0]?.url
+                              ? location?.image?.[0]?.url
                               : require("../assets/images/avt.png")
                           }
                           alt="User Avatar"
@@ -146,24 +147,11 @@ const ListLocationBusinessScreen = () => {
                     <td>{getCategoryName(location?.category?.id)}</td>
                     <td>{location?.address}</td>
                     <td>
-                      {/* Hiển thị trạng thái */}
+                      {/* Hiển thị đánh giá trung bình */}
                       <span>
-                        {" "}
-                        {location.status === "inactive" ? (
-                          <span className="status-label status-waiting">
-                            Chờ phê duyệt
-                          </span>
-                        ) : location.status === "active" ? (
-                          <span className="status-label status-completed">
-                            Đã phê duyệt
-                          </span>
-                        ) : location.status === "rejected" ? (
-                          <span className="status-label status-cancelled">
-                            Bị từ chối
-                          </span>
-                        ) : (
-                          <span>Chưa xác định</span>
-                        )}
+                        {typeof location.rating === "number"
+                          ? `${location.rating.toFixed(1)} ★`
+                          : "Chưa có"}
                       </span>
                     </td>
                     <td>

@@ -30,7 +30,7 @@
 
 .widthlistbusiness {
   width: 1148px !important;
-  height: 800px;
+  height: calc(100vh - 10%);
 }
 
 .listbusinessbody {

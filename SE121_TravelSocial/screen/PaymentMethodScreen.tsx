@@ -27,6 +27,7 @@ interface Bank {
 export default function PaymentMethodScreen({ navigation }: {navigation: NativeStackNavigatorProps}) {
     const route = useRoute<ReservationRouteProp>();
     const { locationId, totalPrice, selectedRoomsData } = route.params;
+    // totalPrice is now the backend-calculated price
     console.log('roomdata in payment: ', selectedRoomsData);
     const {userId} = useUser(); 
     const [selectedButton, setSelectedButton] = useState<string | null>(null);
@@ -264,7 +265,12 @@ const saveQRImageToGallery = async () => {
         }
     };
 
-    
+    // If totalPrice is missing, show error
+    useEffect(() => {
+        if (totalPrice === undefined || totalPrice === null) {
+            Alert.alert('Lỗi', 'Không nhận được giá từ máy chủ. Vui lòng quay lại và thử lại.');
+        }
+    }, [totalPrice]);
     
 
     return (

@@ -115,6 +115,26 @@ export default function DetailBookingScreen({ navigation }: {navigation: NativeS
   };
       
 
+    useEffect(() => {
+      console.log('bookingDetails: ', bookingDetails);
+        if (bookingDetails && bookingDetails.locationId) {
+            const fetchLocationDetails = async () => {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/locationbyid/${bookingDetails.locationId}`);
+                    const result = await response.json();
+                    console.log('resulttt: ', result);
+                    if (result.isSuccess) {
+                      console.log('location details: ', result.data);
+                        setLocationDetails(result.data);
+                    }
+                } catch (error) {
+                    // handle error
+                }
+            };
+            fetchLocationDetails();
+        }
+    }, [bookingDetails]);
+
     if (!bookingDetails) {
         return (
           <View>
@@ -130,117 +150,141 @@ export default function DetailBookingScreen({ navigation }: {navigation: NativeS
                     <TouchableOpacity style={styles.arrowleftbutton} onPress={() => navigation.goBack()}>
                     <Image source={require('../assets/icons/arrowleft.png')} style={styles.arrowlefticon} />
                     </TouchableOpacity>
-                    <Text style={styles.headerTitle}>Yêu Cầu Đặt Chỗ</Text>
+                    <Text style={styles.headerTitle}>Lịch Sử Đặt Chỗ</Text>
                 </View>
                 <ScrollView>
-                <View style={{flexDirection:'row'}}>
+                  <View style={{flexDirection:'row'}}>
                     <View style={styles.imageContainer}>
+                      {locationDetails?.image?.[0]?.url ? (
+                        <Image source={{ uri: locationDetails.image[0].url }} style={styles.image} />
+                      ) : (
                         <Image source={require('../assets/images/camping-ho-coc.png')} style={styles.image} />
+                      )}
                     </View>
-                    <View style ={styles.textContainer}>
-                        <Text style= {styles.title}>{title || 'Tên địa điểm'}</Text>
-                        <View style={styles.detailsContainer}>
-                            <View style={styles.featureBox}>
-                                <Image source={require('../assets/icons/clock.png')} style ={{marginRight:3,}}></Image>
-                                <Text style={styles.boxText}>mễn phí hủy trong 24h</Text>
-                            </View>
+                    <View style={styles.textContainer}>
+                      <Text style={styles.title}>{locationDetails?.name || title || 'Tên địa điểm'}</Text>
+                      <View style={styles.detailsContainer}>
+                        {locationDetails?.rating && (
+                          <View style={styles.ratingBox}>
+                            <Image source={require('../assets/icons/star.png')} style={{height:20, width:20, marginRight:3}} />
+                            <Text style={styles.boxText}>{locationDetails.rating}</Text>
+                          </View>
+                        )}
+                        <View style={styles.featureBox}>
+                          <Image source={require('../assets/icons/clock.png')} style={{marginRight:3}} />
+                          <Text style={styles.boxText}>mễn phí hủy trong 24h</Text>
                         </View>
+                      </View>
                     </View>
-                </View>
-                <View style ={{width:'100%', height:10, backgroundColor:'#E0DCDC', marginVertical:10, }}></View>
-                <View style={styles.bookingcontainer}>
+                  </View>
+                  <View style={{width:'100%', height:10, backgroundColor:'#E0DCDC', marginVertical:10}} />
+                  <View style={styles.bookingcontainer}>
                     <Text style={styles.yourbooking}>Booking của bạn</Text>
-                    <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
-                        <Text style={styles.firsttext}>Ngày</Text>
-                        <Text style={styles.secondtext}>{formatRoomDate(new Date(bookingDetails.checkinDate))} - {formatRoomDate(new Date(bookingDetails.checkoutDate))}</Text>
-                    </View>
-    
-                    <View style={{flexDirection:'column', alignItems:'flex-start', marginTop:10,}}>
-                        <Text style={[styles.firsttext,{flexDirection:'column'} ]}>Số phòng</Text>
-                        <View>
-                            {bookingDetails?.items?.map((room: { roomId: {_id:string, name:string}; quantity: number }, index: number) => (
-                            <Text key={index} style={styles.secondtext}>
-                                {room.roomId.name}: {room.quantity} phòng
-                            </Text>
-                            ))}
+                    <View style={styles.bookingTable}>
+                      <View style={styles.bookingTableHeader}>
+                        <Text style={[styles.bookingTableCell, styles.bookingTableHeaderCell, {flex:2}]}>Tên</Text>
+                        <Text style={[styles.bookingTableCell, styles.bookingTableHeaderCell]}>Số lượng</Text>
+                        <Text style={[styles.bookingTableCell, styles.bookingTableHeaderCell]}>Đơn vị</Text>
+                        <Text style={[styles.bookingTableCell, styles.bookingTableHeaderCell]}>Giá</Text>
+                      </View>
+                      {/* Phòng */}
+                      {bookingDetails?.items?.map((room: any, idx: number) => (
+                        <View key={room.roomId?._id + idx} style={styles.bookingTableRow}>
+                          <Text style={[styles.bookingTableCell, {flex:2}]}>{room.roomId?.name}</Text>
+                          <Text style={styles.bookingTableCell}>{room.quantity}</Text>
+                          <Text style={styles.bookingTableCell}>phòng</Text>
+                          <Text style={styles.bookingTableCell}>{room.price ? (room.price * room.quantity).toLocaleString('vi-VN') : ''} VND</Text>
                         </View>
+                      ))}
+                      {/* Dịch vụ nếu có */}
+                      {bookingDetails?.services?.map((service: any, idx: number) => (
+                        <View key={service.serviceId?._id + idx} style={styles.bookingTableRow}>
+                          <Text style={[styles.bookingTableCell, {flex:2}]}>{service.serviceId?.name}</Text>
+                          <Text style={styles.bookingTableCell}>{service.quantity}</Text>
+                          <Text style={styles.bookingTableCell}>{service.serviceId?.unit || ''}</Text>
+                          <Text style={styles.bookingTableCell}>{service.price ? (service.price * service.quantity).toLocaleString('vi-VN') : ''} VND</Text>
+                        </View>
+                      ))}
                     </View>
-    
-                </View>
-    
-                <View style ={{width:'100%', height:10, backgroundColor:'#E0DCDC', marginVertical:10, }}></View>
-                <View style={styles.bookingcontainer}>
+                  </View>
+                  <View style={{width:'100%', height:10, backgroundColor:'#E0DCDC', marginVertical:10}} />
+                  <View style={styles.bookingcontainer}>
                     <Text style={styles.yourbooking}>Chi tiết giá</Text>
-                    <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
-    
-                        <Text style={styles.firsttext}>Phòng </Text>
-                        <Text style={styles.secondtext1}>{bookingDetails.totalPrice} VND</Text>
+                    <View style={styles.priceTable}>
+                      <View style={styles.priceRowTable}>
+                        <Text style={styles.priceLabel}>Phòng</Text>
+                        <Text style={styles.priceValue}>{bookingDetails?.totalPrice?.toLocaleString('vi-VN') || '0'} VND</Text>
+                      </View>
+                      {bookingDetails?.services && bookingDetails.services.length > 0 && (
+                        <View style={styles.priceRowTable}>
+                          <Text style={styles.priceLabel}>Dịch vụ kèm theo</Text>
+                          <Text style={styles.priceValue}>{(bookingDetails.services.reduce((sum: number, s: {price: number, quantity: number}) => sum + (s.price * s.quantity), 0)).toLocaleString('vi-VN')} VND</Text>
+                        </View>
+                      )}
+                      {bookingDetails?.discount > 0 && (
+                        <View style={[styles.priceRowTable, {backgroundColor:'#e6f0ff'}]}>
+                          <Text style={[styles.priceLabel, {color:'#176FF2'}]}>Giảm giá voucher</Text>
+                          <Text style={[styles.priceValue, {color:'#176FF2'}]}>- {bookingDetails.discount?.toLocaleString('vi-VN')} VND</Text>
+                        </View>
+                      )}
+                      <View style={styles.priceRowTableTotal}>
+                        <Text style={[styles.priceLabel, {fontWeight:'bold', fontSize:20}]}>Tổng cộng</Text>
+                        <Text style={[styles.priceValue, {fontWeight:'bold', fontSize:20, color:'#e53935'}]}>{bookingDetails?.totalPriceAfterTax?.toLocaleString('vi-VN') || '0'} VND</Text>
+                      </View>
                     </View>
-                    <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
-                        <Text style={styles.firsttext}>Thuế</Text>
-                        <Text style={styles.secondtext1}>{bookingDetails.tax} VND</Text>
-                    </View>
-    
-                    <View style ={{width:'100%', height:1, backgroundColor:'#E0DCDC', marginVertical:10, }}></View>
-                    
-                    <View style={{flexDirection:'row', alignItems:'center', marginTop:10,}}>
-                        <Text style={styles.firsttext}>Tổng cộng</Text>
-                        <Text style={styles.secondtext1}>{bookingDetails.totalPriceAfterTax} VND</Text>
-                    </View>
-    
-                </View>
-    
-                <View style ={{width:'100%', height:10, backgroundColor:'#E0DCDC', marginVertical:10, }}></View>
-
-                <View style={styles.bookingcontainer}>
+                  </View>
+                  <View style={{width:'100%', height:10, backgroundColor:'#E0DCDC', marginVertical:10}} />
+                  <View style={styles.bookingcontainer}>
                     <View style={{ flexDirection: 'row' }}>
-                        <Text style={styles.yourbooking}>Phương thức thanh toán</Text>
-                        <Text style={{ color: 'red', fontSize: 20, marginLeft: 5 }}>*</Text>
+                      <Text style={styles.yourbooking}>Phương thức thanh toán</Text>
+                      <Text style={{ color: 'red', fontSize: 20, marginLeft: 5 }}>*</Text>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
-                        <Text style={styles.firsttext}>Trả hết</Text>
-                        <Text style={styles.secondtext}>
+                      <Text style={styles.firsttext}>Trả hết</Text>
+                      <Text style={styles.secondtext}>
                         {bookingDetails?.totalPriceAfterTax?.toLocaleString('vi-VN')} VND
-                        </Text>
-                        <View style={{ position: 'absolute', right: 0 }}>
-                        <RadioButton
-                            value="first"
-                            status={checked === 'first' ? 'checked' : 'unchecked'}
-                        />
-                        </View>
+                      </Text>
+                      <View style={{ position: 'absolute', right: 0 }}>
+                      <RadioButton
+                          value="first"
+                          status={checked === 'first' ? 'checked' : 'unchecked'}
+                      />
+                      </View>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
-                        <Text style={styles.firsttext}>Trả một nửa</Text>
-                        <Text style={styles.secondtext}>
+                      <Text style={styles.firsttext}>Trả một nửa</Text>
+                      <Text style={styles.secondtext}>
                         {(bookingDetails?.totalPriceAfterTax / 2)?.toLocaleString('vi-VN')} VND
-                        </Text>
-                        <View style={{ position: 'absolute', right: 0 }}>
-                        <RadioButton
-                            value="second"
-                            status={checked === 'second' ? 'checked' : 'unchecked'}
-                        />
-                        </View>
+                      </Text>
+                      <View style={{ position: 'absolute', right: 0 }}>
+                      <RadioButton
+                          value="second"
+                          status={checked === 'second' ? 'checked' : 'unchecked'}
+                      />
+                      </View>
                     </View>
                     <Text style={{ width: '60%' }}>
-                        Cần trả{' '}
-                        {(bookingDetails?.totalPriceAfterTax / 2)?.toLocaleString('vi-VN')} VND hôm nay và
-                        còn lại vào ngày {formatRoomDate(new Date(bookingDetails.checkinDate))}
+                      Cần trả{' '}
+                      {(bookingDetails?.totalPriceAfterTax / 2)?.toLocaleString('vi-VN')} VND hôm nay và
+                      còn lại vào ngày {formatRoomDate(new Date(bookingDetails.checkinDate))}
                     </Text>
-                </View>
-    
-                <View style ={{width:'100%', height:10, backgroundColor:'#E0DCDC', marginVertical:10, }}></View>
-                
-                <View style={{width:'100%', marginVertical:20,}}>
-                    <View style = {{  alignItems:'center', justifyContent:'center',alignContent:'center',width:'100%'}}>
-                        
-                    <TouchableOpacity
+                  </View>
+                  <View style={{width:'100%', height:10, backgroundColor:'#E0DCDC', marginVertical:10}} />
+                  <View style={styles.bookingcontainer}>
+                    <Text style={styles.yourbooking}>Thông tin liên lạc</Text>
+                    <Text style={styles.firsttext}>{bookingDetails?.contactName || 'Chưa có tên liên lạc'}</Text>
+                    <Text style={styles.firsttext}>{bookingDetails?.contactPhone || 'Chưa có số điện thoại'}</Text>
+                  </View>
+                  <View style={{width:'100%', marginVertical:20}}>
+                    <View style={{ alignItems:'center', justifyContent:'center',alignContent:'center',width:'100%'}}>
+                      <TouchableOpacity
                         style={styles.addpaymentmethod2}
                         onPress={handleCancelBooking}
-                        >
+                      >
                         <Text style={styles.boxText3}>Hủy</Text>
-                    </TouchableOpacity>
+                      </TouchableOpacity>
                     </View>
-                </View>
+                  </View>
                 </ScrollView>
             </View>  
         );
@@ -470,4 +514,103 @@ const styles = StyleSheet.create({
         fontSize: 16,
       },
 
+      tableRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#E0DCDC',
+      },
+      tableLabel: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        flex: 1,
+      },
+      tableValue: {
+        fontSize: 16,
+        flex: 2,
+        textAlign: 'right',
+      },
+
+      bookingTable: {
+        borderWidth: 1,
+        borderColor: '#e0e0e0',
+        borderRadius: 10,
+        overflow: 'hidden',
+        marginTop: 10,
+        marginBottom: 10,
+    },
+    bookingTableHeader: {
+        flexDirection: 'row',
+        backgroundColor: '#f5f7fa',
+        borderBottomWidth: 1,
+        borderColor: '#e0e0e0',
+        paddingVertical: 8,
+    },
+    bookingTableHeaderCell: {
+        fontWeight: 'bold',
+        color: '#176FF2',
+        fontSize: 15,
+    },
+    bookingTableRow: {
+        flexDirection: 'row',
+        borderBottomWidth: 1,
+        borderColor: '#f0f0f0',
+        backgroundColor: '#fff',
+        paddingVertical: 6,
+    },
+    bookingTableCell: {
+        flex: 1,
+        fontSize: 14,
+        color: '#222',
+        textAlign: 'center',
+        paddingHorizontal: 2,
+    },
+    priceTable: {
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: '#e0e0e0',
+        padding: 8,
+        marginTop: 8,
+        marginBottom: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.07,
+        shadowRadius: 2,
+    },
+    priceRowTable: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderBottomWidth: 1,
+        borderBottomColor: '#f0f0f0',
+        paddingVertical: 8,
+        paddingHorizontal: 4,
+    },
+    priceRowTableTotal: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 12,
+        paddingHorizontal: 4,
+        backgroundColor: '#f5f5f5',
+        borderRadius: 8,
+        marginTop: 8,
+    },
+    priceLabel: {
+        flex: 1,
+        fontSize: 16,
+        color: '#222',
+        marginLeft: 4,
+    },
+    priceValue: {
+        fontSize: 16,
+        color: '#222',
+        fontWeight: '600',
+        minWidth: 100,
+        textAlign: 'right',
+    },
 });
+
+

@@ -6,23 +6,22 @@ import Header from '../components/Header.js';
 const titleMap = [
   { path: /^\/dashboard\/admin$/, main: 'Bảng Điều Khiển', sub: null },
   { path: /^\/business\/list$/, main: 'Danh Sách Doanh Nghiệp', sub: null },
-  { path: /^\/business\/detail\/\d+$/, main: 'Danh Sách Doanh Nghiệp', sub: 'Chi Tiết Doanh Nghiệp' },
+  { path: /^\/business\/detail\/[^/]+$/, main: 'Danh Sách Doanh Nghiệp', sub: 'Chi Tiết Doanh Nghiệp' },
   { path: /^\/location\/list$/, main: 'Danh Sách Địa Điểm', sub: null },
-  { path: /^\/location\/detail\/\d+$/, main: 'Danh Sách Địa Điểm', sub: 'Chi Tiết Địa Điểm' },
+  { path: /^\/location\/detail\/[^/]+$/, main: 'Danh Sách Địa Điểm', sub: 'Chi Tiết Địa Điểm' },
   { path: /^\/booking\/list$/, main: 'Danh Sách Đặt Chỗ', sub: null },
-  { path: /^\/booking\/detail\/\d+$/, main: 'Danh Sách Đặt Chỗ', sub: 'Chi Tiết Đặt Chỗ' },
+  { path: /^\/booking\/detail\/[^/]+$/, main: 'Danh Sách Đặt Chỗ', sub: 'Chi Tiết Đặt Chỗ' },
   { path: /^\/statistic$/, main: 'Thống Kê', sub: null },
 
   { path: /^\/dashboard\/business$/, main: 'Bảng Điều Khiển', sub: null },
   { path: /^\/business\/booking\/list$/, main: 'Danh Sách Đặt Chỗ', sub: null },
-  { path: /^\/business\/detail\/\d+$/, main: 'Danh Sách Đặt Chỗ', sub: 'Chi Tiết Đặt Chỗ' },
+  { path: /^\/business\/booking\/detail\/[^/]+$/, main: 'Danh Sách Đặt Chỗ', sub: 'Chi Tiết Đặt Chỗ' },
   { path: /^\/business\/location\/list$/, main: 'Danh Sách Địa Điểm', sub: null },
-  { path: /^\/location\/detail\/\d+$/, main: 'Danh Sách Địa Điểm', sub: 'Chi Tiết Địa Điểm' },
-  
+  { path: /^\/business\/location\/detail\/[^/]+$/, main: 'Danh Sách Địa Điểm', sub: 'Chi Tiết Địa Điểm' },
   { path: /^\/business\/chat$/, main: 'Chăm sóc khách hàng', sub: null },
-  { path: /^\/statistic$/, main: 'Thống Kê', sub: null },
+  { path: /^\/business\/voucher$/, main: 'Voucher', sub: null },
+  { path: /^\/business\/statistic$/, main: 'Thống Kê', sub: null },
 ];
-
 
 
 

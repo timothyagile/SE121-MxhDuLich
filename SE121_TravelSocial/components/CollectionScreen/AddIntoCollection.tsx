@@ -52,7 +52,16 @@ const CustomModal: React.FC<CustomModalProps> = ({ visible, onClose, onSelectCol
         const response = await fetch(`${API_BASE_URL}/collection/getbyuserid/${userId}`);
         const data = await response.json();
         if (data.isSuccess) {
-          setCollections(data.data);
+          // Add previewImageUrl like CollectionScreen
+          const updatedCollections = data.data.map((collection: any) => {
+            const firstLocation = collection.item?.[0];
+            const previewImageUrl = firstLocation?.image?.[0]?.url || null;
+            return {
+              ...collection,
+              previewImageUrl,
+            };
+          });
+          setCollections(updatedCollections);
         } else {
           console.error("Error fetching collections:", data.error);
         }
@@ -139,7 +148,11 @@ const CustomModal: React.FC<CustomModalProps> = ({ visible, onClose, onSelectCol
                                   onPress={() => handleCollectionClick(item._id)}
                                 >
                                   <Image
-                                    source={images[index % images.length]}
+                                    source={
+                                      item.previewImageUrl
+                                        ? { uri: item.previewImageUrl }
+                                        : require("../../assets/images/defaultlocation.png")
+                                    }
                                     style={{ width: 150, height: 150, borderRadius: 20 }}
                                   />
                                 </TouchableOpacity>

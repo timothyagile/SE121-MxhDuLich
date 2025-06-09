@@ -26,11 +26,19 @@ export const saveEvent = async (eventData) => {
       },
       body: JSON.stringify(eventData),
     });
-    
-    return await response.json();
+
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      const data = await response.json();
+      return data;
+    } else {
+      const text = await response.text();
+      console.log('Non-JSON response from saveEvent:', text);
+      return { error: true, message: text };
+    }
   } catch (error) {
-    console.error('Error saving event:', error);
-    return { success: false, error: error.message };
+    console.log('Error saving event:', error);
+    return { error: true, message: error.message };
   }
 };
 

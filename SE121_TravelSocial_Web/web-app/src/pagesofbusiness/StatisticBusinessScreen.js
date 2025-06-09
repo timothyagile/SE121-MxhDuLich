@@ -11,6 +11,19 @@ const StatisticBusinessScreen = () => {
     { name: "Doanh thu", data: [] },
   ]);
   const [years, setYears] = useState(new Date().getFullYear() - 1);
+  const [statusStats, setStatusStats] = useState({
+    pending: 0,
+    confirm: 0,
+    complete: 0,
+    canceled: 0,
+  });
+
+  // Thêm các biến thống kê tổng quan
+  const [totalBooking, setTotalBooking] = useState(0);
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [avgRevenuePerBooking, setAvgRevenuePerBooking] = useState(0);
+  const [avgRevenuePerMonth, setAvgRevenuePerMonth] = useState(0);
+  const [uniqueCustomers, setUniqueCustomers] = useState(0);
 
   const chartOptions = {
     chart: {
@@ -42,8 +55,9 @@ const StatisticBusinessScreen = () => {
   useEffect(() => {
     const fetchSuccessRate = async () => {
       try {
+        // Sử dụng API mới trả về đầy đủ thông tin
         const response = await fetch(
-          `http://localhost:3000/booking/getbybusinessid/${userId}`
+          `http://localhost:3000/booking/getfullbybusinessid/${userId}`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch bookings data.");
@@ -381,13 +395,32 @@ const StatisticBusinessScreen = () => {
     // fetchServiceBookingRates();
   }, [userId, years]);
 
+  // Tính toán các thống kê tổng quan khi bookings thay đổi
+  useEffect(() => {
+    if (!bookings || bookings.length === 0) {
+      setTotalBooking(0);
+      setTotalRevenue(0);
+      setAvgRevenuePerBooking(0);
+      setAvgRevenuePerMonth(0);
+      setUniqueCustomers(0);
+      return;
+    }
+    setTotalBooking(bookings.length);
+    const revenue = bookings.reduce((sum, b) => sum + (b.totalPriceAfterTax || 0), 0);
+    setTotalRevenue(revenue);
+    setAvgRevenuePerBooking(bookings.length > 0 ? Math.round(revenue / bookings.length) : 0);
+    setAvgRevenuePerMonth(Math.round(revenue / 12));
+    const customerSet = new Set(bookings.map(b => b.userId));
+    setUniqueCustomers(customerSet.size);
+  }, [bookings]);
+
   const handleYearChange = (event) => {
     setYears(event.target.value); // Cập nhật năm
   };
 
   return (
-    <div class="container pg-0">
-      <div class="containerformobile">
+    <div className="container">
+      <div className="containerformobile">
         <div style={{ marginBottom: "20px" }}>
           <label htmlFor="yearSelect">Chọn năm: </label>
           <select id="yearSelect" value={years} onChange={handleYearChange}>
@@ -399,21 +432,44 @@ const StatisticBusinessScreen = () => {
             ))}
           </select>
         </div>
-        <div class="containerlistbusiness widthlistbusiness">
+        <div className="containerlistbusiness widthlistbusiness">
+          {/* Thống kê tổng quan */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="bg-blue-50 border rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-blue-700">{totalBooking}</div>
+              <div className="text-gray-600 mt-1">Tổng số booking</div>
+            </div>
+            <div className="bg-green-50 border rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-green-700">{totalRevenue.toLocaleString('vi-VN')} đ</div>
+              <div className="text-gray-600 mt-1">Tổng doanh thu</div>
+            </div>
+            <div className="bg-yellow-50 border rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-yellow-700">{avgRevenuePerBooking.toLocaleString('vi-VN')} đ</div>
+              <div className="text-gray-600 mt-1">Doanh thu TB/Booking</div>
+            </div>
+            <div className="bg-purple-50 border rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-purple-700">{avgRevenuePerMonth.toLocaleString('vi-VN')} đ</div>
+              <div className="text-gray-600 mt-1">Doanh thu TB/Tháng</div>
+            </div>
+            <div className="bg-pink-50 border rounded-lg p-4 text-center col-span-2 md:col-span-1">
+              <div className="text-2xl font-bold text-pink-700">{uniqueCustomers}</div>
+              <div className="text-gray-600 mt-1">Khách hàng duy nhất</div>
+            </div>
+          </div>
           <Chart
             options={chartOptions}
             series={seriesData}
             type="line"
             height={350}
           />
-          <div class="chartcontainer">
-            <div class="staticchart">
+          <div className="chartcontainer">
+            <div className="staticchart">
               <h3 style={{ textAlign: "center" }}>
                 Tỉ lệ Thành công của Booking
               </h3>
 
               <Chart
-                class="piechart"
+                className="piechart"
                 options={chartData.options}
                 series={chartData.series}
                 type="donut"
@@ -421,10 +477,10 @@ const StatisticBusinessScreen = () => {
               />
             </div>
 
-            <div class="staticchart">
+            <div className="staticchart">
               <h3 style={{ textAlign: "center" }}>Tỉ lệ Đặt các Dịch vụ</h3>
               <Chart
-                class="piechart"
+                className="piechart"
                 options={chartData2.options}
                 series={chartData2.series}
                 type="donut"
@@ -432,7 +488,47 @@ const StatisticBusinessScreen = () => {
               />
             </div>
           </div>
+          <div className="mt-8">
+          <h2 className="text-xl font-bold mb-2">
+            Thống kê trạng thái booking ({years})
+          </h2>
+          <table className="min-w-[350px] bg-white rounded shadow border mb-6">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-4 py-2 border">Trạng thái</th>
+                <th className="px-4 py-2 border">Số lượng</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="px-4 py-2 border">Chờ duyệt</td>
+                <td className="px-4 py-2 border text-center">
+                  {statusStats.pending}
+                </td>
+              </tr>
+              <tr>
+                <td className="px-4 py-2 border">Đã xác nhận</td>
+                <td className="px-4 py-2 border text-center">
+                  {statusStats.confirm}
+                </td>
+              </tr>
+              <tr>
+                <td className="px-4 py-2 border">Hoàn thành</td>
+                <td className="px-4 py-2 border text-center">
+                  {statusStats.complete}
+                </td>
+              </tr>
+              <tr>
+                <td className="px-4 py-2 border">Đã hủy</td>
+                <td className="px-4 py-2 border text-center">
+                  {statusStats.canceled}
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
+        </div>
+        
       </div>
     </div>
   );

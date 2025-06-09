@@ -69,18 +69,17 @@ export default function ViewMapScreen() {
           longitudeDelta: 0.05,
         }}
       >
-       
-        <Marker
-          coordinate={{
-            latitude: locationDetails?.latitude,
-            longitude: locationDetails?.longitude,
-          }}
-          title="Vị trí của bạn"
-          description="Đây là vị trí bạn đã chọn"
-        >
-          <Image source={require('../assets/icons/marker.png')} style={styles.markerIcon} />
-        </Marker>
-            </MapView>
+        {locationDetails?.latitude && locationDetails?.longitude && (
+          <Marker
+            coordinate={{
+              latitude: locationDetails.latitude,
+              longitude: locationDetails.longitude,
+            }}
+            title={locationDetails?.name || 'Vị trí'}
+            description={locationDetails?.address || ''}
+          />
+        )}
+      </MapView>
     </View>
   );
 }
