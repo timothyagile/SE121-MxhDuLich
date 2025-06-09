@@ -37,6 +37,7 @@ import ViewMapScreen from '@/screen/ViewMapScreen';
 import VoucherScreen from '@/screen/VoucherScreen';
 import SocialScreen from '@/screen/SocialScreen';
 import PostDetailScreen from '@/screen/PostDetailScreen';
+import FriendsListScreen from '@/screen/FriendsListScreen';
 
 LogBox.ignoreLogs([
   'Encountered two children with the same key',
@@ -234,6 +235,13 @@ export default function App() {
           <Stack.Screen
             name='post-detail-screen'
             component={PostDetailScreen}
+            options={{
+              headerShown: false
+            }} />
+
+          <Stack.Screen
+            name='friends-list-screen'
+            component={FriendsListScreen}
             options={{
               headerShown: false
             }} />
