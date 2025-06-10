@@ -25,7 +25,8 @@
         "googleMaps": {
           "apiKey": "DFeOdc8f33Rcr7api34zbvYjur5RM8t9W8OxcFlW"
         }
-      }
+      },
+      "package": "com.se121.travelsocial"
     },
     "web": {
       "bundler": "metro",
@@ -34,14 +35,25 @@
     },
     "plugins": [
       "expo-router",
-      ["expo-font",
-      {
-        "fonts": ["./assets/fonts/Hiatus.ttf"]
-      }]
-      
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/Hiatus.ttf"
+          ]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "ec7479c9-f6df-402b-abd0-38edb2268383"
+      }
     }
   }
 }

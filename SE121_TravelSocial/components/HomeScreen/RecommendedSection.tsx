@@ -296,6 +296,7 @@ const styles = StyleSheet.create({
         left:7,
         top:2,
         marginVertical: 2,
+        width: 160,
     },
     textrating: {
         fontWeight: 'medium',
