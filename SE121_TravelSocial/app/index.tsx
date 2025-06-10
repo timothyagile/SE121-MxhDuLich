@@ -53,7 +53,7 @@ export default function App() {
     <NavigationContainer independent={true}>
       <UserProvider>
         <Stack.Navigator
-          initialRouteName='login'>
+          initialRouteName='chat-board-screen'>
           <Stack.Screen
             name="welcome1"
             component={WelcomeScreen1}

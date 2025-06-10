@@ -51,6 +51,7 @@ const getUserConversation = async (userId) => {
             members: conv.member,
             createdAt: conv.createdAt,
             updatedAt: conv.updatedAt,
+            lastMessage: conv.lastMessage || 'Hãy gửi lời chào đến bạn bè của bạn',
         };
     });
 

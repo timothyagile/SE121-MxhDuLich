@@ -34,10 +34,11 @@ module.exports.createMessage = async (req, res, next) => {
         }
         // Saved database
         const result = await messageSvc.createMessage(messageData)
-        // Emit to user room
+        // Emit to sender user room 
         await socketChatService.emitMessageToUserRoomHandler(messageData, req.io)
         // Emit to conv room 
         await socketChatService.emitMessageToConversationRoomHandler(messageData, req.io)
+        // Emit to all user rooms in the conversation
 
         res.status(201).json({
             isSuccess: true,
