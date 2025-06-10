@@ -4,6 +4,9 @@ import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/n
 import axios from 'axios';
 import { API_BASE_URL } from '@/constants/config';
 import { useUser } from '@/context/UserContext';
+import io, { Socket } from 'socket.io-client';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useSocket } from '@/context/SocketContext';
 
 interface Conversation {
   _id: string;
@@ -18,29 +21,90 @@ export default function ChatBoardScreen({ navigation }: {navigation: NativeStack
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  //const { userId } = useUser(); // Lấy userId từ context
-  const userId = "671a02c2c0202050e0969548"
+  const [bearerToken, setBearerToken] = useState<string>('');
+  const { socket, isConnected, joinUserRoom, initializeSocket } = useSocket();
+  const { userId } = useUser(); // Lấy userId từ context
+  //const userId = "671a02c2c0202050e0969548"
   
   useEffect(() => {
+    const setupSocket = async () => {
+      // Đảm bảo socket được khởi tạo nếu chưa có
+      if (!socket) {
+        await initializeSocket();
+      }
+    };
+
+    setupSocket();
+  }, []);
+  
+  useEffect(() => {
+    // Fetch conversations
     const fetchConversations = async () => {
       setLoading(true);
       try {
-          console.log("User ID:", userId);
-          // Thay thế URL_API_CUA_BAN bằng endpoint API thực tế của bạn
-          const response = await axios.get(`${API_BASE_URL}/conversation/${userId}`); 
-          setConversations(response.data.data || []); // Giả sử response.data chứa mảng hội thoại
-          console.log("Hội thoại:", response.data.data);
-          setError(null);
+        console.log("User ID:", userId);
+        const response = await axios.get(`${API_BASE_URL}/conversation/${userId}`); 
+        setConversations(response.data.data || []);
+        console.log("Hội thoại:", response.data.data);
+        setError(null);
       } catch (err: any) {
-          setError(err.message || 'Đã xảy ra lỗi');
-          console.error("Lỗi fetch hội thoại:", err);
+        setError(err.message || 'Đã xảy ra lỗi');
+        console.error("Lỗi fetch hội thoại:", err);
       } finally {
-          setLoading(false);
+        setLoading(false);
       }
     };
 
     fetchConversations();
   }, []);
+
+  // Join user room khi socket connect
+  useEffect(() => {
+    if (isConnected && socket) {
+      joinUserRoom(userId ? userId : '');
+    }
+  }, [isConnected, socket]);
+
+  // Lắng nghe tin nhắn mới
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNewMessage = (messageData: any) => {
+      console.log('Nhận tin nhắn mới:', messageData);
+      
+      setConversations(prevConversations => {
+        const updatedConversations = [...prevConversations];
+        
+        const conversationIndex = updatedConversations.findIndex(
+          conv => conv._id === messageData.conversationId
+        );
+        
+        if (conversationIndex !== -1) {
+          const updatedConversation = {
+            ...updatedConversations[conversationIndex],
+            lastMessage: messageData.content || messageData.message,
+            timestamp: new Date().toLocaleTimeString('vi-VN', { 
+              hour: '2-digit', 
+              minute: '2-digit' 
+            }),
+            unreadCount: (updatedConversations[conversationIndex].unreadCount || 0) + 1
+          };
+          
+          updatedConversations.splice(conversationIndex, 1);
+          return [updatedConversation, ...updatedConversations];
+        } else {
+          // Fetch lại nếu là conversation mới
+          return prevConversations;
+        }
+      });
+    };
+
+    socket.on('new message', handleNewMessage);
+
+    return () => {
+      socket.off('new message', handleNewMessage);
+    };
+  }, [socket]);
 
   const renderConversationItem = ({ item }: { item: Conversation }) => (
     <TouchableOpacity 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef  } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useRoute } from '@react-navigation/native';
 import { Text, View, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView, Alert, Platform, FlatList, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
@@ -7,6 +7,8 @@ import { RootStackParamList } from '@/types/navigation';
 import { useUser } from '@/context/UserContext';
 import { API_BASE_URL } from '@/constants/config';
 import axios from 'axios';
+import { useSocket } from '@/context/SocketContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type ReservationRouteProp = RouteProp<RootStackParamList,'chat-screen'>;
 
@@ -31,18 +33,126 @@ interface ApiResponse {
 export default function ChatScreen({ navigation }: {navigation: NativeStackNavigatorProps}) {
   const route = useRoute<ReservationRouteProp>();
   const { conversationId, userName } = route.params;
-  const {userId} = useUser();
+  const { userId } = useUser();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loadingMessages, setLoadingMessages] = useState(true);
   const [sendingMessage, setSendingMessage] = useState(false);
   const flatListRef = useRef<FlatList>(null);
+  const { socket, isConnected, joinConversationRoom, leaveConversationRoom } = useSocket();
+
+  // Join conversation room khi vào screen
+  useEffect(() => {
+    const setupConversationRoom = async () => {
+      if (isConnected && socket) {
+        console.log('Joining conversation room:', conversationId);
+        await joinConversationRoom(conversationId);
+      }
+    };
+
+    setupConversationRoom();
+
+    // Leave conversation room khi unmount
+    return () => {
+      if (isConnected && socket) {
+        console.log('Leaving conversation room:', conversationId);
+        leaveConversationRoom(conversationId);
+      }
+    };
+  }, [isConnected, socket, conversationId]);
+
+  // Lắng nghe tin nhắn mới real-time
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNewMessage = (messageData: any) => {
+      console.log('Nhận tin nhắn mới trong chat:', messageData);
+      
+      // Chỉ cập nhật nếu tin nhắn thuộc conversation hiện tại
+      if (messageData.conversationId === conversationId) {
+        // Transform socket message to match Message interface
+        const transformedMessage: Message = {
+          _id: messageData._id || `socket-${Date.now()}-${Math.random()}`,
+          conversationId: messageData.conversationId,
+          senderId: messageData.from || messageData.senderId, // Map 'from' to 'senderId'
+          message: messageData.message,
+          images: messageData.images || [],
+          videos: messageData.videos || [],
+          createdAt: messageData.createdAt || new Date().toISOString(),
+          updatedAt: messageData.updatedAt || new Date().toISOString(),
+          __v: messageData.__v || 0
+        };
+  
+        console.log('Transformed message:', transformedMessage);
+  
+        setMessages(prevMessages => {
+          // Kiểm tra xem tin nhắn đã tồn tại chưa để tránh duplicate
+          const messageExists = prevMessages.some(msg => 
+            msg._id === transformedMessage._id || 
+            (msg.message === transformedMessage.message && 
+             msg.senderId === transformedMessage.senderId &&
+             Math.abs(new Date(msg.createdAt).getTime() - new Date(transformedMessage.createdAt).getTime()) < 5000) // 5 giây tolerance
+          );
+          
+          if (!messageExists) {
+            console.log('Adding transformed message to UI');
+            // Thêm tin nhắn mới vào cuối danh sách
+            return [...prevMessages, transformedMessage];
+          } else {
+            console.log('Message already exists, skipping');
+          }
+          return prevMessages;
+        });
+
+      //   setMessages(prevMessages => {
+      //   // CHỈ kiểm tra duplicate theo _id (nếu có)
+      //   // Bỏ qua việc check theo nội dung + thời gian
+      //   const messageExists = transformedMessage._id && 
+      //     prevMessages.some(msg => msg._id === transformedMessage._id);
+        
+      //   if (!messageExists) {
+      //     console.log('Adding transformed message to UI');
+      //     return [...prevMessages, transformedMessage];
+      //   } else {
+      //     console.log('Message with same _id already exists, skipping');
+      //   }
+      //   return prevMessages;
+      // });
+
+      // // Cuộn xuống tin nhắn mới
+      // setTimeout(() => {
+      //   flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+      // }, 100);
+  
+        // Cuộn xuống tin nhắn mới
+        setTimeout(() => {
+          flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+        }, 100);
+      }
+    };
+
+    // Lắng nghe event 'private message'
+    socket.on('private message', handleNewMessage);
+
+    // Cleanup event listener
+    return () => {
+      socket.off('private message', handleNewMessage);
+    };
+  }, [socket, conversationId]);
 
   // Fetch tin nhắn từ API
   const fetchMessages = useCallback(async () => {
     setLoadingMessages(true);
     try {
-      const response = await axios.get<ApiResponse>(`${API_BASE_URL}/message/${conversationId}`);
+      // Lấy token để gửi kèm request
+      const token = await AsyncStorage.getItem('token');
+      const bearerToken = token ? `Bearer ${token}` : '';
+
+      const response = await axios.get<ApiResponse>(`${API_BASE_URL}/message/${conversationId}`, {
+        headers: {
+          'Authorization': bearerToken
+        }
+      });
       
       if (response.data.isSuccess) {
         // Sắp xếp tin nhắn theo thời gian (cũ nhất -> mới nhất)
@@ -54,9 +164,11 @@ export default function ChatScreen({ navigation }: {navigation: NativeStackNavig
         console.error("Lỗi API:", response.data.error);
         Alert.alert("Lỗi", "Không thể tải tin nhắn");
       }
-    } catch (error) {
-      console.error("Lỗi fetch tin nhắn:", error);
-      Alert.alert("Lỗi", "Không thể kết nối đến server");
+    } catch (error: any) {
+      if (error.response?.status !== 404) {
+        console.error("Lỗi fetch tin nhắn:", error);
+        Alert.alert("Lỗi", "Không thể kết nối đến server");
+      }
     } finally {
       setLoadingMessages(false);
     }
@@ -71,7 +183,7 @@ export default function ChatScreen({ navigation }: {navigation: NativeStackNavig
     if (messages.length > 0 && flatListRef.current) {
       // Timeout nhỏ để đảm bảo FlatList đã render xong
       setTimeout(() => {
-        flatListRef.current?.scrollToEnd({ animated: true });
+        flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
       }, 100);
     }
   }, [messages]);
@@ -101,6 +213,10 @@ export default function ChatScreen({ navigation }: {navigation: NativeStackNavig
     setNewMessage('');
 
     try {
+      // Lấy token để gửi kèm request
+      const token = await AsyncStorage.getItem('token');
+      const bearerToken = token ? `Bearer ${token}` : '';
+
       // Gọi API để gửi tin nhắn
       const response = await axios.post(`${API_BASE_URL}/message`, {
         conversationId: conversationId,
@@ -108,6 +224,11 @@ export default function ChatScreen({ navigation }: {navigation: NativeStackNavig
         message: messageText,
         images: [],
         videos: []
+      }, {
+        headers: {
+          'Authorization': bearerToken,
+          'Content-Type': 'application/json'
+        }
       });
 
       if (response.data.isSuccess) {
@@ -196,6 +317,18 @@ export default function ChatScreen({ navigation }: {navigation: NativeStackNavig
             <ActivityIndicator size="large" color="#196EEE" />
             <Text style={styles.loadingText}>Đang tải tin nhắn...</Text>
           </View>
+        ) : messages.length === 0 ? (
+          <View style={styles.emptyMessagesContainer}>
+            <View style={styles.emptyMessageContent}>
+              <Image source={require('../assets/images/avt.png')} style={styles.emptyAvatar} />
+              <Text style={styles.emptyMessageText}>
+                Hãy gửi lời chào đến {userName}
+              </Text>
+              <Text style={styles.emptyMessageSubText}>
+                Bắt đầu cuộc trò chuyện của bạn
+              </Text>
+            </View>
+          </View>
         ) : (
           <FlatList
             ref={flatListRef}
@@ -205,7 +338,10 @@ export default function ChatScreen({ navigation }: {navigation: NativeStackNavig
             contentContainerStyle={styles.messagesContainer}
             showsVerticalScrollIndicator={false}
             inverted={true}
-            onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: false })}
+            onContentSizeChange={() => 
+              // SỬA: Thay scrollToEnd bằng scrollToOffset
+              flatListRef.current?.scrollToOffset({ offset: 0, animated: false })
+            }
           />
         )}
       </View>
@@ -419,5 +555,34 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     tintColor: '#FFFFFF',
+  },
+  emptyMessagesContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 30,
+  },
+  emptyMessageContent: {
+    alignItems: 'center',
+    opacity: 0.7,
+  },
+  emptyAvatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: 20,
+    resizeMode: 'cover',
+  },
+  emptyMessageText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333333',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  emptyMessageSubText: {
+    fontSize: 14,
+    color: '#666666',
+    textAlign: 'center',
   },
 });

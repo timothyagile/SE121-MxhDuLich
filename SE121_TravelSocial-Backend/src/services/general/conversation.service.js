@@ -91,8 +91,27 @@ const createConversation = async (conversationData) => {
     return newConversation;
 }
 
+const updateConversation = async (conversationId, lastMessage) => {
+    // Tìm conversation theo ID
+    const result = await Conversation.findById(
+        conversationId,
+    );
+
+    if (!result) {
+        throw new NotFoundException('Conversation not found');
+    }
+
+    // Cập nhật trường lastMessage
+    result.lastMessage = lastMessage;
+    result.updatedAt = new Date();
+    await result.save();
+
+    return result;
+}
+
 module.exports = {
     //getAllConversations,
     getUserConversation,
-    createConversation
+    createConversation,
+    updateConversation
 }

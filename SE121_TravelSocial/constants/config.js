@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'http://192.168.111.188:3000';
+export const API_BASE_URL = 'http://192.168.110.157:3000';
 export const API_RCM_URL = 'http://10.0.2.2:5000';
 
 // export const API_BASE_URL = 'http://10.10.99.88:3000';
