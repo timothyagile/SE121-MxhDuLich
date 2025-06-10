@@ -4,6 +4,7 @@ import locationData from '@/constants/location'
 import * as Network from 'expo-network';
 import { API_BASE_URL, API_RCM_URL } from '../../constants/config';
 import { useUser } from '../../context/UserContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window')
 const CARD_WIDTH = width - 240;
@@ -53,12 +54,23 @@ const DailySectionComponent = React.memo(function DailySection({ categoryId, nav
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userId]);
 
+    // Hàm fetch có timeout
+    const fetchWithTimeout = (url: string, options = {}, timeout = 10000) => {
+        return Promise.race([
+            fetch(url, options),
+            new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Request timeout')), timeout)
+            )
+        ]);
+    };
+
     const getRealtimeRecommendations = async (pageNumber: number) => {
         try {
             setLoading(true);
             setErrorMsg(null);
             // Kiểm tra kết nối mạng trước khi fetch
             const networkState = await Network.getNetworkStateAsync();
+            let lastLocationId = await AsyncStorage.getItem('lastViewedLocationId');
             if (!networkState.isConnected) {
                 setErrorMsg('Không có kết nối mạng. Vui lòng kiểm tra lại.');
                 setLoading(false);
@@ -69,10 +81,18 @@ const DailySectionComponent = React.memo(function DailySection({ categoryId, nav
             let url = `${API_RCM_URL}/realtime-recommend`;
             if (userId) {
                 url += `?user_id=${userId}`;
+                if (lastLocationId) {
+                    url += `&product_id=${lastLocationId}&event_type=view`;
+                }
             } else {
                 url += `?top_n=10`;
             }
-            const response = await fetch(url);
+            console.log('Fetching realtime recommendations from:', url);
+            const response = await fetchWithTimeout(url, {}, 10000); // 10s timeout
+            // Đảm bảo response là Response trước khi gọi .json()
+            if (!(response instanceof Response)) {
+                throw new Error('Không nhận được phản hồi hợp lệ từ máy chủ.');
+            }
             const data = await response.json();
             if (data.recommendations) {
                 let newLocations: Location[];
@@ -98,10 +118,12 @@ const DailySectionComponent = React.memo(function DailySection({ categoryId, nav
             } else {
                 setHasMore(false);
             }
-        } catch (error) {
+        } catch (error: any) {
             setHasMore(false);
             if (error instanceof TypeError && String(error).includes('Network request failed')) {
                 setErrorMsg('Không thể kết nối tới máy chủ. Vui lòng kiểm tra mạng hoặc thử lại sau.');
+            } else if (error.message === 'Request timeout') {
+                setErrorMsg('Kết nối tới máy chủ quá lâu. Vui lòng thử lại sau.');
             } else {
                 setErrorMsg('Đã xảy ra lỗi khi tải dữ liệu. Vui lòng thử lại.');
             }
@@ -182,7 +204,11 @@ const DailySectionComponent = React.memo(function DailySection({ categoryId, nav
                 data={locations}
                 horizontal={false}
                 showsHorizontalScrollIndicator={false}
-                keyExtractor={(item) => item._id.toString()}
+                keyExtractor={(item, index) =>
+                  (item?._id?.toString?.() ||
+                   item?.location_id?.toString?.() ||
+                   index.toString())
+                }
                 contentContainerStyle={styles.container}
                 renderItem={renderItem}
                 numColumns={2}

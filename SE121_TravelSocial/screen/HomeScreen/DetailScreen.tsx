@@ -241,7 +241,8 @@ const storeLocationDetails = async (data: any) => {
   try {
     const jsonValue = JSON.stringify(data);
     await AsyncStorage.setItem('@location_details', jsonValue);
-    console.log('Location details saved to local storage.');
+    await AsyncStorage.setItem('lastViewedLocationId', data._id); // Lưu ID địa điểm đã xem gần nhất
+    console.log('Location details saved to local storage.', jsonValue);
   } catch (e) {
     console.error('Error saving location details:', e);
   }

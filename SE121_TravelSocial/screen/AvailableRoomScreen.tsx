@@ -8,7 +8,7 @@ import { API_BASE_URL } from '../constants/config';
 import axios from 'axios';
 import { FontAwesome } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import ServiceOption2 from '@/components/DetailScreen/ServiceOption2';
+import ServiceOption2 from '../components/DetailScreen/ServiceOption2';
 import { useUser } from '../context/UserContext';
 import { trackEvents } from '../constants/recommendation';
 
@@ -294,7 +294,14 @@ export default function AvailableRoomScreen({ navigation }: {navigation: NativeS
                     <Text style={styles.createButtonText}>Xác nhận</Text>
                 </TouchableOpacity>
             </View>
-
+            {/* Thêm nút chọn dịch vụ kèm theo */}
+            <View style={{alignItems:'flex-end', marginRight:20, marginBottom:10, zIndex: 100}}>
+                <TouchableOpacity style={{backgroundColor:'#176FF2', borderRadius:8, paddingVertical:8, paddingHorizontal:16}} onPress={() => toggleModalService()}>
+                    <Text style={{color:'white', fontWeight:'bold'}}>
+                        {selectedServices.length > 0 ? `Đã chọn ${selectedServices.length} dịch vụ` : 'Chọn dịch vụ kèm theo'}
+                    </Text>
+                </TouchableOpacity>
+            </View>
             <ScrollView style={styles.body}>
                 <View style={styles.container}>
                 <View style={styles.body}>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Text, View, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView, Alert, Platform, Linking, ActivityIndicator } from 'react-native';
 import { NativeStackNavigatorProps } from 'react-native-screens/lib/typescript/native-stack/types';
 import { RootStackParamList } from '@/types/navigation';
@@ -10,6 +10,7 @@ import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 import { Icon, IconButton } from 'react-native-paper';
 import { trackEvents } from '../constants/recommendation';
+import { WebView } from 'react-native-webview';
 
 
 type ReservationRouteProp = RouteProp<RootStackParamList, 'payment-method-screen'>;
@@ -26,8 +27,9 @@ interface Bank {
 
 export default function PaymentMethodScreen({ navigation }: {navigation: NativeStackNavigatorProps}) {
     const route = useRoute<ReservationRouteProp>();
-    const { locationId, totalPrice, selectedRoomsData } = route.params;
+    const {locationId, totalPrice, selectedRoomsData, bookingId } = route.params; // nhận bookingId từ params
     // totalPrice is now the backend-calculated price
+    console.log('bookingId in payment: ', bookingId);
     console.log('roomdata in payment: ', selectedRoomsData);
     const {userId} = useUser(); 
     const [selectedButton, setSelectedButton] = useState<string | null>(null);
@@ -37,7 +39,35 @@ export default function PaymentMethodScreen({ navigation }: {navigation: NativeS
     const [loading, setLoading] = useState(true);
     const [qrImage, setQrImage] = useState<string | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false);
-    
+    const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
+    const [showWebView, setShowWebView] = useState(false);
+    const webviewRef = useRef<WebView>(null);
+
+    // Gọi API tạo link thanh toán VNPay khi vào trang
+    const fetchPaymentUrl = async () => {
+        if (!bookingId) return;
+        try {
+            const res = await fetch(`${API_BASE_URL}/create_payment_url`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ bookingId}), // clientIp có thể lấy từ backend nếu cần
+            });
+            const data = await res.json();
+            console.log('Payment URL data:', data);
+            if (data.isSuccess && data.data) {
+                setPaymentUrl(data.data);
+                console.log('Payment URL:', data.data);
+            } else {
+                setPaymentUrl(null);
+            }
+        } catch (e) {
+            setPaymentUrl(null);
+        }
+    };
+
+    useEffect(() => {
+        fetchPaymentUrl();
+    }, [bookingId]);
 
     const handlePress = (button: string) => {
         setSelectedButton(button);
@@ -153,23 +183,17 @@ const saveQRImageToGallery = async () => {
     };
 
     const applyAndPay = async () => {
-        // if (selectedBank) {
-        //     Linking.openURL(selectedBank.deeplink).catch(err => 
-        //         Alert.alert('Error', 'Không thể mở ứng dụng ngân hàng.')
-        //     );
-        // } else {
-        //     Alert.alert('Error', 'Vui lòng chọn một ngân hàng trước khi thanh toán.');
-        // }
         setIsSubmitting(true);
-
-    try {
-        if (selectedBank) {
-            await Linking.openURL(selectedBank.deeplink).catch(err =>
-                Alert.alert('Error', 'Không thể mở ứng dụng ngân hàng.')
-            );
-        }
-        // Gọi API tạo booking
-            await createBooking();
+        try {
+            fetchPaymentUrl()
+            // if (selectedBank) {
+            //     await Linking.openURL(selectedBank.deeplink).catch(err =>
+            //         Alert.alert('Error', 'Không thể mở ứng dụng ngân hàng.')
+            //     );
+            // }
+            // // No booking creation here; bookingId should be passed in params
+            // Alert.alert('Tiếp tục', 'Vui lòng hoàn tất thanh toán.');
+            // // Optionally, navigate to booking detail or main screen after payment
         } finally {
             setIsSubmitting(false);
         }
@@ -196,75 +220,6 @@ const saveQRImageToGallery = async () => {
         }
     }, [locationId]);
 
-    const createBooking = async () => {
-        // const totalPriceAfterTax = Math.max(parseInt(totalPrice) * 0.08);
-        try {
-            // Cấu trúc dữ liệu gửi đi
-            const bookingData = {
-                // tax: 0.08,
-                // totalPrice: totalPrice,
-                userId: userId,
-                // totalPriceAfterTax: totalPriceAfterTax,
-                // tax: 0.04,
-                // totalPrice: totalPrice,
-                checkinDate: selectedRoomsData[0].roomDetails.checkinDate,
-                checkoutDate: selectedRoomsData[0].roomDetails.checkoutDate,
-                dateBooking:  new Date(),
-                items: selectedRoomsData.map((room) => {
-                    // Tính số đêm
-                    const checkIn = new Date(room.roomDetails.checkinDate);
-                    const checkOut = new Date(room.roomDetails.checkoutDate);
-                    const checkInTime = checkIn.getTime();
-                    const checkOutTime = checkOut.getTime();
-                    const diffTime = checkOutTime - checkInTime; 
-                    const night = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24))); // Số ngày, tối thiểu là 1
-    
-                    return {
-                        roomId: room.roomId,
-                        // price: room.roomDetails.price,
-                        quantity: room.count,
-                        nights: night,
-                    };
-                }),
-                // amountPaid: parseInt(totalPrice),
-            };
-
-            console.log('booking data: ',bookingData)
-    
-            const response = await fetch(`${API_BASE_URL}/booking/createbooking`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(bookingData),
-            });
-    
-            const result = await response.json();
-            console.log('API response status:', response.status);
-            console.log('API response data:', result);            if (result.isSuccess) {
-                // Track successful booking event
-                if (userId && locationId) {
-                    trackEvents.book(userId, locationId, {
-                        total_price: totalPrice,
-                        check_in_date: selectedRoomsData[0].roomDetails.checkinDate.toISOString(),
-                        check_out_date: selectedRoomsData[0].roomDetails.checkoutDate.toISOString(),
-                        rooms_count: selectedRoomsData.reduce((sum, room) => sum + room.count, 0),
-                        booking_id: result.data?._id || 'unknown'
-                    });
-                    console.log(`Tracked successful booking event for user: ${userId}, location: ${locationId}`);
-                }
-                
-                Alert.alert('Thành công!', 'Đặt chỗ của bạn đã được tạo.');
-                navigation.navigate('main-screen', { screen: 'Booking' }); 
-            } else {
-                Alert.alert('Lỗi!', result.message || 'Không thể tạo đặt chỗ.');
-            }
-        } catch (error) {
-            console.error('Error creating booking:', error);
-            Alert.alert('Lỗi!', 'Không thể kết nối với máy chủ.');
-        }
-    };
-
     // If totalPrice is missing, show error
     useEffect(() => {
         if (totalPrice === undefined || totalPrice === null) {
@@ -283,7 +238,7 @@ const saveQRImageToGallery = async () => {
                 <Text style={styles.headerTitle}>Phương Thức Thanh Toán</Text>
             </View>
 
-            <ScrollView>
+            {/* <ScrollView>
                 <View style={{flexDirection:'row'}}>
                     <View style={styles.imageContainer}>
                         <Image source={require('../assets/images/camping-ho-coc.png')} style={styles.image} />
@@ -408,7 +363,41 @@ const saveQRImageToGallery = async () => {
                     </TouchableOpacity>
                     </View>
                 </View>
-            </ScrollView>
+            </ScrollView> */}
+            {paymentUrl && showWebView && (
+                <View style={{flex: 1, height: '100%', width: '100%'}}>
+                    <WebView
+                        ref={webviewRef}
+                        source={{ uri: paymentUrl }}
+                        style={{ flex: 1 }}
+                        startInLoadingState
+                        javaScriptEnabled
+                        domStorageEnabled
+                        onNavigationStateChange={(navState) => {
+                            if (navState.url && navState.url.includes('vnpay_return')) {
+                                // @ts-ignore
+                                webviewRef.current?.stopLoading && webviewRef.current.stopLoading();
+                                setShowWebView(false);
+                                navigation.navigate('detail-booking-screen', {
+                                    bookingId,
+                                    title: 'Kết quả thanh toán',
+                                    status: 'pending', // hoặc lấy từ backend nếu có
+                                });
+                            }
+                        }}
+                    />
+                </View>
+            )}
+            {paymentUrl && !showWebView && (
+                <View style={{alignItems:'center', marginVertical:16}}>
+                    <TouchableOpacity
+                        style={{backgroundColor:'#176FF2', borderRadius:8, padding:16, marginBottom:8}}
+                        onPress={() => setShowWebView(true)}
+                    >
+                        <Text style={{color:'#fff', fontWeight:'bold', fontSize:18}}>Thanh toán qua VNPay</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
         </View>
     );
 }
