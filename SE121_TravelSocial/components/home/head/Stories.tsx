@@ -103,8 +103,8 @@ interface Friend {
             setStoryData([...initialData, ...friendStories]);
           }
         } catch (error) {
-          console.error('Error fetching friends:', error);
-          setError('Failed to load friends');
+          console.log('Error fetching friends:', error);
+          setError('No friends');
         } finally {
           setLoading(false);
         }

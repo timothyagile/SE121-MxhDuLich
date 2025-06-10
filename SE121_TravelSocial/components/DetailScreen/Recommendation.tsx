@@ -32,62 +32,82 @@ export default function Recommendation({ navigation, locationId }: PopularSectio
         }));
     };
 
-   const getContentBasedRecommendations = async (pageNumber: number) => {
-     try {
-       setLoading(true);
-       setIsFetchingMore(true);
-       // Gọi API content_based recommendation với product_id
-       const response = await fetch(`${API_RCM_URL}/recommend_legacy/?case=content_based&product_id=${locationId}`);
-       let data = null;
-       let isJson = false;
-       const contentType = response.headers.get('content-type');
-       if (contentType && contentType.includes('application/json')) {
-         try {
-           data = await response.json();
-           isJson = true;
-         } catch (jsonErr) {
-           // JSON parse error
-           const text = await response.text().catch(() => '');
-           console.log('Recommend API JSON parse error:', jsonErr, text);
-           setHasMore(false);
-           setLoading(false);
-           setIsFetchingMore(false);
-           return;
-         }
-       } else {
-         // Not JSON
-         const text = await response.text();
-         console.error('Recommend API response not ok:', text);
-         setHasMore(false);
-         setLoading(false);
-         setIsFetchingMore(false);
-         return;
-       }
-       if (isJson && data && data.recommendations) {
-         if (pageNumber === 1) {
-           setLocations(data.recommendations);
-         } else {
-           // Tránh trùng lặp
-           const newItems = data.recommendations;
-           setLocations(prev => {
-             const existingIds = new Set(prev.map(item => item._id || item.location_id));
-             const uniqueNewItems = newItems.filter((item: any) => !existingIds.has(item._id || item.location_id));
-             return [...prev, ...uniqueNewItems];
-           });
-         }
-         setHasMore(data.recommendations.length > 0);
-         setPage(pageNumber + 1);
-       } else {
-         setHasMore(false);
-       }
-     } catch (error) {
-       setHasMore(false);
-       console.error('Content-based Recommend API error:', error);
-     } finally {
-       setIsFetchingMore(false);
-       setLoading(false);
-     }
-   };
+    // Hàm fetch có timeout
+const fetchWithTimeout = (url: string, options = {}, timeout = 10000) => {
+    return Promise.race([
+        fetch(url, options),
+        new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Request timeout')), timeout)
+        )
+    ]);
+};
+
+const getContentBasedRecommendations = async (pageNumber: number) => {
+  try {
+    setLoading(true);
+    setIsFetchingMore(true);
+    // Gọi API content_based recommendation với product_id
+    const response = await fetchWithTimeout(`${API_RCM_URL}/recommend_legacy/?case=content_based&product_id=${locationId}`, {}, 10000); // 10s timeout
+    // Đảm bảo response là Response trước khi gọi .json()
+    if (!(response instanceof Response)) {
+      throw new Error('Không nhận được phản hồi hợp lệ từ máy chủ.');
+    }
+    let data = null;
+    let isJson = false;
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      try {
+        data = await response.json();
+        isJson = true;
+      } catch (jsonErr) {
+        // JSON parse error
+        const text = await response.text().catch(() => '');
+        console.log('Recommend API JSON parse error:', jsonErr, text);
+        setHasMore(false);
+        setLoading(false);
+        setIsFetchingMore(false);
+        return;
+      }
+    } else {
+      // Not JSON
+      const text = await response.text();
+      console.error('Recommend API response not ok:', text);
+      setHasMore(false);
+      setLoading(false);
+      setIsFetchingMore(false);
+      return;
+    }
+    if (isJson && data && data.recommendations) {
+      if (pageNumber === 1) {
+        setLocations(data.recommendations);
+      } else {
+        // Tránh trùng lặp
+        const newItems = data.recommendations;
+        setLocations(prev => {
+          const existingIds = new Set(prev.map(item => item._id || item.location_id));
+          const uniqueNewItems = newItems.filter((item: any) => !existingIds.has(item._id || item.location_id));
+          return [...prev, ...uniqueNewItems];
+        });
+      }
+      setHasMore(data.recommendations.length > 0);
+      setPage(pageNumber + 1);
+    } else {
+      setHasMore(false);
+    }
+  } catch (error: any) {
+    setHasMore(false);
+    if (error instanceof TypeError && String(error).includes('Network request failed')) {
+      console.error('Content-based Recommend API error:', error);
+    } else if (error.message === 'Request timeout') {
+      console.error('Content-based Recommend API error: Request timeout');
+    } else {
+      console.error('Content-based Recommend API error:', error);
+    }
+  } finally {
+    setIsFetchingMore(false);
+    setLoading(false);
+  }
+};
 
     useEffect(() => {
         getContentBasedRecommendations(1);

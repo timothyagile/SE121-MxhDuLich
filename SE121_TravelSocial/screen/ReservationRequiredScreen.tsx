@@ -326,22 +326,61 @@ const recalculateTotalPrice = async (voucherObj?: any) => {
 };
 
     const handlePayment = async () => {
-        // Track booking event (proceeding to payment)
-        if (userId && locationId) {
-            trackEvents.click(userId, locationId, {
-                action: 'proceed_to_payment',
-                total_price: displayedTotalPrice,
-                rooms_count: selectedRoomsData.length,
-            });
-            console.log(`Tracked payment click event for user: ${userId}, location: ${locationId}`);
+        // if (!phoneNumber || !name.firstName || !name.lastName) {
+        //     Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin liên lạc.');
+        //     return;
+        // }
+        if (!previewBookingId) {
+            Alert.alert('Lỗi', 'Không thể tạo booking preview. Vui lòng thử lại.');
+            return;
         }
-        
-        navigation.navigate('payment-method-screen',{
-            locationId: locationId,
-            totalPrice: displayedTotalPrice,
-            selectedRoomsData: selectedRoomsData,
-            selectedVoucher: selectedVoucher ? selectedVoucher.code : null,
-        });
+        try {
+            // Build booking payload
+            const bookingData = {
+                userId,
+                dateBooking: new Date(),
+                checkinDate: selectedRoomsData[0].roomDetails.checkinDate,
+                checkoutDate: selectedRoomsData[0].roomDetails.checkoutDate,
+                preview_bookingId: previewBookingId,
+                voucherId: selectedVoucher?._id || null,
+                contact: {
+                    firstName: name.firstName,
+                    lastName: name.lastName,
+                    phoneNumber: phoneNumber,
+                },
+            };
+            const response = await fetch(`${API_BASE_URL}/booking/createbooking`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bookingData),
+            });
+            const result = await response.json();
+            console.log('Booking creation result:', result);
+            if (result.isSuccess && result.data && result.data._id) {
+                // Track booking event
+                if (userId && locationId) {
+                    trackEvents.book(userId, locationId, {
+                        total_price: displayedTotalPrice,
+                        check_in_date: selectedRoomsData[0].roomDetails.checkinDate,
+                        check_out_date: selectedRoomsData[0].roomDetails.checkoutDate,
+                        rooms_count: selectedRoomsData.length,
+                        booking_id: result.data._id,
+                    });
+                }
+                // Navigate to payment screen with bookingId
+                navigation.navigate('payment-method-screen', {
+                    bookingId: result.data._id,
+                    locationId: locationId,
+                    totalPrice: displayedTotalPrice,
+                    selectedRoomsData: selectedRoomsData,
+                });
+            } else {
+                Alert.alert('Lỗi', result.message || 'Không thể tạo đặt chỗ.');
+            }
+        } catch (error) {
+            console.error('Error creating booking:', error);
+            Alert.alert('Lỗi', 'Không thể kết nối với máy chủ.');
+        }
     };
 
     return (

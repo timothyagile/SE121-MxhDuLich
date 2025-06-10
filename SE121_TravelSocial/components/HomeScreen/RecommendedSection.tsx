@@ -59,6 +59,16 @@ const RecommendedSectionComponent = React.memo(function RecommendedSection({ cat
         getPopularLocations(1);
     }, []);
 
+    // Hàm fetch có timeout
+    const fetchWithTimeout = (url: string, options = {}, timeout = 10000) => {
+        return Promise.race([
+            fetch(url, options),
+            new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Request timeout')), timeout)
+            )
+        ]);
+    };
+
     const getPopularLocations = async (pageNumber: number) => {
         try {
             setLoading(true);
@@ -68,7 +78,11 @@ const RecommendedSectionComponent = React.memo(function RecommendedSection({ cat
                 setHasMore(cacheRef.data.length > 0);
                 return;
             }
-            const response = await fetch(`${API_RCM_URL}/recommend_legacy?case=popular`);
+            const response = await fetchWithTimeout(`${API_RCM_URL}/recommend_legacy?case=popular`, {}, 10000); // 10s timeout
+            // Đảm bảo response là Response trước khi gọi .json()
+            if (!(response instanceof Response)) {
+                throw new Error('Không nhận được phản hồi hợp lệ từ máy chủ.');
+            }
             let data = null;
             let isJson = false;
             const contentType = response.headers.get('content-type');
@@ -113,9 +127,15 @@ const RecommendedSectionComponent = React.memo(function RecommendedSection({ cat
             } else {
                 setHasMore(false);
             }
-        } catch (error) {
+        } catch (error: any) {
             setHasMore(false);
-            console.error('Popular API error:', error);
+            if (error instanceof TypeError && String(error).includes('Network request failed')) {
+                console.error('Popular API error:', error);
+            } else if (error.message === 'Request timeout') {
+                console.error('Popular API error: Request timeout');
+            } else {
+                console.error('Popular API error:', error);
+            }
         } finally {
             setIsFetchingMore(false);
             setLoading(false);
@@ -296,6 +316,7 @@ const styles = StyleSheet.create({
         left:7,
         top:2,
         marginVertical: 2,
+        width: 160,
     },
     textrating: {
         fontWeight: 'medium',
