@@ -19,6 +19,7 @@ const ChatBusinessScreen = () => {
   const [sendingMessage, setSendingMessage] = useState(false); // Thêm state loading
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
+  const userId = localStorage.getItem('userId');
 
 
   // Ref cho messages container
@@ -235,7 +236,7 @@ const ChatBusinessScreen = () => {
           console.log('✅ Message belongs to current conversation');
           
           // Chỉ thêm tin nhắn nếu không phải từ chính mình gửi
-          if (messageData.senderId !== '671a02c2c0202050e0969548') {
+          if (messageData.senderId !== userId) {
             console.log('✅ Message is from another user, adding to messages');
             
             setMessages(prevMessages => {
